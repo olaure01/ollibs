@@ -31,13 +31,13 @@ clean :
 .PRECIOUS: %.vo %.glob
 
 
-MYLIBSDIR = .
+OLLIBSDIR = .
 
-.DEFAULT_GOAL := mylibs
+.DEFAULT_GOAL := ollibs
 
-all: mylibs doc
+all: ollibs doc
 
-mylibs: $(VFILES:.v=.vo)
+ollibs: $(VFILES:.v=.vo)
 
-include mylibs.mk
+include ollibs.mk
 
