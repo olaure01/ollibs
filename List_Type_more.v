@@ -39,14 +39,13 @@ induction l1 ; induction l3 ; intros ;
 Qed.
 
 Ltac dichot_Type_app_exec H :=
-  lazymatch type of H with
+  match type of H with
   | _ ++ _ = _ ++ _ => apply dichot_Type_app in H ;
                          let l2 := fresh "l" in
                          let l4 := fresh "l" in
                          let H1 := fresh H in
                          let H2 := fresh H in
                          destruct H as [(l2 & H1 & H2) | (l4 & H1 & H2)]
-  | _ => fail
   end.
 
 Lemma dichot_Type_elt_app {A} : forall l1 (a : A) l2 l3 l4,
@@ -76,7 +75,7 @@ induction l1 ; induction l3 ; intros ;
 Qed.
 
 Ltac dichot_Type_elt_app_exec H :=
-  lazymatch type of H with
+  match type of H with
   | _ ++ _ :: _ = _ ++ _ => apply dichot_Type_elt_app in H ;
                               let l2 := fresh "l" in
                               let l4 := fresh "l" in
@@ -90,7 +89,6 @@ Ltac dichot_Type_elt_app_exec H :=
                               let H1 := fresh H in
                               let H2 := fresh H in
                               destruct H as [(l2 & H1 & H2) | (l4 & H1 & H2)]
-  | _ => fail
   end.
 
 
@@ -122,7 +120,7 @@ exists (a0, l3) ; split ; [ | split] ;
 Qed.
 
 Ltac decomp_map_Type_eq H Heq :=
-  lazymatch type of H with
+  match type of H with
   | _ ++ _ = map _ _ => apply app_eq_map_Type in H ;
                           let l1 := fresh "l" in
                           let l2 := fresh "l" in
