@@ -232,6 +232,19 @@ constructor...
 apply IHl1...
 Qed.
 
+Lemma Forall_Type_In {A} : forall P l (a : A), Forall_Type P l -> In_Type a l -> P a.
+Proof.
+intros.
+eapply Forall_Type_forall in X ; eassumption.
+Qed.
+
+Lemma Forall_Type_elt {A} : forall P l1 l2 (a : A), Forall_Type P (l1 ++ a :: l2) -> P a.
+Proof.
+intros P l1 l2 a HF.
+eapply Forall_Type_In ; try eassumption.
+apply in_Type_elt.
+Qed.
+
 Lemma Forall_Type_rev {A} : forall P (l : list A),
   Forall_Type P l -> Forall_Type P (rev l).
 Proof with try assumption.
