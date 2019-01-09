@@ -1,4 +1,4 @@
-$(OLLIBSDIR)/AFC.vo: $(OLLIBSDIR)/AFC.v
+$(OLLIBSDIR)/AFC.vo: $(OLLIBSDIR)/Vector_more.vo $(OLLIBSDIR)/AFC.v
 $(OLLIBSDIR)/Bool_more.vo: $(OLLIBSDIR)/Bool_more.v $(OLLIBSDIR)/List_Type.vo
 $(OLLIBSDIR)/CPermutation_solve.vo: $(OLLIBSDIR)/CPermutation_solve.v $(OLLIBSDIR)/List_more.vo $(OLLIBSDIR)/CyclicPerm.vo
 $(OLLIBSDIR)/CyclicPerm.vo: $(OLLIBSDIR)/CyclicPerm.v $(OLLIBSDIR)/List_more.vo $(OLLIBSDIR)/Permutation_more.vo
