@@ -245,6 +245,38 @@ eapply Forall_Type_In ; try eassumption.
 apply in_Type_elt.
 Qed.
 
+Lemma Forall_Type_map {A B} : forall (f : A -> B) l,
+  Forall_Type (fun x => { y | x = f y }) l -> { l0 | l = map f l0 }.
+Proof with try reflexivity.
+induction l ; intro H.
+- exists (@nil A)...
+- inversion H ; subst.
+  destruct X as [y Hy] ; subst.
+  apply IHl in X0.
+  destruct X0 as [l0 Hl0] ; subst.
+  exists (y :: l0)...
+Qed.
+
+Lemma map_Forall_Type_map {A B} : forall (f : A -> B) l,
+  { l0 | l = map f l0 } -> Forall_Type (fun x => { y | x = f y }) l.
+Proof with try reflexivity.
+induction l ; intro H.
+- constructor.
+- destruct H as [l0 Heq].
+  destruct l0 ; inversion Heq ; subst.
+  constructor.
+  + exists a0...
+  + apply IHl.
+    exists l0...
+Qed.
+
+Lemma map_ext_Forall_Type {A B} : forall (f g : A -> B) l,
+  Forall_Type (fun x => f x = g x) l -> map f l = map g l.
+Proof.
+intros f g l HF.
+apply map_ext_in_Type ; apply Forall_Type_forall ; assumption.
+Qed.
+
 Lemma Forall_Type_rev {A} : forall P (l : list A),
   Forall_Type P l -> Forall_Type P (rev l).
 Proof with try assumption.

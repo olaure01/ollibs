@@ -453,6 +453,12 @@ induction l ; split ; intro H.
     exists l0...
 Qed.
 
+Lemma map_ext_Forall {A B} : forall (f g : A -> B) l,
+  Forall (fun x => f x = g x) l -> map f l = map g l.
+Proof.
+intros ; apply map_ext_in ; apply Forall_forall ; assumption.
+Qed.
+
 Lemma Forall_rev {A} : forall P (l : list A), Forall P l -> Forall P (rev l).
 Proof with try assumption.
 induction l ; intros HP.
