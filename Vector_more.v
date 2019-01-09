@@ -4,8 +4,7 @@
 Usefull properties apparently missing in the Vector library. *)
 
 
-Require Import Peano_dec.
-Require Import Lia.
+Require Import Peano_dec Lt.
 Require Export Vector.
 
 
@@ -62,8 +61,7 @@ Proof.
 intros k ; revert n ; induction k ; intros ; (destruct n ; [ inversion H1 | subst ]).
 - rewrite <- hd_nth_order.
   rewrite (eta v) ; reflexivity.
-- assert (k < n) as Hlt by lia.
-  rewrite <- (nth_order_tl _ Hlt).
+- rewrite <- (nth_order_tl _ (lt_S_n _ _ H1)).
   rewrite (eta v).
   apply IHk.
 Qed.
@@ -75,15 +73,14 @@ Proof.
 intros k1 ; revert n ; induction k1 ; intros ; (destruct n ; [ inversion H1 | subst ]).
 - rewrite <- 2 hd_nth_order.
   destruct k2.
-  + exfalso ; lia.
+  + exfalso ; apply H ; reflexivity.
   + rewrite 2 (eta v) ; reflexivity.
-- assert (k1 < n) as Hlt by lia.
-  rewrite <- 2 (nth_order_tl _ Hlt).
+- rewrite <- 2 (nth_order_tl _ (lt_S_n _ _ H1)).
   rewrite 2 (eta v).
   destruct k2.
   + reflexivity.
   + apply IHk1.
-    lia.
+    intros Hk ; apply H ; rewrite Hk ; reflexivity.
 Qed.
 
 
@@ -144,8 +141,7 @@ induction n ; intros.
   apply inj_pairT2_nat in H2 ; subst.
   destruct i.
   + rewrite <- hd_nth_order...
-  + assert (i < n) as Hi' by lia.
-    rewrite <- (nth_order_tl _ Hi' Hi).
+  + rewrite <- (nth_order_tl _ (lt_S_n _ _ Hi) Hi).
     apply IHn...
 Qed.
 
@@ -158,12 +154,10 @@ induction n ; intros.
 - rewrite (eta v).
   rewrite (eta v) in H.
   constructor.
-  + assert (O < S n) as H0 by lia.
-    specialize H with 0 H0.
+  + specialize H with 0 (lt_0_Sn n).
     rewrite <- hd_nth_order in H...
   + apply IHn ; intros.
-    assert (S i < S n) as HS by lia.
-    specialize H with (S i) HS.
+    specialize H with (S i) (lt_n_S _ _ Hi).
     rewrite <- (nth_order_tl _ Hi) in H...
 Qed.
 
@@ -181,8 +175,7 @@ induction n ; intros.
   apply inj_pairT2_nat in H5 ; subst.
   destruct i.
   + rewrite <- hd_nth_order...
-  + assert (i < n) as Hi' by lia.
-    rewrite <- 2 (nth_order_tl _ Hi' Hi).
+  + rewrite <- 2 (nth_order_tl _ (lt_S_n _ _ Hi) Hi).
     apply IHn...
 Qed.
 
@@ -198,12 +191,10 @@ induction n ; intros.
   rewrite (eta v2).
   rewrite (eta v2) in H.
   constructor.
-  + assert (O < S n) as H0 by lia.
-    specialize H with 0 H0.
+  + specialize H with 0 (lt_0_Sn _).
     rewrite <- hd_nth_order in H...
   + apply IHn ; intros.
-    assert (S i < S n) as HS by lia.
-    specialize H with (S i) HS.
+    specialize H with (S i) (lt_n_S _ _ Hi).
     rewrite <- 2 (nth_order_tl _ Hi) in H...
 Qed.
 
