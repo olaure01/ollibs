@@ -248,12 +248,12 @@ Lemma perm_flat_map_cons_flat_map_app {T1 T2} :
 forall A (f : T1 -> T2), injective f -> forall l0 l1 l2 lp1 lp2 l L,
   Permutation_Type lp1 lp2 ->
   l1 ++ map f lp2 ++ l2 = l ++ flat_map (cons (f A)) L ->
-{ sl : _ &  prod (l1 ++ map f lp1 ++ l2 = (fst (snd sl)) ++ flat_map (cons (f A)) (snd (snd sl)))
-            (prod (Permutation_Type (fst (fst (fst sl))) (snd (fst (fst sl))))
-                  (prod ((fst (snd (fst sl))) ++ map f (fst (fst (fst sl))) ++ (snd (snd (fst sl)))
-                             = (fst (snd sl)) ++ flat_map (app (map f l0)) (snd (snd sl)))
-                        ((fst (snd (fst sl))) ++ map f (snd (fst (fst sl))) ++ (snd (snd (fst sl)))
-                             = l ++ flat_map (app (map f l0)) L))) }.
+{ sl &  prod (l1 ++ map f lp1 ++ l2 = (fst (snd sl)) ++ flat_map (cons (f A)) (snd (snd sl)))
+        (prod (Permutation_Type (fst (fst (fst sl))) (snd (fst (fst sl))))
+              (prod ((fst (snd (fst sl))) ++ map f (fst (fst (fst sl))) ++ (snd (snd (fst sl)))
+                         = (fst (snd sl)) ++ flat_map (app (map f l0)) (snd (snd sl)))
+                    ((fst (snd (fst sl))) ++ map f (snd (fst (fst sl))) ++ (snd (snd (fst sl)))
+                         = l ++ flat_map (app (map f l0)) L))) }.
 Proof with try assumption ; try reflexivity.
 intros A f Hinj l0 l1 l2 lp1 lp2 l L HP Heq.
 app_vs_app_flat_map_inv Heq.
