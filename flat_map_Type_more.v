@@ -8,6 +8,25 @@ Require Import List_more.
 Require Import List_Type_more.
 Require Import Permutation_Type_more.
 Require Import CyclicPerm_Type.
+Require Import concat_Type_more.
+
+Lemma flat_map_elt {A B} {f : A -> list B} : forall a L l1 l2,
+     flat_map f L = l1 ++ a :: l2 ->
+     {' (L1,L2,L0,l1',l2') | l1 = flat_map f L1 ++ l1' /\ l2 = l2' ++ 
+flat_map f L2
+                          /\ L = L1 ++ L0 :: L2 /\ f L0 = l1' ++ a :: l2' }.
+Proof with try reflexivity.
+   intros a L l1 l2 Heq.
+   rewrite flat_map_concat_map in Heq.
+   apply concat_elt in Heq. destruct Heq as ((((L1 & L2) & l1'') & l2'') & 
+eqb & eqt & eq) ; subst.
+   symmetry in eq ; decomp_map_Type eq ; subst.
+   simpl in eq3 ; symmetry in eq3.
+   exists (l0,l2,x,l1'',l2'') ; simpl ; split; [ | split ; [ | split ]] ; try rewrite 
+flat_map_concat_map...
+   assumption.
+Qed.
+
 
 Lemma app_vs_flat_map {B T} {f : B -> T} : forall L l1 l2,
   l1 ++ l2 = flat_map (fun p => f (fst p) :: (snd p)) L ->
