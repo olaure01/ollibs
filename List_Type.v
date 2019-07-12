@@ -48,7 +48,7 @@ Fixpoint In_Type (a:A) (l:list A) : Type :=
   Qed.
 
   Theorem in_Type_split : forall x (l:list A), In_Type x l ->
-    { l' | l = fst l' ++ x::snd l' }.
+    { '(l1,l2) | l = l1 ++  x:: l2 }.
   Proof.
   induction l; simpl; destruct 1.
   subst a; auto.

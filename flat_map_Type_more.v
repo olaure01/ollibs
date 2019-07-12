@@ -11,13 +11,13 @@ Require Import CyclicPerm_Type.
 
 Lemma app_vs_flat_map {T} : forall (A : T) L l1 l2,
   l1 ++ l2 = flat_map (cons A) L ->
-      { ql | snd (snd ql) <> nil
-          /\ L = fst (fst ql) ++ (fst (snd ql) ++ snd (snd ql)) :: snd (fst ql)
-          /\ l1 = flat_map (cons A) (fst (fst ql) ++ fst (snd ql) :: nil)
-          /\ l2 = snd (snd ql) ++ flat_map (cons A) (snd (fst ql)) }
-    + { pl | L = fst pl ++ snd pl
-          /\ l1 = flat_map (cons A) (fst pl)
-          /\ l2 = flat_map (cons A) (snd pl) }.
+      {' (L1,L2,l1',l2') | l2' <> nil
+          /\ L = L1 ++ (l1' ++ l2') :: L2
+          /\ l1 = flat_map (cons A) (L1 ++ l1' :: nil)
+          /\ l2 = l2' ++ flat_map (cons A) L2 }
+    + {' (L1,L2) | L = L1 ++ L2
+          /\ l1 = flat_map (cons A) L1
+          /\ l2 = flat_map (cons A) L2 }.
 Proof with try assumption ; try reflexivity.
 induction L ; intros l1 l2 Heq.
 - right.
@@ -36,13 +36,13 @@ induction L ; intros l1 l2 Heq.
       -- right.
          exists (l1 :: nil , L) ; split ; [ | split ] ; simpl ; try rewrite app_nil_r...
       -- left.
-         exists ((nil, L), (l1, t :: l)) ; split ; [ | split ; [ | split ]] ;
+         exists (nil, L, l1, t :: l) ; split ; [ | split ; [ | split ]] ;
            simpl ; try rewrite app_nil_r...
          intros Heq ; inversion Heq.
   + apply IHL in Heq1.
-    destruct Heq1 as [[[[L1 L2] [l1' l2']] (Hnil & Heq1 & Heq2 & Heq3)]
+    destruct Heq1 as [[(((L1,L2),l1'),l2') (Hnil & Heq1 & Heq2 & Heq3)]
                      | [[L1 L2] (Heq1 & Heq2 & Heq3)]] ; [left | right].
-    * exists ((a :: L1, L2), (l1', l2')) ; split ; [ | split ; [ | split ]]  ; subst...
+    * exists (a :: L1, L2, l1', l2') ; split ; [ | split ; [ | split ]]  ; subst...
     * exists (a :: L1, L2) ; split ; [ | split ]  ; subst...
 Qed.
 
@@ -58,9 +58,8 @@ Ltac app_vs_flat_map_inv H :=
         let H1 := fresh H in
         let H2 := fresh H in
         let H3 := fresh H in
-        destruct H as [ [[[L1 L2] [l1 l2]] (Hnil & H1 & H2 & H3)]
-                      | [[L1 L2] (H1 & H2 & H3)]] ;
-        (try simpl in Hnil) ; (try simpl in H1) ; (try simpl in H2) ; (try simpl in H3) ; subst
+        destruct H as [ [(((L1,L2),l1),l2) (Hnil & H1 & H2 & H3)]
+                      | [[L1 L2] (H1 & H2 & H3)]] ; subst
   end.
 
 
@@ -69,13 +68,13 @@ Lemma app_vs_app_flat_map {T} : forall (A : T) l0 L l1 l2,
       { l' | l' <> nil
           /\ l0 = l1 ++ l'
           /\ l2 = l' ++ flat_map (cons A) L }
-    + { ql | snd (snd ql) <> nil
-          /\ L = fst (fst ql) ++ (fst (snd ql) ++ snd (snd ql)) :: snd (fst ql)
-          /\ l1 = l0 ++ flat_map (cons A) (fst (fst ql) ++ fst (snd ql) :: nil)
-          /\ l2 = snd (snd ql) ++ flat_map (cons A) (snd (fst ql)) }
-    + { pl | L = fst pl ++ snd pl
-          /\ l1 = l0 ++ flat_map (cons A) (fst pl)
-          /\ l2 = flat_map (cons A) (snd pl) }.
+    + {' (L1,L2,l1',l2') | l2' <> nil
+          /\ L = L1 ++ (l1' ++ l2') :: L2
+          /\ l1 = l0 ++ flat_map (cons A) (L1 ++ l1' :: nil)
+          /\ l2 = l2' ++ flat_map (cons A) L2 }
+    + {' (L1,L2) | L = L1 ++ L2
+          /\ l1 = l0 ++ flat_map (cons A) L1
+          /\ l2 = flat_map (cons A) L2 }.
 Proof with try assumption ; try reflexivity.
 intros A l0 L l1 l2 Heq.
 dichot_Type_app_exec Heq.
@@ -89,9 +88,9 @@ dichot_Type_app_exec Heq.
 - subst.
   app_vs_flat_map_inv Heq1.
   + left ; right.
-    exists ((L0, L1), (l, l1)) ; split ; [ | split ; [ | split ]]...
+    exists (L0,L1,l,l1) ; split ; [ | split ; [ | split ]]...
   + right.
-    exists (L0, L1) ; split ; [ | split ]...
+    exists (L0,L1) ; split ; [ | split ]...
 Qed.
 
 Ltac app_vs_app_flat_map_inv H :=
@@ -107,9 +106,8 @@ Ltac app_vs_app_flat_map_inv H :=
         let H2 := fresh H in
         let H3 := fresh H in
         destruct H as [ [[l1 (Hnil & H1 & H2)]
-                      | [[[L1 L2] [l1 l2]] (Hnil & H1 & H2 & H3)]]
-                      | [[L1 L2] (H1 & H2 & H3)]] ;
-        (try simpl in Hnil) ; (try simpl in H1) ; (try simpl in H2) ; (try simpl in H3) ; subst
+                      | [(((L1,L2),l1),l2) (Hnil & H1 & H2 & H3)]]
+                      | [[L1 L2] (H1 & H2 & H3)]] ; subst
   end.
 
 Lemma elt_vs_app_flat_map {T} : forall (A : T) l0 L l1 l2 B,
