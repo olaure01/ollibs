@@ -8,7 +8,6 @@ Require Import List_more.
 Require Import List_Type_more.
 Require Import Permutation_Type_more.
 Require Import CyclicPerm_Type.
-Require Import concat_Type_more.
 
 Lemma flat_map_elt {A B} {f : A -> list B} : forall a L l1 l2,
      flat_map f L = l1 ++ a :: l2 ->

@@ -319,6 +319,50 @@ Ltac decomp_map_Type H :=
   end.
 
 
+(** ** [concat] *)
+
+Lemma concat_elt {A} : forall (a : A) L l1 l2,
+    concat L = l1 ++ a :: l2 ->
+    {' (L1,L2,l1',l2') | l1 = concat L1 ++ l1' /\ l2 = l2' ++ concat L2
+                      /\ L = L1 ++ (l1' ++ a :: l2') :: L2 }.
+Proof.
+  intros a L.
+  induction L; intros l1 l2 eq.
+  - destruct l1; inversion eq.
+  - simpl in eq.
+    dichot_Type_elt_app_exec eq.
+    + split with (nil,L,l1,l).
+      subst.
+      split; [ | split]; reflexivity.
+    + destruct IHL with l0 l2 as ((((L1,L2),l1'),l2') & (eqb & eqt & eq)) ; [symmetry ; apply eq1 |].
+      split with ((a0 :: L1),L2,l1',l2').
+      subst.
+      split ; [ | split]; try reflexivity.
+      apply app_assoc.
+Qed.
+
+Lemma concat_Forall2_Type {A B} : forall (L : list (list A)) (l : list B) R,
+    Forall2_Type R (concat L) l ->
+    { L' : _ & concat L' = l & Forall2_Type (fun x y => Forall2_Type R x y) L L' }.
+Proof with try assumption.
+  induction L; intros l R F2R.
+  - inversion F2R; subst.
+    split with nil.
+    + reflexivity.
+    + apply Forall2_Type_nil.
+  - simpl in F2R.
+    destruct Forall2_Type_app_inv_l with A B R a (concat L) l...
+    destruct x.
+    destruct x.
+    simpl in *.
+    destruct IHL with l1 R as [L' p1 p2]...
+    split with (l0 :: L').
+    + simpl; rewrite p1...
+      symmetry...
+    + apply Forall2_Type_cons...
+Qed.
+
+
 (** ** [In] *)
 
 Lemma in_Type_elt {A} : forall (a:A) l1 l2, In_Type a (l1 ++ a :: l2).
@@ -458,7 +502,6 @@ Section In_Forall_Type.
   Context {A : Type}.
   Variable P : A -> Type.
 
-
   Fixpoint In_Forall_Type {l} (a : A) (Pa : P a) (Fl : Forall_Type P l) : Type :=
     match Fl with
     | Forall_Type_nil _ => False
@@ -484,7 +527,7 @@ Section In_Forall_Type.
       split with Pa.
       right...
   Qed.
-  
+
   Lemma In_Forall_Type_in : forall l a (Fl : Forall_Type P l),
       In_Type a l ->
       {Pa & In_Forall_Type a Pa Fl}.
@@ -505,13 +548,13 @@ Section In_Forall_Type.
       split with Pa.
       right...
   Qed.
-  
+
   Fixpoint Forall_Type_sum (f : forall a, P a -> nat) (l : list A) (Pl : Forall_Type P l) :=
     match Pl with
     | Forall_Type_nil _ => 0
     | @Forall_Type_cons _ _ x l Px Pl => (f x Px) + (Forall_Type_sum f l Pl)
     end.
-  
+
   Fixpoint Forall_Type_App l1 l2 Pl1 Pl2 :=
     match Pl1 with
     | Forall_Type_nil _ => Pl2
