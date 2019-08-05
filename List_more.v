@@ -1,5 +1,6 @@
 (* List_more Library *)
 
+
 (** * Add-ons for List library
 Usefull properties apparently missing in the List library. *)
 
@@ -272,7 +273,7 @@ destruct H ; intuition.
 Qed.
 
 Lemma in_concat {A} : forall (l : list A) (L : list (list A)) a, In a l -> In l L -> In a (concat L).
-Proof with try assumption; try reflexivity.        
+Proof with try assumption; try reflexivity.
   intros l L a Hin1 Hin2.
   induction L; inversion Hin2; subst.
   - clear IHL; induction l; inversion Hin1; subst.
