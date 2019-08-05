@@ -310,6 +310,12 @@ induction l ; intros ; simpl...
 rewrite IHl...
 Qed.
 
+Lemma last_length {A} : forall l (a:A), length (l ++ a :: nil) = S (length l).
+Proof.
+intros ; rewrite app_length ; simpl.
+rewrite plus_comm; reflexivity.
+Qed.
+
 
 (** ** [rev] *)
 
