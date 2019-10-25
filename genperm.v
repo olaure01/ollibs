@@ -1,13 +1,4 @@
 (* genperm Library *)
-(* v 0.2  2017/08/13   Olivier Laurent *)
-
-
-(* Release Notes
-     v0.2: more precise PEperm_vs_elt_inv and PEperm_vs_cons_inv
-           a few simplifications in proofs
-           added PEperm_PCperm_cons and PEperm_PCperm_app
-*)
-
 
 (** * Factorized statements for different notions of permutation *)
 
@@ -15,6 +6,7 @@ Require Import Morphisms.
 Require Import List.
 
 Require Import Injective.
+Require Import List_more.
 Require Import Permutation_more.
 Require Import Permutation_solve.
 Require Import CyclicPerm.
@@ -66,6 +58,14 @@ Instance cperm_PCperm {A} b : Proper (CPermutation ==> PCperm b) (@id (list A)).
 Proof with try assumption.
 destruct b ; intros l l' HC...
 apply cperm_perm...
+Qed.
+
+Lemma PCperm_monot {A} : forall b1 b2, Bool.leb b1 b2 ->
+  forall l1 l2 : list A, PCperm b1 l1 l2 -> PCperm b2 l1 l2.
+Proof.
+intros b1 b2 Hleb l1 l2.
+destruct b1; destruct b2; try (now inversion Hleb).
+apply cperm_perm.
 Qed.
 
 Instance PCperm_refl {A} b : Reflexive (@PCperm A b).
@@ -186,6 +186,22 @@ exists l' ; exists l'' ; split.
 - reflexivity.
 Qed.
 
+Lemma PCperm_cons_cons_inv {A} b : forall (a : A) l l1, ~ In a l -> ~ In a l1 ->
+  PCperm b (a :: l) (a :: l1) -> PEperm b l l1.
+Proof.
+intros a l l1 Hin1 Hin2 HP.
+destruct b.
+- now apply Permutation_cons_inv with a.
+- assert (HP' := HP).
+  rewrite <- app_nil_l in HP; apply PCperm_vs_elt_inv in HP; rewrite app_nil_r in HP.
+  destruct HP as (l' & l'' & HP & Heq) ; subst.
+  rewrite HP; simpl.
+  destruct l'; inversion Heq; subst.
+  + symmetry; apply app_nil_r.
+  + exfalso; apply Hin1.
+    apply in_elt.
+Qed.
+
 Instance PCperm_map {A B} (f : A -> B) b :
   Proper (PCperm b ==> PCperm b) (map f).
 Proof with try assumption.
@@ -266,6 +282,14 @@ Ltac PEperm_solve :=
 Instance PEperm_perm {A} b : Proper (PEperm b ==> (@Permutation A)) id.
 Proof.
 destruct b ; intros l l' HP ; simpl in HP ; now subst.
+Qed.
+
+Lemma PEperm_monot {A} : forall b1 b2, Bool.leb b1 b2 ->
+  forall l1 l2 : list A, PEperm b1 l1 l2 -> PEperm b2 l1 l2.
+Proof.
+intros b1 b2 Hleb l1 l2.
+destruct b1; destruct b2; try (now inversion Hleb).
+simpl; intros HP; subst; reflexivity.
 Qed.
 
 Instance PEperm_refl {A} b : Reflexive (@PEperm A b).
