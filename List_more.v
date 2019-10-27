@@ -984,16 +984,6 @@ Qed.
 
 (* seq *)
 
-(* exists in recent versions of stdlib cf 8.10 *)
-Lemma seq_app : forall len1 len2 start,
-  seq start (len1 + len2) = seq start len1 ++ seq (start + len1) len2.
-Proof.
-induction len1; intros start len2.
-- simpl; f_equal; lia.
-- simpl; rewrite IHlen1.
-  f_equal; f_equal; f_equal; lia.
-Qed.
-
 Lemma seq_cons : forall s l, s :: seq (S s) l = seq s (S l).
 Proof. intros s l; revert s; induction l; intros s; simpl; now rewrite ? IHl. Qed.
 
@@ -1004,30 +994,4 @@ change (s + l :: nil) with (seq (s + l) 1).
 rewrite <- seq_app.
 f_equal; lia.
 Qed.
-
-
-(* skipn *)
-(* exists in recent versions of stdlib cf 8.10 *)
-(* note in these versions skipn_none = skipn_all *)
-Lemma skipn_all2 {A} : forall n (l : list A),
-  length l <= n -> skipn n l = nil.
-Proof with try reflexivity.
-  induction n; intros l Hle.
-  - destruct l; inversion Hle...
-  - destruct l; simpl in Hle...
-    apply IHn.
-    lia.
-Qed.
-
-(* exists in recent versions of stdlib cf 8.10 *)
-Lemma skipn_length {A} : forall n (l : list A),
-    length (skipn n l) = length l - n.
-Proof with try reflexivity.
-  induction n; intros l.
-  - simpl; lia.
-  - destruct l...
-    simpl; rewrite IHn...
-Qed.
-
-
 
