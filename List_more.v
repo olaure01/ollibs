@@ -1,6 +1,5 @@
 (* List_more Library *)
 
-
 (** * Add-ons for List library
 Usefull properties apparently missing in the List library. *)
 
@@ -993,5 +992,40 @@ intros s l.
 change (s + l :: nil) with (seq (s + l) 1).
 rewrite <- seq_app.
 f_equal; lia.
+Qed.
+
+
+(** ** Definition and properties of the constant list *)
+Fixpoint const_list {A} n (a : A) :=
+  match n with
+  | 0 => nil
+  | S n => a :: (const_list n a)
+  end.
+
+Lemma const_list_length {A} : forall n (a : A),
+  length (const_list n a) = n.
+Proof with try reflexivity.
+intros n a; induction n...
+simpl; rewrite IHn...
+Qed.
+
+Lemma const_list_cons {A} : forall n (a : A),
+  a :: const_list n a = const_list n a ++ (a :: nil).
+Proof with try reflexivity.
+induction n; intros a...
+simpl; rewrite IHn...
+Qed.
+
+Lemma const_list_to_concat {A} : forall n (a : A),
+  const_list n a = concat (const_list n (a :: nil)).
+Proof with try reflexivity.
+induction n; intros a...
+simpl; rewrite IHn...
+Qed.
+
+Lemma In_const_list {A} : forall n (a : A) b,
+  In b (const_list n a) -> b = a.
+Proof.
+induction n; intros a b Hin; inversion Hin; subst; [ reflexivity | now apply IHn ].
 Qed.
 
