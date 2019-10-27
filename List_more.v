@@ -5,8 +5,8 @@
 Usefull properties apparently missing in the List library. *)
 
 Require Export List.
-Require Import Lt Le Plus Max.
 Require Import PeanoNat.
+Require Import Lt Le Plus Max.
 Require Import Lia.
 
 
