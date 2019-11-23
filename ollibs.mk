@@ -24,6 +24,7 @@ $(OLLIBSDIR)/genperm_Type.vo: $(OLLIBSDIR)/genperm_Type.v $(OLLIBSDIR)/Permutati
 $(OLLIBSDIR)/Permutation_Type.vo: $(OLLIBSDIR)/Permutation_Type_more.v $(OLLIBSDIR)/List_Type.vo
 $(OLLIBSDIR)/Permutation_Type_more.vo: $(OLLIBSDIR)/Permutation_Type_more.v $(OLLIBSDIR)/funtheory.vo $(OLLIBSDIR)/List_more.vo $(OLLIBSDIR)/List_Type.vo $(OLLIBSDIR)/List_Type_more.vo $(OLLIBSDIR)/Permutation_more.vo $(OLLIBSDIR)/Permutation_Type.vo
 $(OLLIBSDIR)/Permutation_Type_solve.vo: $(OLLIBSDIR)/Permutation_Type_solve.v $(OLLIBSDIR)/List_more.vo $(OLLIBSDIR)/Permutation_Type.vo $(OLLIBSDIR)/Permutation_Type_more.vo
+$(OLLIBSDIR)/transp_perm.vo: $(OLLIBSDIR)/transp_perm.v $(OLLIBSDIR)/List_more.vo $(OLLIBSDIR)/Permutation_Type.vo $(OLLIBSDIR)/funtheory.vo
 $(OLLIBSDIR)/CPermutation_Type_solve.vo: $(OLLIBSDIR)/CPermutation_Type_solve.v $(OLLIBSDIR)/List_more.vo $(OLLIBSDIR)/CyclicPerm_Type.vo
 $(OLLIBSDIR)/fmsetlist_Type.vo : $(OLLIBSDIR)/fmsetlist_Type.v $(OLLIBSDIR)/Bool_more.vo $(OLLIBSDIR)/funtheory.vo $(OLLIBSDIR)/Permutation_Type_more.vo $(OLLIBSDIR)/COrders.vo
 $(OLLIBSDIR)/fmsetoidlist_Type.vo : $(OLLIBSDIR)/fmsetoidlist_Type.v $(OLLIBSDIR)/Permutation_Type.vo
