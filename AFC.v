@@ -2,7 +2,7 @@
 
 (** * Axiom(s) of Finite Choice *)
 
-Require Import Le Lt Max Compare_dec List.
+Require Import PeanoNat Le Lt Compare_dec List.
 Require Vector_more.
 
 (** * Functional Axiom of Choice for finite functions *)
@@ -50,13 +50,13 @@ induction l ; intros.
     exists (max k1 k2) ; constructor.
     * eapply H...
       -- left...
-      -- apply le_max_l.
+      -- apply Nat.le_max_l.
     * revert Hk2.
       clear - H.
       induction l ; intro Hl ; constructor ; inversion Hl ; subst.
       -- eapply H...
          ++ right ; left...
-         ++ apply le_max_r.
+         ++ apply Nat.le_max_r.
       -- apply IHl...
          intros.
          eapply H...
@@ -89,12 +89,12 @@ induction m ; intros.
   intros.
   inversion H1 ; subst ; eapply H.
   + apply Hk'.
-  + etransitivity ; [ | apply le_max_r ].
+  + etransitivity ; [ | apply Nat.le_max_r ].
     apply le_n_Sn.
   + apply Hk.
     apply lt_S_n.
     apply le_lt_n_Sm ; assumption.
-  + etransitivity ; [ | apply le_max_l ].
+  + etransitivity ; [ | apply Nat.le_max_l ].
     apply le_n_Sn.
 Qed.
 
@@ -114,12 +114,12 @@ induction l ; intros.
     exists (max k1 k2) ; constructor.
     * eapply H...
       -- left.
-      -- apply le_max_l.
+      -- apply Nat.le_max_l.
     * revert Hk2 ; clear - H.
       induction l ; intro Hl ; constructor ; inversion Hl ; subst.
       -- eapply H...
          ++ right ; left.
-         ++ apply le_max_r.
+         ++ apply Nat.le_max_r.
       -- apply Vector_more.inj_pairT2_nat in H2 ; subst.
          apply IHl...
          intros.
@@ -150,10 +150,10 @@ induction m ; intros P Hext Hinc HI.
     inversion Hn ; subst.
     * apply (Hinc _ _ k').
       -- eapply Hext ; apply Hk'.
-      -- etransitivity ; [ apply le_n_Sn | apply le_max_r ].
+      -- etransitivity ; [ apply le_n_Sn | apply Nat.le_max_r ].
     * apply (Hinc _ _ k)...
       -- eapply Hext ; apply (Hk _ H0).
-      -- etransitivity ; [ apply le_n_Sn | apply le_max_l ].
+      -- etransitivity ; [ apply le_n_Sn | apply Nat.le_max_l ].
   + intros ; eapply Hext...
   + intros ; apply (Hinc _ _ i)...
 Qed.

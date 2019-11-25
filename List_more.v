@@ -4,9 +4,7 @@
 Usefull properties apparently missing in the List library. *)
 
 Require Export List.
-Require Import PeanoNat.
-Require Import Lt Le Plus Max.
-Require Import Lia.
+Require Import PeanoNat Lt Le Lia.
 
 
 
@@ -430,7 +428,7 @@ Qed.
 Lemma last_length {A} : forall l (a:A), length (l ++ a :: nil) = S (length l).
 Proof.
 intros ; rewrite app_length ; simpl.
-rewrite plus_comm; reflexivity.
+rewrite Nat.add_comm; reflexivity.
 Qed.
 
 
@@ -863,7 +861,7 @@ Lemma list_sum_app : forall l1 l2,
 Proof with try reflexivity.
 induction l1 ; intros l2...
 simpl ; rewrite IHl1.
-rewrite plus_assoc...
+rewrite Nat.add_assoc...
 Qed.
 
 (** ** Max of elements of a list of [nat] : [list_max] *)
@@ -875,7 +873,7 @@ Lemma list_max_app : forall l1 l2,
 Proof with try reflexivity.
 induction l1 ; intros l2...
 simpl ; rewrite IHl1.
-rewrite max_assoc...
+rewrite Nat.max_assoc...
 Qed.
 
 Lemma list_max_le : forall l n,
