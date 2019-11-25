@@ -1018,37 +1018,21 @@ apply in_seq in H; lia.
 Qed.
 
 
-(** ** Definition and properties of the constant list *)
-Fixpoint const_list {A} n (a : A) :=
-  match n with
-  | 0 => nil
-  | S n => a :: (const_list n a)
-  end.
+(* repeat *)
 
-Lemma const_list_length {A} : forall n (a : A),
-  length (const_list n a) = n.
-Proof with try reflexivity.
-intros n a; induction n...
-simpl; rewrite IHn...
-Qed.
-
-Lemma const_list_cons {A} : forall n (a : A),
-  a :: const_list n a = const_list n a ++ (a :: nil).
-Proof with try reflexivity.
-induction n; intros a...
-simpl; rewrite IHn...
-Qed.
-
-Lemma const_list_to_concat {A} : forall n (a : A),
-  const_list n a = concat (const_list n (a :: nil)).
-Proof with try reflexivity.
-induction n; intros a...
-simpl; rewrite IHn...
-Qed.
-
-Lemma In_const_list {A} : forall n (a : A) b,
-  In b (const_list n a) -> b = a.
+Lemma repeat_cons A n (a:A) :
+  a :: repeat a n = repeat a n ++ (a :: nil).
 Proof.
-induction n; intros a b Hin; inversion Hin; subst; [ reflexivity | now apply IHn ].
+induction n; simpl.
+- reflexivity.
+- f_equal; apply IHn.
+Qed.
+
+Lemma repeat_to_concat A n (a:A) :
+  repeat a n = concat (repeat (a :: nil) n).
+Proof.
+induction n; simpl.
+- reflexivity.
+- f_equal; apply IHn.
 Qed.
 
