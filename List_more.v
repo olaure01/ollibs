@@ -809,6 +809,33 @@ induction l; intros [H|H]; inversion H; subst; try now repeat constructor.
 - eapply or_intror in H1; apply IHl in H1; now constructor.
 Qed.
 
+Lemma existsb_Exists {A} : forall P (l : list A),
+  existsb P l = true <-> Exists (fun x => is_true (P x)) l.
+Proof with try assumption.
+induction l ; split ; intros H ; try (now inversion H).
+- inversion H.
+  apply Bool.orb_true_iff in H1.
+  destruct H1 as [H1 | H1].
+  + constructor...
+  + apply Exists_cons_tl.
+    apply IHl...
+- inversion H ; subst.
+  + simpl ; rewrite H1.
+    reflexivity.
+  + apply IHl in H1.
+    simpl ; rewrite H1.
+    rewrite Bool.orb_true_r.
+    reflexivity.
+Qed.
+
+Lemma forallb_Forall {A} : forall P (l : list A),
+  forallb P l = true <-> Forall (fun x => is_true (P x)) l.
+Proof.
+intros P l; split; intros Hf.
+- now apply Forall_forall, forallb_forall.
+- now apply forallb_forall, Forall_forall.
+Qed.
+
 
 (** ** Map for functions with two arguments : [map2] *)
 
