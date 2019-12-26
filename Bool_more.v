@@ -19,8 +19,8 @@ Proof. intros b1 b2 b3; destruct b1; destruct b2; destruct b3; intuition. Qed.
 Instance leb_preorder : PreOrder leb.
 Proof.
 split.
-- intros b ; apply leb_refl.
-- intros b1 b2 b3 ; apply leb_trans.
+- intros b; apply leb_refl.
+- intros b1 b2 b3; apply leb_trans.
 Qed.
 
 Lemma leb_true : forall b, leb b true.
@@ -45,7 +45,7 @@ Lemma UIP_bool : forall (b1 b2 : bool) (f1 f2 : b1 = b2), f1 = f2.
 Proof.
 intros b1 b2 f1 f2.
 assert (forall f, f = eq_refl_bool_ext b1 b2 f1) as Heq
- by (destruct f; revert f1; destruct b1 ; reflexivity).
+ by (destruct f; revert f1; destruct b1; reflexivity).
 rewrite (Heq f2).
 apply Heq.
 Qed.
