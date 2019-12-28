@@ -8,7 +8,7 @@ Working with `Coq 8.10.0`
 * `AFC`          : proofs of finite versions of the axiom of choice
 * `Bijective`    : properties of bijective functions
 * `Bool_more`    : add-ons for standard library Bool
-* `dectype`      : types with Boolean equality
+* `dectype`      : types with Boolean equality (using records rather than modules)
 * `fmsetlist`    : finite multisets with Coq equality
 * `fmsetoidlist` : finite multisets as setoid
 * `infinite`     : infinite types

@@ -278,6 +278,22 @@ Definition nat_infdectype := {|
 |}.
 *)
 
+(* [list] construction of [InfDecType] *)
+Lemma nat_injective_list (T : Type) : inhabited_Type T -> nat_injective (list T).
+Proof.
+intros [x]; exists (repeat x); intros n; induction n; simpl;
+  intros m Heq; destruct m; inversion Heq; [ reflexivity | subst ].
+now f_equal; apply IHn.
+Qed.
+
+Definition list_infdectype (D : DecType) (Dinh : inhabited_Type D) := {|
+  infcar := list_dectype D;
+  fresh := (proj1_sig (@nat_injective_choice (list_dectype D) (nat_injective_list Dinh)));
+  fresh_prop := (proj2_sig (@nat_injective_choice (list_dectype D) (nat_injective_list Dinh)));
+|}.
+(* alternative definition could use: (x : D) : fresh := fun L => x :: concat L *)
+
+
 Section InfDecTypes.
 
 Context { X : InfDecType }.

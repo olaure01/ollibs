@@ -6,6 +6,21 @@ Require Import List_more.
 (** Properties of functions *)
 
 
+(** * Inhabitation *)
+
+Inductive inhabited_Type (A:Type) : Type := inhabits_Type : A -> inhabited_Type A.
+Arguments inhabits_Type {_} _.
+
+Lemma inhabited_Type_fun {A B} (f : A -> B) : inhabited_Type A -> inhabited_Type B.
+Proof. intros [a]; apply (inhabits_Type (f a)). Qed.
+
+Lemma inhabited_Type_img {A B} : inhabited_Type B -> inhabited_Type (A -> B).
+Proof. intros [b]; apply (inhabits_Type (fun _ => b)). Qed.
+
+Lemma inhabited_Type_id {A} : inhabited_Type (A -> A).
+Proof. apply (inhabits_Type id). Qed.
+
+
 (** * Retraction pairs *)
 
 Definition retract {A B} (s : B -> A) (i : A -> B) := forall x, s (i x) = x.
