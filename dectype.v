@@ -7,6 +7,50 @@ Require Eqdep_dec.
 Set Implicit Arguments.
 
 
+(** * Inhabitation *)
+
+Inductive inhabited_Type (A:Type) : Type := inhabits_Type : A -> inhabited_Type A.
+Arguments inhabits_Type {_} _.
+
+Definition inhabitant_Type {A:Type} (Hinh : inhabited_Type A) :=
+  match Hinh with
+  | inhabits_Type a => a
+  end.
+
+Lemma inhabited_Type_unit : inhabited_Type unit.
+Proof (inhabits_Type tt).
+
+Lemma inhabited_Type_bool : inhabited_Type bool.
+Proof (inhabits_Type false).
+
+Lemma inhabited_Type_nat : inhabited_Type nat.
+Proof (inhabits_Type 0).
+
+Lemma inhabited_Type_option A : inhabited_Type (option A).
+Proof (inhabits_Type None).
+
+Lemma inhabited_Type_suml {A B} : inhabited_Type A -> inhabited_Type (sum A B).
+Proof (fun Hinh => inhabits_Type (inl (inhabitant_Type Hinh))).
+
+Lemma inhabited_Type_sumr {A B} : inhabited_Type B -> inhabited_Type (sum A B).
+Proof (fun Hinh => inhabits_Type (inr (inhabitant_Type Hinh))).
+
+Lemma inhabited_Type_prod {A B} : inhabited_Type A -> inhabited_Type B -> inhabited_Type (prod A B).
+Proof (fun HinhA HinhB => inhabits_Type (inhabitant_Type HinhA, inhabitant_Type HinhB)).
+
+Lemma inhabited_Type_list A : inhabited_Type (list A).
+Proof (inhabits_Type nil).
+
+Lemma inhabited_Type_fun {A B} (f : A -> B) : inhabited_Type A -> inhabited_Type B.
+Proof (fun Hinh => inhabits_Type (f (inhabitant_Type Hinh))).
+
+Lemma inhabited_Type_img {A B} : inhabited_Type B -> inhabited_Type (A -> B).
+Proof (fun Hinh => inhabits_Type (fun _ => (inhabitant_Type Hinh))).
+
+Lemma inhabited_Type_id {A} : inhabited_Type (A -> A).
+Proof (inhabits_Type id).
+
+
 (** * Decidable Types *)
 (* types with a boolean binary predicate equivalent to equality *)
 
@@ -200,4 +244,56 @@ match goal with
 | H : ?y <> ?x |- context f [eq_dt_dec ?x ?y] => rewrite (if_eq_dt_dec_neq x y (not_eq_sym H))
 | |- context f [eq_dt_dec ?x ?y] => case_eq (eq_dt_dec x y); intros Heq Heqeq; [ subst x | ]
 end; simpl.
+
+
+(** * Inhabited Decidable Types *)
+(* types with a boolean binary predicate equivalent to equality *)
+
+Record InhDecType := {
+  inhcar :> DecType;
+  inh_dt : inhabited_Type inhcar
+}.
+Arguments inh_dt {_}.
+
+Definition unit_inhdectype := {|
+  inhcar := unit_dectype;
+  inh_dt := inhabited_Type_unit
+|}.
+
+Definition bool_inhdectype := {|
+  inhcar := bool_dectype;
+  inh_dt := inhabited_Type_bool
+|}.
+
+Definition nat_inhdectype := {|
+  inhcar := nat_dectype;
+  inh_dt := inhabited_Type_nat
+|}.
+
+Definition option_inhdectype (D : DecType) := {|
+  inhcar := option_dectype D;
+  inh_dt := inhabited_Type_option D
+|}.
+
+Definition suml_inhdectype (D1 : InhDecType) (D2 : DecType) := {|
+  inhcar := sum_dectype D1 D2;
+  inh_dt := inhabited_Type_suml inh_dt
+|}.
+
+Definition sumr_inhdectype (D1 : DecType) (D2 : InhDecType) := {|
+  inhcar := sum_dectype D1 D2;
+  inh_dt := inhabited_Type_sumr inh_dt
+|}.
+
+Definition sum_inhdectype (D1 D2 : InhDecType) := suml_inhdectype D1 D2.
+
+Definition prod_inhdectype (D1 D2 : InhDecType) := {|
+  inhcar := prod_dectype D1 D2;
+  inh_dt := inhabited_Type_prod inh_dt inh_dt
+|}.
+
+Definition list_inhdectype (D : DecType) := {|
+  inhcar := list_dectype D;
+  inh_dt := inhabited_Type_list D
+|}.
 

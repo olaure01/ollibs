@@ -251,49 +251,6 @@ Record InfDecType := {
 Arguments fresh {_}.
 Arguments fresh_prop {_}.
 
-(* [nat] instance of [InfDecType] *)
-Definition nat_infdectype := {|
-  infcar := nat_dectype;
-  fresh := (proj1_sig (section_choice (nat_bijective_section (existT _ id (id_bijective)))));
-  fresh_prop := (proj2_sig (section_choice (nat_bijective_section (existT _ id (id_bijective)))));
-|}.
-(* alternative direct construction *)
-Definition nat_fresh l := S (fold_right max 0 l).
-Lemma nat_fresh_prop : forall l, ~ In (nat_fresh l) l.
-Proof.
-enough (forall l n h, ~ In (n + nat_fresh (h ++ l)) l) as Hh
-  by (intros l; rewrite <- (app_nil_l l) at 1; apply (Hh _ 0)).
-induction l; unfold nat_fresh; simpl; intros n h Hin; auto.
-destruct Hin as [Hin|Hin].
-- enough (a < n + S (fold_right Init.Nat.max 0 (h ++ a :: l))) by lia.
-  clear; induction h; simpl; lia.
-- apply IHl with n (h ++ a :: nil).
-  now rewrite <- app_assoc.
-Qed.
-(*
-Definition nat_infdectype := {|
-  infcar := nat_dectype;
-  fresh := nat_fresh;
-  fresh_prop := nat_fresh_prop
-|}.
-*)
-
-(* [list] construction of [InfDecType] *)
-Lemma nat_injective_list (T : Type) : inhabited_Type T -> nat_injective (list T).
-Proof.
-intros [x]; exists (repeat x); intros n; induction n; simpl;
-  intros m Heq; destruct m; inversion Heq; [ reflexivity | subst ].
-now f_equal; apply IHn.
-Qed.
-
-Definition list_infdectype (D : DecType) (Dinh : inhabited_Type D) := {|
-  infcar := list_dectype D;
-  fresh := (proj1_sig (@nat_injective_choice (list_dectype D) (nat_injective_list Dinh)));
-  fresh_prop := (proj2_sig (@nat_injective_choice (list_dectype D) (nat_injective_list Dinh)));
-|}.
-(* alternative definition could use: (x : D) : fresh := fun L => x :: concat L *)
-
-
 Section InfDecTypes.
 
 Context { X : InfDecType }.
@@ -375,5 +332,148 @@ destruct n; simpl in Heq, Hprf; rewrite Heq in Hprf.
   apply (freshlist_of_list_NoDup l m).
 Qed.
 
+Definition Inh_of_InfDecType := {|
+  inhcar := X;
+  inh_dt := inhabits_Type (fresh nil)
+|}.
+
 End InfDecTypes.
+Arguments Inh_of_InfDecType _ : clear implicits.
+
+(* [nat] instance of [InfDecType] *)
+Definition nat_infdectype := {|
+  infcar := nat_dectype;
+  fresh := (proj1_sig (section_choice (nat_bijective_section (existT _ id (id_bijective)))));
+  fresh_prop := (proj2_sig (section_choice (nat_bijective_section (existT _ id (id_bijective)))));
+|}.
+(* alternative direct construction *)
+Definition nat_fresh l := S (fold_right max 0 l).
+Lemma nat_fresh_prop : forall l, ~ In (nat_fresh l) l.
+Proof.
+enough (forall l n h, ~ In (n + nat_fresh (h ++ l)) l) as Hh
+  by (intros l; rewrite <- (app_nil_l l) at 1; apply (Hh _ 0)).
+induction l; unfold nat_fresh; simpl; intros n h Hin; auto.
+destruct Hin as [Hin|Hin].
+- enough (a < n + S (fold_right Init.Nat.max 0 (h ++ a :: l))) by lia.
+  clear; induction h; simpl; lia.
+- apply IHl with n (h ++ a :: nil).
+  now rewrite <- app_assoc.
+Qed.
+(*
+Definition nat_infdectype := {|
+  infcar := nat_dectype;
+  fresh := nat_fresh;
+  fresh_prop := nat_fresh_prop
+|}.
+*)
+
+(* [option] construction of [InfDecType] *)
+Lemma nat_injective_option (T : Type) : nat_injective T -> nat_injective (option T).
+Proof.
+intros [i Hi].
+exists (fun n => Some (i n)).
+intros n m Heq; injection Heq; apply Hi.
+Qed.
+
+Definition option_infdectype (D : InfDecType) := {|
+  infcar := option_dectype D;
+  fresh := (proj1_sig (@nat_injective_choice (option_dectype D)
+                      (nat_injective_option infinite_nat_injective)));
+  fresh_prop := (proj2_sig (@nat_injective_choice (option_dectype D)
+                           (nat_injective_option infinite_nat_injective)));
+|}.
+(* alternative definition could use: fresh := fun L => Some (fresh (SomeDown L))
+                               with: SomeDown := nil => nil
+                                               | None :: r => SomeDown r
+                                               | Some x :: r => x :: SomeDown r *)
+
+(* [sum] constructions of [InfDecType] *)
+Lemma nat_injective_suml (T1 T2 : Type) : nat_injective T1 -> nat_injective (sum T1 T2).
+Proof.
+intros [i Hi].
+exists (fun n => inl (i n)).
+intros n m Heq; injection Heq; apply Hi.
+Qed.
+
+Definition suml_infdectype (D1 : InfDecType) (D2 : DecType) := {|
+  infcar := sum_dectype D1 D2;
+  fresh := (proj1_sig (@nat_injective_choice (sum_dectype D1 D2)
+                      (nat_injective_suml _ infinite_nat_injective)));
+  fresh_prop := (proj2_sig (@nat_injective_choice (sum_dectype D1 D2)
+                           (nat_injective_suml _ infinite_nat_injective)));
+|}.
+(* alternative definition could use direct definition of fresh *)
+
+Lemma nat_injective_sumr (T1 T2 : Type) : nat_injective T2 -> nat_injective (sum T1 T2).
+Proof.
+intros [i Hi].
+exists (fun n => inr (i n)).
+intros n m Heq; injection Heq; apply Hi.
+Qed.
+
+Definition sumr_infdectype (D1 : DecType) (D2 : InfDecType) := {|
+  infcar := sum_dectype D1 D2;
+  fresh := (proj1_sig (@nat_injective_choice (sum_dectype D1 D2)
+                      (nat_injective_sumr _ infinite_nat_injective)));
+  fresh_prop := (proj2_sig (@nat_injective_choice (sum_dectype D1 D2)
+                (nat_injective_sumr _ infinite_nat_injective)));
+|}.
+(* alternative definition could use direct definition of fresh *)
+
+(* [prod] constructions of [InfDecType] *)
+Section Prod.
+
+  Variable (ID : InfDecType) (D : InhDecType).
+
+  Definition prodl_fresh : list (prod ID D) -> prod ID D :=
+    fun l => (fresh (map fst l), inhabitant_Type inh_dt).
+
+  Lemma notin_prodl_fresh : forall l, ~ In (prodl_fresh l) l.
+  Proof.
+  intros l Hin.
+  apply (in_map fst) in Hin.
+  now apply fresh_prop in Hin.
+  Qed.
+
+  Definition prodl_infdectype := {|
+    infcar := prod_dectype ID D;
+    fresh := prodl_fresh;
+    fresh_prop := notin_prodl_fresh;
+  |}.
+
+  Definition prodr_fresh : list (prod D ID) -> prod D ID :=
+    fun l => (inhabitant_Type inh_dt, fresh (map snd l)).
+
+  Lemma notin_prodr_fresh : forall l, ~ In (prodr_fresh l) l.
+  Proof.
+  intros l Hin.
+  apply (in_map snd) in Hin.
+  now apply fresh_prop in Hin.
+  Qed.
+
+  Definition prodr_infdectype := {|
+    infcar := prod_dectype D ID;
+    fresh := prodr_fresh;
+    fresh_prop := notin_prodr_fresh;
+  |}.
+
+End Prod.
+
+Definition prod_infdectype (ID1 ID2 : InfDecType) :=
+  prodl_infdectype ID1 (Inh_of_InfDecType ID2).
+
+(* [list] construction of [InfDecType] *)
+Lemma nat_injective_list (T : Type) : inhabited_Type T -> nat_injective (list T).
+Proof.
+intros [x]; exists (repeat x); intros n; induction n; simpl;
+  intros m Heq; destruct m; inversion Heq; [ reflexivity | subst ].
+now f_equal; apply IHn.
+Qed.
+
+Definition list_infdectype (D : InhDecType) := {|
+  infcar := list_dectype D;
+  fresh := (proj1_sig (@nat_injective_choice (list_dectype D) (nat_injective_list inh_dt)));
+  fresh_prop := (proj2_sig (@nat_injective_choice (list_dectype D) (nat_injective_list inh_dt)));
+|}.
+(* alternative definition could use: (x : D) : fresh := fun L => x :: concat L *)
 
