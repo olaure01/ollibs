@@ -4,7 +4,7 @@
 Usefull properties apparently missing in the List library. *)
 
 Require Export List.
-Require Import PeanoNat Lt Le Lia.
+Require Import PeanoNat Lia.
 
 
 
@@ -685,7 +685,7 @@ induction l ; intros.
 - destruct i ; inversion H...
   simpl in H0.
   apply IHl...
-  apply lt_S_n...
+  apply Nat.succ_lt_mono...
 Qed.
 
 Lemma Forall_incl {A} : forall P (l1 l2 : list A),
@@ -882,7 +882,7 @@ induction l1 ; intros.
     simpl.
     apply IHl1.
     simpl in H.
-    apply lt_S_n...
+    apply Nat.succ_lt_mono...
 Qed.
 
 
@@ -1067,4 +1067,20 @@ induction n; simpl.
 - reflexivity.
 - f_equal; apply IHn.
 Qed.
+
+
+(* TODO add filterpair :
+    Fixpoint filterpair {A B : Type} (f:A->bool) (l:list (prod A B)) : list (prod A B) :=
+      match l with
+        | nil => nil
+        | (x,v) as p :: l => if f x then p::(filterpair f l) else filterpair f l
+      end.
+
+with lemmas copied from [filter]
+define remove_snd using filterpair (rename as remove_key?)
+take lemmas remove_snd_remove remove_snd_notin snd_remove_snd NoDup_remove_snd
+   (from quantifiers work: foformulas.v)
+have a look on OCaml standard library about filter and association pairs *)
+
+
 
