@@ -2,7 +2,7 @@
 
 (** * Well-founded order on product and applications to products of nat *)
 
-Require Import Relation_Definitions Wellfounded Wf_nat Lia.
+Require Import Relation_Definitions Wf_nat Lia.
 
 
 (** * Non-Dependant Product of two [well_founded] relations *)
@@ -49,11 +49,11 @@ Definition wf_nat_nat := wf_prod _ _ _ _ lt_wf lt_wf.
 
 Ltac lt_nat_nat_solve :=
   match goal with
-  | |- lt_nat_nat ?v1 ?v2 => try (left ; simpl ; lia) ;
-                             try (right ; split ; simpl ; lia) ;
+  | |- lt_nat_nat ?v1 ?v2 => try (left; simpl; lia);
+                             try (right; split; simpl; lia);
                              fail
-  | |- lt_prod _ _ lt lt ?v1 ?v2 => try (left ; simpl ; lia) ;
-                                    try (right ; split ; simpl ; lia) ;
+  | |- lt_prod _ _ lt lt ?v1 ?v2 => try (left; simpl; lia);
+                                    try (right; split; simpl; lia);
                                     fail
   end.
 
@@ -65,19 +65,19 @@ Definition wf_nat_nat_nat := wf_prod _ _ _ _ lt_wf wf_nat_nat.
 Ltac lt_nat_nat_nat_solve :=
   match goal with 
   | |- lt_nat_nat_nat ?v1 ?v2 =>
-     try (left ; simpl ; lia) ;
-     try (right ; split ; [ | left ] ; simpl ; lia) ;
-     try (right ; split ; [ | right ; split ] ; simpl ; lia) ;
+     try (left; simpl; lia);
+     try (right; split; [ | left ]; simpl; lia);
+     try (right; split; [ | right; split ]; simpl; lia);
      fail
   | |- lt_prod _ _ lt lt_nat_nat ?v1 ?v2 =>
-     try (left ; simpl ; lia) ;
-     try (right ; split ; [ | left ] ; simpl ; lia) ;
-     try (right ; split ; [ | right ; split ] ; simpl ; lia) ;
+     try (left; simpl; lia);
+     try (right; split; [ | left ]; simpl; lia);
+     try (right; split; [ | right; split ]; simpl; lia);
      fail
   | |- lt_prod _ _ lt (lt_prod _ _ lt lt) ?v1 ?v2 =>
-     try (left ; simpl ; lia) ;
-     try (right ; split ; [ | left ] ; simpl ; lia) ;
-     try (right ; split ; [ | right ; split ] ; simpl ; lia) ;
+     try (left; simpl; lia);
+     try (right; split; [ | left ]; simpl; lia);
+     try (right; split; [ | right; split ]; simpl; lia);
      fail
   end.
 
