@@ -19,6 +19,7 @@ funtheory.v
 genperm_Type.v
 genperm.v
 infinite.v
+List_assoc.v
 List_more.v
 List_Type_more.v
 List_Type.v

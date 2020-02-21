@@ -13,6 +13,7 @@ Working with `Coq 8.10.2`
 * `funtheory`    : properties of functions
 * `infinite`     : infinite types
 * `List_more`    : add-ons for standard library List
+* `List_assoc`   : some operations on association lists
 * `nattree`      : nat-labelled trees and coding into nat
 * `Vector_more`  : add-ons for standard library Vector
 * `Wf_nat_more`  : add-ons for standard library Wf_nat
