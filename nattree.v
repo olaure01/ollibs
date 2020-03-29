@@ -7,7 +7,7 @@ Require Import funtheory.
 
 (** * Coding of pairs of [nat] *)
 
-(** Simple coding **)
+(** Simple coding into [nat]\0 **)
 Definition cpair n m := 2 ^ n * (2 * m + 1).
 
 Lemma cpair_pos : forall n m, 0 < cpair n m.
@@ -16,25 +16,6 @@ intros n m; unfold cpair.
 enough (2 ^ n <> 0) by nia.
 now apply Nat.pow_nonzero.
 Qed.
-
-Lemma cpair_inc_l : forall n n' m, n < n' -> cpair n m < cpair n' m.
-Proof.
-intros n n' m Hlt; unfold cpair.
-apply Nat.pow_lt_mono_r with (a:=2) in Hlt; simpl; nia.
-Qed.
-
-Lemma cpair_inc_r : forall n m m', m < m' -> cpair n m < cpair n m'.
-Proof.
-intros n m m' Hlt; unfold cpair.
-enough (2 ^ n <> 0) by nia.
-now apply Nat.pow_nonzero.
-Qed.
-
-Lemma cpair_lt_l : forall n m, n < cpair n m.
-Proof. intros n m; unfold cpair; induction n; simpl; lia. Qed.
-
-Lemma cpair_lt_r : forall n m, m < cpair n m.
-Proof. intros n m; unfold cpair; induction n; simpl; lia. Qed.
 
 Lemma cpair_inj : injective2 cpair.
 Proof.
@@ -56,22 +37,92 @@ induction k.
   + left; exists (S n); lia.
 Qed.
 
-Lemma cpair_surj : forall k , 0 < k -> { '(n,m) | k = cpair n m }.
+Lemma cpair_surj : forall k, 0 < k -> {'(n,m) | k = cpair n m }.
 Proof.
 induction k using (well_founded_induction Wf_nat.lt_wf); intros Hpos.
 destruct (even_odd_decomp k) as [ [k' Hk] | [ k' Hk ] ]; subst.
 - assert (0 < k') as Hpos2 by lia.
   assert (k' < 2 * k') as Hdec by lia.
-  destruct (H k' Hdec Hpos2) as [(n, m) Heq].
+  destruct (H k' Hdec Hpos2) as [(n, m) Heq]; subst.
   exists (S n, m).
-  unfold cpair in *; rewrite Heq; simpl; lia.
+  unfold cpair; simpl; lia.
 - exists (0, k').
   unfold cpair; simpl; lia.
 Qed.
 
+Definition dpair1 k (Hpos : k > 0) := fst (proj1_sig (cpair_surj k Hpos)).
+Definition dpair2 k (Hpos : k > 0) := snd (proj1_sig (cpair_surj k Hpos)).
 
-(** Refined surjective coding **)
+Lemma cpair_dpair : forall k (Hpos : 0 < k),
+  k = cpair (dpair1 k Hpos) (dpair2 k Hpos).
+Proof.
+intros k Hpos.
+assert (Heq := proj2_sig (cpair_surj k Hpos)).
+now rewrite surjective_pairing in Heq.
+Qed.
+
+
+(** Refined surjective coding in [nat] **)
 Definition pcpair n m := pred (cpair n m).
+
+Lemma pcpair_inj : injective2 pcpair.
+Proof.
+intros n m n' m' Heq.
+assert (Hpos := cpair_pos n m).
+assert (Hpos' := cpair_pos n' m').
+unfold pcpair in *; apply cpair_inj; lia.
+Qed.
+
+Lemma pcpair_surj : surjective2 pcpair.
+Proof.
+intros k.
+destruct (cpair_surj _ (Nat.lt_0_succ k)) as [(n, m) Heq].
+exists (n, m); unfold pcpair; lia.
+Qed.
+
+Definition pdpair1 k := dpair1 (S k) (Nat.lt_0_succ k).
+Definition pdpair2 k := dpair2 (S k) (Nat.lt_0_succ k).
+
+Lemma pcpair_pdpair : forall k, k = pcpair (pdpair1 k) (pdpair2 k).
+Proof.
+intros k.
+unfold pcpair, pdpair1, pdpair2.
+rewrite <- cpair_dpair; lia.
+Qed.
+
+Lemma pdpair1_pcpair : forall n m, pdpair1 (pcpair n m) = n.
+Proof.
+intros n m.
+symmetry; apply (pcpair_inj _ _ _ _ (pcpair_pdpair (pcpair n m))).
+Qed.
+
+Lemma pdpair2_pcpair : forall n m, pdpair2 (pcpair n m) = m.
+Proof.
+intros n m.
+symmetry; apply (pcpair_inj _ _ _ _ (pcpair_pdpair (pcpair n m))).
+Qed.
+
+
+(** ** Properties of coding functions *)
+
+Lemma cpair_inc_l : forall n n' m, n < n' -> cpair n m < cpair n' m.
+Proof.
+intros n n' m Hlt; unfold cpair.
+apply Nat.pow_lt_mono_r with (a:=2) in Hlt; simpl; nia.
+Qed.
+
+Lemma cpair_inc_r : forall n m m', m < m' -> cpair n m < cpair n m'.
+Proof.
+intros n m m' Hlt; unfold cpair.
+enough (2 ^ n <> 0) by nia.
+now apply Nat.pow_nonzero.
+Qed.
+
+Lemma cpair_lt_l : forall n m, n < cpair n m.
+Proof. intros n m; unfold cpair; induction n; simpl; lia. Qed.
+
+Lemma cpair_lt_r : forall n m, m < cpair n m.
+Proof. intros n m; unfold cpair; induction n; simpl; lia. Qed.
 
 Lemma pcpair_inc_l : forall n n' m, n < n' -> pcpair n m < pcpair n' m.
 Proof.
@@ -93,24 +144,7 @@ Lemma pcpair_le_l : forall n m, n <= pcpair n m.
 Proof. intros n m; assert (Hlt := cpair_lt_l n m); unfold pcpair; lia. Qed.
 
 Lemma pcpair_le_r : forall n m, m <= pcpair n m.
-Proof.
 Proof. intros n m; assert (Hlt := cpair_lt_r n m); unfold pcpair; lia. Qed.
-
-Lemma pcpair_inj : injective2 pcpair.
-Proof.
-intros n m n' m' Heq.
-assert (Hpos := cpair_pos n m).
-assert (Hpos' := cpair_pos n' m').
-unfold pcpair in *; apply cpair_inj; lia.
-Qed.
-
-Lemma pcpair_surj : surjective2 pcpair.
-Proof.
-intros k.
-assert (0 < S k) as Hlt by lia.
-destruct (cpair_surj _ Hlt) as [(n, m) Heq].
-exists (n, m); unfold pcpair; lia.
-Qed.
 
 
 (** * Coding of [nat]-labelled binary trees *)
