@@ -399,15 +399,6 @@ destruct X ; intuition.
 destruct i ; intuition.
 Qed.
 
-Lemma In_Type_to_In {A} : forall (a : A) l, In_Type a l -> In a l.
-Proof with try assumption; try reflexivity.
-  intros a l Hin.
-  induction l ; inversion Hin; subst.
-  - left...
-  - right.
-    apply IHl...
-Qed.
-
 Lemma map_in_Type {A} {B} : forall (f : A -> B) l L, In_Type l (map f L) -> {l' & prod (In_Type l' L) (l = f l')}.
 Proof with try assumption; try reflexivity.
   intros f l L Hin.

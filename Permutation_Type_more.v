@@ -264,11 +264,9 @@ revert l2 ; induction HP ; intros l2 HF ; inversion HF ; subst.
 - exists nil ; auto.
 - apply IHHP in X0 as [ l2' HP2 HF2 ].
   exists (y :: l2') ; auto.
-  constructor ; assumption.
 - inversion X0 ; subst.
   exists (y1 :: y0 :: l'0) ; auto.
-  + constructor.
-  + constructor ; [ | constructor ] ; assumption.
+  constructor.
 - apply Permutation_Type_nil in HP1 ; subst.
   apply Permutation_Type_nil in HP2 ; subst.
   exists nil ; auto.

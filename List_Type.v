@@ -1,4 +1,4 @@
-(* List_Type_ Library *)
+(* List_Type Library *)
 
 (** * Copy of some List library with parameters with Type output *)
 
@@ -10,7 +10,7 @@ Set Implicit Arguments.
 
 Section In.
 
-Variable A:Type.
+Variable A : Type.
 
 Fixpoint In_Type (a:A) (l:list A) : Type :=
     match l with
@@ -63,7 +63,7 @@ Fixpoint In_Type (a:A) (l:list A) : Type :=
   Qed.
 
   Theorem in_Type_split : forall x (l:list A), In_Type x l ->
-    { '(l1,l2) | l = l1 ++  x:: l2 }.
+    { '(l1,l2) | l = l1 ++ x :: l2 }.
   Proof.
   induction l; simpl; destruct 1.
   subst a; auto.
@@ -81,15 +81,26 @@ Fixpoint In_Type (a:A) (l:list A) : Type :=
 
   (** Decidability of [In] *)
   Theorem in_Type_dec :
-    (forall x y:A, {x = y} + {x <> y}) ->
+    (forall x y : A, {x = y} + {x <> y}) ->
     forall (a:A) (l:list A), (In_Type a l) + (In_Type a l -> False).
   Proof.
-    intro H; induction l as [| a0 l IHl].
+    intro Hdec; induction l as [| a0 l IHl].
     right; apply in_Type_nil.
-    destruct (H a0 a); simpl; auto.
+    destruct (Hdec a0 a); simpl; auto.
     destruct IHl; simpl; auto.
     right; unfold not; intros [Hc1| Hc2]; auto.
   Defined.
+
+  Lemma in_in_Type :
+    (forall x y : A, {x = y} + {x <> y}) ->
+    forall (a:A) l, In a l -> In_Type a l.
+  Proof.
+  intros Hdec a l Hin.
+  destruct (in_Type_dec Hdec a l); [ assumption | ].
+  exfalso; revert Hin.
+  apply notin_Type_notin; assumption.
+  Qed.
+
 
   (** Compatibility with other operations *)
   Lemma in_Type_app_or : forall (l m:list A) (a:A), In_Type a (l ++ m) ->
@@ -129,7 +140,6 @@ Hint Resolve in_Type_eq in_Type_cons in_Type_inv in_Type_nil in_Type_app_or
   (**************************)
 
 Section App.
-
 
   Variable A : Type.
 
@@ -233,7 +243,7 @@ End Elts.
 (************)
 
 Section Map.
-  Variables (A : Type) (B : Type).
+  Variables A B : Type.
   Variable f : A -> B.
 
   Lemma in_Type_map :
@@ -695,5 +705,5 @@ Section Forall2.
   Qed.
 End Forall2.
 
-Hint Constructors Forall2 : core.
+Hint Constructors Forall2_Type : core.
 

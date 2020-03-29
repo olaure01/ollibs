@@ -368,7 +368,6 @@ revert l2 ; induction HP ; intros l2' HF ; inversion HF ; subst.
     exists (lb ++ y :: la).
     * rewrite app_comm_cons ; constructor.
     * apply Forall2_Type_app ; auto.
-      constructor ; auto.
 Qed.
 
 Lemma cperm_Type_image {A B} : forall (f : A -> B) a l l',
