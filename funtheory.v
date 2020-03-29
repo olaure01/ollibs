@@ -46,21 +46,28 @@ Qed.
 
 (** ** Surjective functions *)
 
-Definition surjective := forall y, { x & y = f x }.
+Definition surjective := forall y, { x | y = f x }.
 
 Lemma retract_surjective : forall g, retract f g -> surjective.
 Proof. intros g Hr y; exists (g y); rewrite Hr; reflexivity. Qed.
+
+Lemma surjective_retract : forall (Hs : surjective),
+  retract f (fun y => proj1_sig (Hs y)).
+Proof.
+intros Hs y.
+symmetry; apply (proj2_sig (Hs y)).
+Qed.
 
 
 (** ** Bijective functions *)
 
 Definition bijective :=
-  forall y, { x : _ & y = f x & forall x', y = f x' -> x = x' }.
+  forall y, { x | y = f x & forall x', y = f x' -> x = x' }.
 
-Lemma bijective_inverse : bijective -> { g : B -> A & retract f g & retract g f }.
+Lemma bijective_inverse : bijective -> { g : B -> A | retract f g & retract g f }.
 Proof.
 intros Hbij.
-exists (fun x => projT1 (sigT_of_sigT2 (Hbij x))).
+exists (fun x => proj1_sig (sig_of_sig2 (Hbij x))).
 - intros x; simpl; destruct (Hbij x) as [y Heq _]; auto.
 - intros x; simpl; destruct (Hbij (f x)) as [y _ Heq]; auto.
 Qed.
@@ -72,7 +79,7 @@ destruct (bijective_inverse Hbij) as [g _ Hsec].
 now apply section_injective with g.
 Qed.
 
-Lemma bijective_surjective : bijective -> surjective .
+Lemma bijective_surjective : bijective -> surjective.
 Proof. intros Hbij y; destruct (Hbij y) as [x Hx _]; exists x; assumption. Qed.
 
 Lemma injective_surjective_bijective : injective -> surjective -> bijective.
@@ -227,5 +234,5 @@ Definition injective2 {A B C} (f : A -> B -> C) :=
   forall x y x' y', f x y = f x' y' -> x = x' /\ y = y'.
 
 Definition surjective2 {A B C} (f : A -> B -> C) :=
-  forall z, {'(x,y) : _ & z = f x y }.
+  forall z, {'(x,y) | z = f x y }.
 
