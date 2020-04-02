@@ -1,7 +1,7 @@
 # ollibs
 Add-ons for the Coq Standard Library
 
-Working with `Coq 8.10.2`
+Working with `Coq 8.11.0`
 
 ## Misc
 

@@ -211,7 +211,7 @@ intros f Hf l1; induction l1.
 Qed.
 
 
-(** * More Properties of Surjective Functions *)
+(** * More Properties of Bijective Functions *)
 
 Lemma id_bijective {A} : bijective (@id A).
 Proof. intros x; exists x; unfold id; simpl; intuition. Qed.
