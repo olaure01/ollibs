@@ -10,14 +10,14 @@ Require Import Orders.
 (** * Some properties of [leb] *)
 
 Lemma leb_refl : forall b, leb b b.
-Proof. intro b; destruct b; reflexivity. Qed.
+Proof. destr_bool. Qed.
 
 Lemma leb_trans : forall b1 b2 b3,
   leb b1 b2 -> leb b2 b3 -> leb b1 b3.
-Proof. intros b1 b2 b3; destruct b1; destruct b2; destruct b3; intuition. Qed.
+Proof. destr_bool. Qed.
 
 Lemma leb_true : forall b, leb b true.
-Proof. destruct b; constructor. Qed.
+Proof. destr_bool. Qed.
 
 Lemma false_leb : forall b, leb false b.
 Proof. intros; constructor. Qed.
@@ -36,33 +36,29 @@ Definition ltb (b1 b2:bool) :=
 Hint Unfold ltb: bool.
 
 Lemma ltb_irrefl : forall b, ~ ltb b b.
-Proof. intros b; destruct b; simpl; intros Heq; inversion Heq. Qed.
+Proof. destr_bool; auto. Qed.
 
 Lemma ltb_trans : forall b1 b2 b3,
   ltb b1 b2 -> ltb b2 b3 -> ltb b1 b3.
-Proof. intros b1 b2 b3; destruct b1; destruct b2; destruct b3; intuition. Qed.
+Proof. destr_bool; auto. Qed.
 
 Instance ltb_compat : Proper (eq ==> eq ==> iff) ltb.
 Proof. intuition. Qed.
 
 Lemma ltb_trichotomy : forall x y, { ltb x y } + { x = y } + { ltb y x }.
-Proof. intros x y; destruct x; destruct y; simpl; auto. Qed.
+Proof. destr_bool; auto. Qed.
 
 Lemma ltb_total : forall x y, ltb x y \/ x = y \/ ltb y x.
-Proof. intros x y; destruct (ltb_trichotomy x y) as [ [ Hlt | Heq ] | Hlt ]; auto. Qed.
+Proof. destr_bool; auto. Qed.
 
 Lemma ltb_leb_incl : forall x y, ltb x y -> leb x y.
-Proof. intros x y; destruct x; intuition. Qed.
+Proof. destr_bool; auto. Qed.
 
 Lemma leb_ltbeq_dec : forall x y, leb x y -> { ltb x y } + { x = y }.
-Proof. intros x y; destruct x; destruct y; simpl; auto. Qed.
+Proof. destr_bool; auto. Qed.
 
 Lemma leb_ltbeq : forall x y, leb x y <-> ltb x y \/ x = y.
-Proof.
-intros x y; split; intros Hl.
-- apply leb_ltbeq_dec in Hl; intuition.
-- destruct Hl; [ now apply ltb_leb_incl | subst; apply leb_refl ].
-Qed.
+Proof. destr_bool; intuition. Qed.
 
 
 (** * Compare *)
@@ -75,7 +71,7 @@ Definition compareb (b1 b2 : bool) :=
   end.
 
 Lemma compareb_spec : forall x y, CompareSpec (x = y) (ltb x y) (ltb y x) (compareb x y).
-Proof. intros x y; destruct x; destruct y; intuition. Qed.
+Proof. destr_bool; auto. Qed.
 
 
 (** * Order structures *)
@@ -123,6 +119,7 @@ Module Bool_as_DT <: UsualDecidableType := Bool_as_OT.
 
 
 (** * Uniqueness of Identity Proofs (UIP) at [bool] type (direct proof) *)
+(* alternative to Require Import Eqdep_dec. Check (UIP_dec bool_dec). *)
 (* begin hide *)
 Lemma eq_refl_bool_ext : forall b1 b2 : bool, b1 = b2 -> b1 = b2.
 Proof. destruct b1; destruct b2; intros; ( apply eq_refl || assumption ). Defined.
