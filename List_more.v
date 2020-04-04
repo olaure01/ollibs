@@ -742,15 +742,22 @@ induction l ; intros HP.
   constructor.
 Qed.
 
+(** easy consequence of Forall_impl *)
 Lemma inc_Forall {A} : forall (P : nat -> A -> Prop) l i j,
   (forall i j a, P i a -> i <= j -> P j a) ->
     Forall (P i) l -> i <= j -> Forall (P j) l.
+Proof.
+intros P l i j Hinc HP Hle; apply (@Forall_impl _ (P i)); intuition.
+now apply (Hinc i).
+Qed.
+(*
 Proof with try eassumption.
 intros P l i j Hinc.
 induction l ; intros H Hl ; constructor ; inversion H.
 - eapply Hinc...
 - apply IHl...
 Qed.
+*)
 
 Lemma Exists_app_inv {A} : forall (P : A -> Prop) l1 l2,
   Exists P (l1 ++ l2) -> Exists P l1 \/ Exists P l2.

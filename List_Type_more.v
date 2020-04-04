@@ -5,8 +5,7 @@ Require Import Lia.
 (** * Add-ons for List library
 Usefull properties apparently missing in the List library with Type-compatible outputs. *)
 
-Require Export List_more.
-Require Export List_Type.
+Require Export ListType.
 
 (** ** Properties about Forall_Type *)
 
@@ -276,31 +275,6 @@ Ltac trichot_Type_elt_elt_exec H :=
 
 (** ** Decomposition of [map] *)
 
-Lemma app_eq_map_Type {A B} : forall (f : A -> B) l1 l2 l3,
-  l1 ++ l2 = map f l3 ->
-    {'(l1', l2') | l3 = l1' ++ l2' /\ l1 = map f l1' /\ l2 = map f l2' }.
-Proof with try assumption ; try reflexivity.
-intros f.
-induction l1 ; intros.
-- exists (@nil A, l3).
-  split ; [ | split]...
-- destruct l3 ; inversion H.
-  apply IHl1 in H2.
-  destruct H2 as ((l & l0) & ? & ? & ?) ; subst.
-  exists (a0 :: l, l0).
-  split ; [ | split]...
-Qed.
-
-Lemma cons_eq_map_Type {A B} : forall (f : A -> B) a l2 l3,
-  a :: l2 = map f l3 ->
-    {'(a', l2') | l3 = a' :: l2' /\ a = f a' /\ l2 = map f l2' }.
-Proof.
-intros f a l2 l3 H.
-destruct l3 ; inversion H ; subst.
-exists (a0, l3) ; split ; [ | split] ;
-  try reflexivity ; try eassumption.
-Qed.
-
 Ltac decomp_map_Type_eq H Heq :=
   match type of H with
   | _ ++ _ = map _ _ => apply app_eq_map_Type in H ;
@@ -338,7 +312,7 @@ Ltac decomp_map_Type H :=
 
 (** ** [concat] *)
 
-Lemma concat_elt {A} : forall (a : A) L l1 l2,
+Lemma concat_vs_elt {A} : forall (a : A) L l1 l2,
     concat L = l1 ++ a :: l2 ->
     {' (L1,L2,l1',l2') | l1 = concat L1 ++ l1' /\ l2 = l2' ++ concat L2
                       /\ L = L1 ++ (l1' ++ a :: l2') :: L2 }.
@@ -379,220 +353,7 @@ Proof with try assumption.
     + apply Forall2_Type_cons...
 Qed.
 
-
-(** ** [In] *)
-
-Lemma in_Type_elt {A} : forall (a:A) l1 l2, In_Type a (l1 ++ a :: l2).
-Proof.
-intros.
-apply in_Type_or_app.
-right.
-intuition.
-Qed.
-
-Lemma in_Type_elt_inv {A} : forall (a b : A) l1 l2,
-  In_Type a (l1 ++ b :: l2) -> (a = b) + (In_Type a (l1 ++ l2)).
-Proof.
-intros.
-apply in_Type_app_or in X.
-destruct X ; intuition.
-destruct i ; intuition.
-Qed.
-
-Lemma map_in_Type {A} {B} : forall (f : A -> B) l L, In_Type l (map f L) -> {l' & prod (In_Type l' L) (l = f l')}.
-Proof with try assumption; try reflexivity.
-  intros f l L Hin.
-  revert l Hin.
-  induction L; intros l Hin; inversion Hin; subst.
-  - split with a.
-    split...
-    left...
-  - specialize (IHL l X) as (l' & (Hin' & Heq)).
-    split with l'...
-    split...
-    right...
-Qed.
-
-Lemma nth_In_Type {A} : forall n l (d:A), n < length l ->
-  In_Type (nth n l d) l.
-Proof.
-  unfold lt; induction n as [| n hn]; simpl; destruct l; simpl; intros d ie;
-    try (now inversion ie).
-  - left; reflexivity.
-  - right; apply hn; auto with arith.
-Qed.
-
-Lemma In_nth_Type {A} l (x:A) d : In_Type x l ->
-  { n : _ & n < length l & nth n l d = x }.
-Proof.
-  induction l as [|a l IH]; intros Hin.
-  - inversion Hin.
-  - destruct Hin as [Hin|Hin].
-    + subst; exists 0; simpl; auto with arith.
-    + destruct (IH Hin) as [n Hn Hn'].
-      exists (S n); simpl; auto with arith.
-Qed.
-
-
-(** ** Set inclusion on list *)
-
-Lemma incl_Type_nil {A} : forall l : list A, incl_Type nil l.
-Proof.
-intros l a Hin.
-inversion Hin.
-Qed.
-
-Lemma incl_Type_app_app {A} : forall l1 l2 m1 m2:list A,
-  incl_Type l1 m1 -> incl_Type l2 m2 -> incl_Type (l1 ++ l2) (m1 ++ m2).
-Proof.
-intros l1 l2 m1 m2 Hi1 Hi2.
-apply incl_Type_app.
-- apply incl_Type_appl.
-  assumption.
-- apply incl_Type_appr.
-  assumption.
-Qed.
-
-Lemma incl_Type_cons_inv {A} : forall (a:A) (l m:list A),
-  incl_Type (a :: l) m -> (In_Type a m) * (incl_Type l m).
-Proof.
-intros a l m Hi.
-split.
-- apply Hi.
-  constructor.
-  reflexivity.
-- intros b Hin.
-  apply Hi.
-  apply in_Type_cons.
-  assumption.
-Qed.
-
-(** ** [remove] *)
-
-Lemma notin_Type_remove {A} : forall Hdec l (x : A), (In_Type x l -> False) ->
-  remove Hdec x l = l.
-Proof.
-induction l; simpl; intuition.
-destruct (Hdec x a); subst; intuition.
-f_equal; intuition.
-Qed.
-
-Lemma remove_Type_length {A} : forall Hdec l (x : A), In_Type x l ->
-  length (remove Hdec x l) < length l.
-Proof.
-induction l; simpl; intros x Hin.
-- inversion Hin.
-- destruct (Hdec x a) as [Heq | Hneq]; subst; simpl.
-  + destruct (in_Type_dec Hdec a l); intuition.
-    rewrite notin_Type_remove; intuition.
-  + destruct Hin as [Hin | Hin].
-    * exfalso; now apply Hneq.
-    * apply IHl in Hin; lia.
-Qed.
-
-Lemma in_Type_remove {A} : forall Hdec l (x y : A),
-  In_Type x (remove Hdec y l) -> prod (In_Type x l) (x <> y).
-Proof.
-induction l; intros x y Hin.
-- inversion Hin.
-- simpl in Hin.
-  destruct (Hdec y a); subst; split.
-  + right; now apply IHl with a.
-  + intros Heq; revert Hin; subst; apply remove_In_Type.
-  + inversion Hin; subst; [left; reflexivity|right].
-    now apply IHl with y.
-  + inversion Hin; subst.
-    * now intros Heq; apply n.
-    * intros Heq; revert X; subst; apply remove_In_Type.
-Qed.
-
-Lemma in_in_remove {A} : forall Hdec l (x y : A), x <> y -> In x l -> In x (remove Hdec y l).
-Proof.
-induction l; simpl; intros x y Hneq Hin.
-- inversion Hin.
-- destruct (Hdec y a); subst.
-  + destruct Hin.
-    * exfalso; now apply Hneq.
-    * now apply IHl.
-  + simpl; destruct Hin; [now left|right].
-    now apply IHl.
-Qed.
-
-
 (** ** [Forall] and [Exists] *)
-
-Lemma Forall_Type_app_inv {A} : forall P (l1 : list A) l2,
-  Forall_Type P (l1 ++ l2) -> Forall_Type P l1 * Forall_Type P l2.
-Proof with try assumption.
-induction l1 ; intros.
-- split...
-  constructor.
-- inversion X ; subst.
-  apply IHl1 in X1.
-  destruct X1.
-  split...
-  constructor...
-Qed.
-
-Lemma Forall_Type_app {A} : forall P (l1 : list A) l2,
-  Forall_Type P l1 -> Forall_Type P l2 -> Forall_Type P (l1 ++ l2).
-Proof with try assumption.
-induction l1 ; intros...
-inversion X ; subst.
-constructor...
-apply IHl1...
-Qed.
-
-Lemma Forall_Type_elt {A} : forall P l1 l2 (a : A), Forall_Type P (l1 ++ a :: l2) -> P a.
-Proof.
-intros P l1 l2 a HF.
-eapply Forall_Type_forall ; try eassumption.
-apply in_Type_elt.
-Qed.
-
-Lemma Forall_Type_map {A B} : forall (f : A -> B) l,
-  Forall_Type (fun x => { y | x = f y }) l -> { l0 | l = map f l0 }.
-Proof with try reflexivity.
-induction l ; intro H.
-- exists (@nil A)...
-- inversion H ; subst.
-  destruct X as [y Hy] ; subst.
-  apply IHl in X0.
-  destruct X0 as [l0 Hl0] ; subst.
-  exists (y :: l0)...
-Qed.
-
-Lemma map_Forall_Type_map {A B} : forall (f : A -> B) l,
-  { l0 | l = map f l0 } -> Forall_Type (fun x => { y | x = f y }) l.
-Proof with try reflexivity.
-induction l ; intro H.
-- constructor.
-- destruct H as [l0 Heq].
-  destruct l0 ; inversion Heq ; subst.
-  constructor.
-  + exists a0...
-  + apply IHl.
-    exists l0...
-Qed.
-
-Lemma map_ext_Forall_Type {A B} : forall (f g : A -> B) l,
-  Forall_Type (fun x => f x = g x) l -> map f l = map g l.
-Proof.
-intros f g l HF.
-apply map_ext_in_Type ; apply Forall_Type_forall ; assumption.
-Qed.
-
-Lemma Forall_Type_rev {A} : forall P (l : list A),
-  Forall_Type P l -> Forall_Type P (rev l).
-Proof with try assumption.
-induction l ; intros HP.
-- constructor.
-- inversion HP ; subst.
-  apply IHl in X0.
-  apply Forall_Type_app...
-  constructor...
-  constructor.
-Qed.
 
 Lemma existsb_Exists_Type {A} : forall P (l : list A),
   existsb P l = true -> Exists_Type (fun x => is_true (P x)) l.
@@ -707,12 +468,3 @@ Section In_Forall_Type.
   Qed.
 
 End In_Forall_Type.
-
-
-(*Constant list *)
-Lemma In_Type_repeat {A} : forall n (a : A) b,
-  In_Type b (repeat a n) -> b = a.
-Proof.
-induction n; intros a b Hin; inversion Hin; subst; [ reflexivity | now apply IHn ].
-Qed.
-
