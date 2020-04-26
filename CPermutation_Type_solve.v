@@ -5,8 +5,7 @@
 (** * Some tactics for tentative automatic solving of [CPermutation] goals
 The main tactic is [cperm_solve] which fails is the goal is not solved. *)
 
-Require Import List_more.
-Require Import CyclicPerm_Type.
+Require Import List_more CPermutation_Type.
 
 
 Ltac cperm_Type_rot :=
@@ -64,5 +63,3 @@ with cperm_Type_run :=
           | instantiate ]
   | _ => idtac
   end ).
-
-

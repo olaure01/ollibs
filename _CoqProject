@@ -5,7 +5,7 @@ BOrders.v
 CPermutation_more.v
 CPermutation_solve.v
 CPermutation_Type_solve.v
-CyclicPerm_Type.v
+CPermutation_Type.v
 dectype.v
 Dependent_Forall_Type.v
 flat_map_Type_more.v

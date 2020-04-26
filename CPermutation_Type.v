@@ -1,10 +1,10 @@
-(* CyclicPerm_Type library *)
+(* CPermutation_Type library *)
 
 
 (** * Cyclic Permutations
 Definition and basic properties of cyclic permutations in Type. *)
 
-Require Import List CMorphisms.
+Require Import CMorphisms.
 Require Import List_more Permutation_Type_more.
 
 (** Definition *)

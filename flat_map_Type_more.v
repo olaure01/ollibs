@@ -3,7 +3,7 @@
 (** * Add-ons for List library
 Properties of flat_map. *)
 
-Require Import List_more Permutation_Type_more funtheory CyclicPerm_Type.
+Require Import funtheory List_more Permutation_Type_more CPermutation_Type.
 
 
 Lemma flat_map_elt {A B} {f : A -> list B} : forall a L l1 l2,

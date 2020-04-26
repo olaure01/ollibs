@@ -3,7 +3,7 @@
 (** * Factorized statements for different notions of permutation *)
 
 Require Import List CMorphisms.
-Require Import Permutation_Type_more funtheory Permutation_Type_solve CyclicPerm_Type CPermutation_Type_solve.
+Require Import funtheory Permutation_Type_more Permutation_Type_solve CPermutation_Type CPermutation_Type_solve.
 
 
 (** ** Definitions
