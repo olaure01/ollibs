@@ -345,8 +345,8 @@ Arguments Inh_of_InfDecType _ : clear implicits.
 (* [nat] instance of [InfDecType] *)
 Definition nat_infdectype := {|
   infcar := nat_dectype;
-  fresh := (proj1_sig (section_choice (nat_bijective_section (existT _ id (@id_bijective _)))));
-  fresh_prop := (proj2_sig (section_choice (nat_bijective_section (existT _ id (@id_bijective _)))));
+  fresh := (proj1_sig (section_choice (nat_bijective_section (existT _ id (id_bijective)))));
+  fresh_prop := (proj2_sig (section_choice (nat_bijective_section (existT _ id (id_bijective)))));
 |}.
 (* alternative direct construction *)
 Definition nat_fresh l := S (fold_right max 0 l).

@@ -209,6 +209,7 @@ Qed.
 
 Lemma id_bijective A : bijective (@id A).
 Proof. intros x; exists x; unfold id; simpl; intuition. Qed.
+Arguments id_bijective {_}.
 
 Lemma compose_bijective A B C : forall (f : A -> B) (g : B -> C),
   bijective f -> bijective g -> bijective (compose g f).
