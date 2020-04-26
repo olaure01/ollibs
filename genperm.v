@@ -3,7 +3,7 @@
 (** * Factorized statements for different notions of permutation *)
 
 Require Import List Morphisms.
-Require Import List_more Permutation_more funtheory Permutation_solve CyclicPerm CPermutation_solve.
+Require Import List_more Permutation_more funtheory Permutation_solve CPermutation CPermutation_solve.
 
 
 (** ** Definitions
@@ -43,13 +43,13 @@ Ltac PCperm_solve :=
 Instance PCperm_perm {A} b : Proper (PCperm b ==> (@Permutation A)) id.
 Proof with try assumption.
 destruct b ; intros l l' HP...
-apply cperm_perm...
+apply CPermutation_Permutation...
 Qed.
 
-Instance cperm_PCperm {A} b : Proper (CPermutation ==> PCperm b) (@id (list A)).
+Instance cperm_PCperm {A} b : Proper (@CPermutation A ==> PCperm b) (@id (list A)).
 Proof with try assumption.
 destruct b ; intros l l' HC...
-apply cperm_perm...
+apply CPermutation_Permutation...
 Qed.
 
 Lemma PCperm_monot {A} : forall b1 b2, Bool.leb b1 b2 ->
@@ -57,7 +57,7 @@ Lemma PCperm_monot {A} : forall b1 b2, Bool.leb b1 b2 ->
 Proof.
 intros b1 b2 Hleb l1 l2.
 destruct b1; destruct b2; try (now inversion Hleb).
-apply cperm_perm.
+apply CPermutation_Permutation.
 Qed.
 
 Instance PCperm_refl {A} b : Reflexive (@PCperm A b).
@@ -88,7 +88,7 @@ Lemma PCperm_swap {A} b : forall (a1 : A) a2,
 Proof.
 destruct b ; intros.
 - apply perm_swap.
-- apply cperm_swap.
+- apply CPermutation_swap.
 Qed.
 
 Lemma PCperm_last {A} b : forall (a : A) l, PCperm b (a :: l) (l ++ a :: nil).
@@ -96,7 +96,7 @@ Proof.
 destruct b ; intros ;
   rewrite <- (app_nil_l l) ; rewrite app_comm_cons.
 - apply Permutation_cons_append.
-- apply cperm_last.
+- apply CPermutation_cons_append.
 Qed.
 
 Lemma PCperm_app_comm {A} b : forall l l', @PCperm A b (l ++ l') (l' ++ l).
@@ -111,21 +111,21 @@ Lemma PCperm_app_rot {A} b : forall l1 l2 l3,
 Proof.
 destruct b ; intros.
 - apply Permutation_app_rot.
-- apply cperm_app_rot.
+- apply CPermutation_app_rot.
 Qed.
 
 Lemma PCperm_nil {A} b : forall l, @PCperm A b nil l -> l = nil.
 Proof with try assumption.
 destruct b ; intros.
 - apply Permutation_nil...
-- apply cperm_nil...
+- apply CPermutation_nil...
 Qed.
 
 Lemma PCperm_nil_cons {A} b : forall l (a : A), ~ PCperm b nil (a :: l).
 Proof with try assumption.
 destruct b ; intros.
 - apply Permutation_nil_cons...
-- apply cperm_nil_cons...
+- apply CPermutation_nil_cons...
 Qed.
 
 Lemma PCperm_length_1_inv {A} b : forall (a : A) l,
@@ -133,7 +133,7 @@ Lemma PCperm_length_1_inv {A} b : forall (a : A) l,
 Proof with try assumption.
 destruct b ; intros.
 - apply Permutation_length_1_inv...
-- apply cperm_one_inv...
+- apply CPermutation_length_1_inv...
 Qed.
 
 Lemma PCperm_length_2_inv {A} b : forall (a1 : A) a2 l,
@@ -141,7 +141,7 @@ Lemma PCperm_length_2_inv {A} b : forall (a1 : A) a2 l,
 Proof with try assumption.
 destruct b ; intros.
 - apply Permutation_length_2_inv...
-- apply cperm_two_inv...
+- apply CPermutation_length_2_inv...
 Qed.
 
 Lemma PCperm_vs_elt_inv {A} b : forall (a : A) l l1 l2,
@@ -158,7 +158,7 @@ destruct b ; intros a l l1 l2 HC.
   etransitivity ; [ eapply Permutation_app_comm | ].
   etransitivity ; [ eassumption | ].
   apply Permutation_app_comm.
-- apply cperm_vs_elt_inv in HC.
+- apply CPermutation_vs_elt_inv in HC.
   destruct HC as (l' & l'' & Heq1 & Heq2) ; subst.
   exists l' ; exists l'' ; split...
   rewrite Heq1...
@@ -199,7 +199,7 @@ Instance PCperm_map {A B} (f : A -> B) b :
 Proof with try assumption.
 destruct b ; intros l1 l2 HC.
 - apply Permutation_map...
-- apply cperm_map...
+- apply CPermutation_map...
 Qed.
 
 Lemma PCperm_map_inv {A B} b : forall (f : A -> B) l1 l2,
@@ -207,14 +207,14 @@ Lemma PCperm_map_inv {A B} b : forall (f : A -> B) l1 l2,
 Proof.
 destruct b ; intros.
 - eapply Permutation_map_inv ; eassumption.
-- eapply cperm_map_inv ; eassumption.
+- eapply CPermutation_map_inv ; eassumption.
 Qed.
 
 Instance PCperm_in {A} b (a : A) : Proper (PCperm b ==> Basics.impl) (In a).
 Proof with try eassumption.
 destruct b ; intros l l' HP HIn.
 - eapply Permutation_in...
-- eapply cperm_in...
+- eapply CPermutation_in...
 Qed.
 
 Instance PCperm_Forall {A} b (P : A -> Prop) :
@@ -222,7 +222,7 @@ Instance PCperm_Forall {A} b (P : A -> Prop) :
 Proof with try eassumption.
 destruct b ; intros l1 l2 HP HF.
 - eapply Permutation_Forall...
-- eapply cperm_Forall...
+- eapply CPermutation_Forall...
 Qed.
 
 Instance PCperm_Exists {A} b (P : A -> Prop) :
@@ -230,14 +230,14 @@ Instance PCperm_Exists {A} b (P : A -> Prop) :
 Proof with try eassumption.
 destruct b ; intros l1 l2 HP HE.
 - eapply Permutation_Exists...
-- eapply cperm_Exists...
+- eapply CPermutation_Exists...
 Qed.
 
 Lemma PCperm_Forall2 {A B} b (P : A -> B -> Prop) :
   forall l1 l1' l2, PCperm b l1 l1' -> Forall2 P l1 l2 -> exists l2',
     PCperm b l2 l2' /\ Forall2 P l1' l2'.
 Proof.
-destruct b ; [ apply Permutation_Forall2 | apply cperm_Forall2 ].
+destruct b ; [ apply Permutation_Forall2 | apply CPermutation_Forall2 ].
 Qed.
 
 Lemma PCperm_image {A B} b : forall (f : A -> B) a l l',
@@ -245,7 +245,7 @@ Lemma PCperm_image {A B} b : forall (f : A -> B) a l l',
 Proof with try eassumption.
 destruct b ; intros.
 - eapply Permutation_image...
-- eapply cperm_image...
+- eapply CPermutation_image...
 Qed.
 
 
@@ -510,4 +510,3 @@ rewrite HPhd.
 rewrite HPtl.
 reflexivity.
 Qed.
-

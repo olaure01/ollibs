@@ -1,7 +1,6 @@
 (* funtheory Library *)
 
-Require Import Program.Basics Relations RelationClasses.
-Require Import List_more.
+Require Import Program.Basics Relations RelationClasses List.
 
 (** Properties of functions *)
 

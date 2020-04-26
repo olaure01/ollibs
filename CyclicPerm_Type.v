@@ -4,11 +4,8 @@
 (** * Cyclic Permutations
 Definition and basic properties of cyclic permutations in Type. *)
 
-Require Import CMorphisms.
-
-Require Import List_Type.
-Require Import List_Type_more.
-Require Import Permutation_Type_more.
+Require Import List CMorphisms.
+Require Import List_more Permutation_Type_more.
 
 (** Definition *)
 Inductive CPermutation_Type {A} : list A -> list A -> Type :=
@@ -42,7 +39,7 @@ Instance cperm_Type_trans {A} : Transitive (@CPermutation_Type A).
 Proof.
 intros l1 l2 l3 HC1 HC2.
 inversion HC1 ; inversion HC2 ; subst.
-apply dichot_Type_app in H1.
+apply dichot_app_inf in H1.
 destruct H1 as [[l2' [Hl1 Hl2]] | [l4' [Hr1 Hr2]]] ; subst.
 - rewrite <- app_assoc.
   rewrite app_assoc.
@@ -187,7 +184,7 @@ Proof.
 intros a l l1 l2 HC.
 inversion HC ; subst.
 symmetry in H1.
-dichot_Type_elt_app_exec H1 ; subst.
+dichot_elt_app_inf_exec H1 ; subst.
 - exists (l0 ++ l1, l) ; simpl ;
     rewrite <- app_assoc ; reflexivity.
 - exists (l4, l2 ++ l3) ; simpl ;
@@ -232,13 +229,13 @@ Lemma cperm_Type_app_app_inv {A} : forall l1 l2 l3 l4 : list A,
 Proof with try assumption.
 intros l1 l2 l3 l4 HC.
 inversion HC as [lx ly Hx Hy].
-dichot_Type_app_exec Hx ; dichot_Type_app_exec Hy ; subst.
+dichot_app_inf_exec Hx ; dichot_app_inf_exec Hy ; subst.
 - left ; left ; left ; right.
   exists (l ++ l0, l0 ++ l).
   simpl ; split ; [ split | ] ; 
     try (rewrite <- ? app_assoc ; apply cperm_Type_app_rot).
   apply cperm_Type.
-- dichot_Type_app_exec Hy0 ; subst.
+- dichot_app_inf_exec Hy0 ; subst.
   + left ; left ; left ; left.
     exists (l, l0, lx, l5).
     simpl ; split ; [ split | split ] ; try apply cperm_Type...
@@ -249,7 +246,7 @@ dichot_Type_app_exec Hx ; dichot_Type_app_exec Hy ; subst.
     split ; [ split | ] ; 
       try (rewrite <- ? app_assoc ; apply cperm_Type_app_rot)...
     apply cperm_Type.
-- dichot_Type_app_exec Hy1 ; subst.
+- dichot_app_inf_exec Hy1 ; subst.
   + left ; left ; right.
     exists (ly ++ l2, l2 ++ ly).
     split ; [ split | ] ; 
@@ -310,7 +307,7 @@ induction l1 ; intros l2 HP.
   apply cperm_Type_vs_cons_inv in Heq.
   destruct Heq as [(l3 & l4) Heq1 Heq2].
   simpl in Heq1 ; simpl in Heq2 ; symmetry in Heq2.
-  decomp_map_Type Heq2 ; subst ; simpl.
+  decomp_map_inf Heq2 ; subst ; simpl.
   exists (x :: l6 ++ l0).
   + simpl ; rewrite ? map_app ; reflexivity.
   + constructor.
@@ -333,7 +330,7 @@ apply cperm_perm_Type...
 Qed.
 
 Instance cperm_Type_Forall_Type {A} (P : A -> Type) :
-  Proper (CPermutation_Type ==> Basics.arrow) (Forall_Type P).
+  Proper (CPermutation_Type ==> Basics.arrow) (Forall_inf P).
 Proof with try eassumption.
 intros l1 l2 HC HF.
 eapply Permutation_Type_Forall_Type...
@@ -341,7 +338,7 @@ apply cperm_perm_Type...
 Qed.
 
 Instance cperm_Type_Exists_Type {A} (P : A -> Type) :
-  Proper (CPermutation_Type ==> Basics.arrow) (Exists_Type P).
+  Proper (CPermutation_Type ==> Basics.arrow) (Exists_inf P).
 Proof with try eassumption.
 intros l1 l2 HC HE.
 eapply Permutation_Type_Exists_Type...
@@ -349,8 +346,8 @@ apply cperm_perm_Type...
 Qed.
 
 Lemma cperm_Type_Forall2 {A B} (P : A -> B -> Type) :
-  forall l1 l1' l2, CPermutation_Type l1 l1' -> Forall2_Type P l1 l2 ->
-    { l2' : _ & CPermutation_Type l2 l2' & Forall2_Type P l1' l2' }.
+  forall l1 l1' l2, CPermutation_Type l1 l1' -> Forall2_inf P l1 l2 ->
+    { l2' : _ & CPermutation_Type l2 l2' & Forall2_inf P l1' l2' }.
 Proof.
 intros l1 l1' l2 HP.
 revert l2 ; induction HP ; intros l2' HF ; inversion HF ; subst.
@@ -363,11 +360,11 @@ revert l2 ; induction HP ; intros l2' HF ; inversion HF ; subst.
     exists (y :: l').
     * reflexivity.
     * rewrite app_nil_l in HF ; simpl ; rewrite app_nil_r ; assumption.
-  + apply Forall2_Type_app_inv_l in X0 as [(la, lb) [HF1 HF2] Heq].
+  + apply Forall2_inf_app_inv_l in X0 as [(la, lb) [HF1 HF2] Heq].
     simpl in Heq ; rewrite Heq.
     exists (lb ++ y :: la).
     * rewrite app_comm_cons ; constructor.
-    * apply Forall2_Type_app ; auto.
+    * apply Forall2_inf_app ; auto.
 Qed.
 
 Lemma cperm_Type_image {A B} : forall (f : A -> B) a l l',
@@ -377,4 +374,3 @@ intros f a l l' HP.
 eapply Permutation_Type_image.
 apply cperm_perm_Type ; eassumption.
 Qed.
-

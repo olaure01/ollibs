@@ -19,78 +19,10 @@
 
 Require Import List CMorphisms FinFun.
 Require Permutation.
-Require Import List_Type.
 
 Import ListNotations. (* For notations [] and [a;b;c] *)
 Set Implicit Arguments.
 (* Set Universe Polymorphism. *)
-
-(**********************************************************************)
-(** ** Predicate for List addition/removal (no need for decidability) in Type *)
-(**********************************************************************)
-
-Section Add_Type.
-
-  Variable A : Type.
-
-  (* [Add a l l'] means that [l'] is exactly [l], with [a] added
-     once somewhere *)
-  Inductive Add_Type (a:A) : list A -> list A -> Type :=
-    | Add_Type_head l : Add_Type a l (a::l)
-    | Add_Type_cons x l l' : Add_Type a l l' -> Add_Type a (x::l) (x::l').
-
-  Lemma Add_Type_app a l1 l2 : Add_Type a (l1++l2) (l1++a::l2).
-  Proof.
-   induction l1; simpl; now constructor.
-  Qed.
-
-  Lemma Add_Type_split a l l' :
-    Add_Type a l l' -> exists l1 l2, l = l1++l2 /\ l' = l1++a::l2.
-  Proof.
-   induction 1.
-   - exists nil; exists l; split; trivial.
-   - destruct IHX as (l1 & l2 & Hl & Hl').
-     exists (x::l1); exists l2; split; simpl; f_equal; trivial.
-  Qed.
-
-  Lemma Add_Type_in a l l' : Add_Type a l l' ->
-   forall x, In x l' <-> In x (a::l).
-  Proof.
-   induction 1; intros; simpl in *; rewrite ?IHX; tauto.
-  Qed.
-
-  Lemma Add_Type_in_Type a l l' : Add_Type a l l' ->
-   forall x, In_Type x l' -> In_Type x (a::l).
-  Proof.
-   induction 1; intros; simpl in *; rewrite ?IHX; [ tauto | ].
-   destruct X0 ; [ right ; left ; assumption | ].
-   assert ((a = x0) + In_Type x0 l) ; try tauto.
-   apply IHX ; assumption.
-  Qed.
-
-  Lemma Add_Type_length a l l' : Add_Type a l l' -> length l' = S (length l).
-  Proof.
-   induction 1; simpl; auto with arith.
-  Qed.
-
-  Lemma Add_Type_inv a l : In_Type a l -> { l' &  Add_Type a l' l }.
-  Proof.
-   intro Ha. destruct (in_Type_split _ _ Ha) as ([l1 l2] & ->).
-   exists (l1 ++ l2). apply Add_Type_app.
-  Qed.
-
-  Lemma incl_Add_Type_inv a l u v :
-    (In_Type a l -> False) ->
-    incl_Type (a::l) v -> Add_Type a u v -> incl_Type l u.
-  Proof.
-   intros Ha H AD y Hy.
-   assert (Hy' : In_Type y (a::u)).
-   { apply (Add_Type_in_Type AD). apply H; simpl; auto. }
-   destruct Hy'; [ subst; now elim Ha | trivial ].
-  Qed.
-
-End Add_Type.
-
 
 
 Section Permutation.
@@ -191,13 +123,13 @@ Proof.
 Qed.
 
 Theorem Permutation_Type_in_Type : forall (l l' : list A) (x : A),
- Permutation_Type l l' -> In_Type x l -> In_Type x l'.
+ Permutation_Type l l' -> In_inf x l -> In_inf x l'.
 Proof.
   intros l l' x Hperm; induction Hperm; simpl; tauto.
 Qed.
 
 Global Instance Permutation_Type_in_Type' :
- Proper (Logic.eq ==> @Permutation_Type A ==> Basics.arrow) (@In_Type A) | 10.
+ Proper (Logic.eq ==> @Permutation_Type A ==> Basics.arrow) (@In_inf A) | 10.
 Proof.
   intros l1 l2 Heq l1' l2' HP Hi ; subst.
   eauto using Permutation_Type_in_Type.
@@ -274,7 +206,7 @@ Proof.
 Qed.
 Local Hint Resolve Permutation_Type_cons_app : core.
 
-Lemma Permutation_Type_Add_Type a l l' : Add_Type a l l' -> Permutation_Type (a::l) l'.
+Lemma Permutation_Type_Add_Type a l l' : Add_inf a l l' -> Permutation_Type (a::l) l'.
 Proof.
  induction 1; simpl; trivial.
  eapply Permutation_Type_trans ; [ apply Permutation_Type_swap | ].
@@ -364,7 +296,7 @@ Proof.
 Qed.
 
 Ltac InvAdd_Type := repeat (match goal with
- | H: Add_Type ?x _ (_ :: _) |- _ => inversion H; clear H; subst
+ | H: Add_inf ?x _ (_ :: _) |- _ => inversion H; clear H; subst
  end).
 
 Ltac finish_basic_perms_Type H :=
@@ -373,7 +305,7 @@ Ltac finish_basic_perms_Type H :=
   (rewrite H; symmetry; now apply Permutation_Type_Add_Type).
 
 Theorem Permutation_Type_Add_Type_inv a l1 l2 :
-  Permutation_Type l1 l2 -> forall l1' l2', Add_Type a l1' l1 -> Add_Type a l2' l2 ->
+  Permutation_Type l1 l2 -> forall l1' l2', Add_inf a l1' l1 -> Add_inf a l2' l2 ->
    Permutation_Type l1' l2'.
 Proof.
  revert l1 l2. refine (Permutation_Type_rect_bis _ _ _ _ _).
@@ -417,7 +349,7 @@ Proof.
      do 2 constructor. now apply IH.
  - (* trans *)
    intros l1 l l2 PE IH PE' IH' l1' l2' AD1 AD2.
-   assert {l' : list A & Add_Type a l' l } as [l' AD].
+   assert {l' : list A & Add_inf a l' l } as [l' AD].
    { clear IH PE' IH' AD2 l2 l2'. revert l1' AD1. induction PE ; intros.
      - inversion AD1.
      - inversion AD1 ; subst.
@@ -443,19 +375,19 @@ Qed.
 Theorem Permutation_Type_app_inv (l1 l2 l3 l4:list A) a :
   Permutation_Type (l1++a::l2) (l3++a::l4) -> Permutation_Type (l1++l2) (l3 ++ l4).
 Proof.
- intros. eapply Permutation_Type_Add_Type_inv; eauto using Add_Type_app.
+ intros. eapply Permutation_Type_Add_Type_inv; eauto using Add_inf_app.
 Qed.
 
 Theorem Permutation_Type_cons_inv l l' a :
  Permutation_Type (a::l) (a::l') -> Permutation_Type l l'.
 Proof.
-  intro. eapply Permutation_Type_Add_Type_inv; eauto using Add_Type_head.
+  intro. eapply Permutation_Type_Add_Type_inv; eauto using Add_inf_head.
 Qed.
 
 Theorem Permutation_Type_cons_app_inv l l1 l2 a :
  Permutation_Type (a :: l) (l1 ++ a :: l2) -> Permutation_Type l (l1 ++ l2).
 Proof.
-  intro. eapply Permutation_Type_Add_Type_inv; eauto using Add_Type_head, Add_Type_app.
+  intro. eapply Permutation_Type_Add_Type_inv; eauto using Add_inf_head, Add_inf_app.
 Qed.
 
 Theorem Permutation_Type_app_inv_l : forall l l1 l2,
@@ -767,5 +699,3 @@ intros l1 l2 HP.
 induction HP ; try constructor ; try assumption.
 etransitivity ; eassumption.
 Qed.
-
-

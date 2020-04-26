@@ -3,7 +3,6 @@
 (** * Axiom(s) of Finite Choice *)
 
 Require Import PeanoNat Lia List.
-Require Vector_more.
 
 (** * Functional Axiom of Choice for finite functions *)
 Lemma AFC {A} : forall (a : A) k (R : nat -> A -> Prop),
@@ -78,7 +77,7 @@ Proof.
 induction l; intros Hinc HF.
 - exists 0; constructor.
 - inversion HF as [ | ? ? v HF1 HF2 Heq0 [Heq1 Heq] ]; subst.
-  apply Vector_more.inj_pairT2_nat in Heq; subst.
+  apply Eqdep_dec.inj_pair2_eq_dec in Heq; [ | exact Nat.eq_dec ]; subst.
   apply IHl in HF2.
   + destruct HF1 as [k1 Hk1].
     destruct HF2 as [k2 Hk2].
@@ -86,11 +85,12 @@ induction l; intros Hinc HF.
     * apply (Hinc h k1); intuition; constructor.
     * revert Hk2; clear - Hinc; induction l; intros HF;
         inversion HF as [ | ? ? v HF1 HF2 Heq0 [Heq1 Heq] ]; 
-        (try apply Vector_more.inj_pairT2_nat in Heq); subst; constructor.
+        try (apply Eqdep_dec.inj_pair2_eq_dec in Heq; [ | exact Nat.eq_dec ]);
+        subst; constructor.
       -- apply Hinc with k2; intuition; constructor; constructor.
       -- apply IHl; intuition.
          inversion H as [ ? v Heq0 [Heq1 Heq] | ? ? v Hin Heq0 [t Heq]]; subst;
-           apply Vector_more.inj_pairT2_nat in Heq; subst;
+           apply Eqdep_dec.inj_pair2_eq_dec in Heq; subst; try exact Nat.eq_dec;
            apply Hinc with i; intuition; constructor; constructor; assumption.
   + intros ? i; intros; apply Hinc with i; intuition; now constructor.
 Qed.
@@ -116,4 +116,3 @@ induction m; intros R Hext Hinc HI.
   + intros; eapply Hext; eassumption.
   + intros; now apply (Hinc _ _ i).
 Qed.
-

@@ -3,7 +3,7 @@
 (** * Factorized statements for different notions of permutation *)
 
 Require Import List CMorphisms.
-Require Import List_Type Permutation_Type_more funtheory Permutation_Type_solve CyclicPerm_Type CPermutation_Type_solve.
+Require Import Permutation_Type_more funtheory Permutation_Type_solve CyclicPerm_Type CPermutation_Type_solve.
 
 
 (** ** Definitions
@@ -249,8 +249,8 @@ destruct b ; intros l1 l2 HP HE.
 Qed.
 
 Lemma PCperm_Type_Forall2 {A B} b (P : A -> B -> Type) :
-  forall l1 l1' l2, PCperm_Type b l1 l1' -> Forall2_Type P l1 l2 -> 
-    { l2' : _ & PCperm_Type b l2 l2' & Forall2_Type P l1' l2' }.
+  forall l1 l1' l2, PCperm_Type b l1 l1' -> Forall2_inf P l1 l2 ->
+    { l2' : _ & PCperm_Type b l2 l2' & Forall2_inf P l1' l2' }.
 Proof.
 destruct b ; [ apply Permutation_Type_Forall2 | apply cperm_Type_Forall2 ].
 Qed.
@@ -264,7 +264,7 @@ destruct b ; intros.
 Qed.
 
 Instance PCperm_Type_Forall_Type {A} b (P : A -> Type) :
-  Proper (PCperm_Type b ==> Basics.arrow) (Forall_Type P).
+  Proper (PCperm_Type b ==> Basics.arrow) (Forall_inf P).
 Proof with try eassumption.
 destruct b ; intros l1 l2 HP HF.
 - eapply Permutation_Type_Forall_Type...
@@ -272,7 +272,7 @@ destruct b ; intros l1 l2 HP HF.
 Qed.
 
 Instance PCperm_Type_Exists_Type {A} b (P : A -> Type) :
-  Proper (PCperm_Type b ==> Basics.arrow) (Exists_Type P).
+  Proper (PCperm_Type b ==> Basics.arrow) (Exists_inf P).
 Proof with try eassumption.
 destruct b ; intros l1 l2 HP HE.
 - eapply Permutation_Type_Exists_Type...
@@ -471,8 +471,8 @@ destruct b ; simpl ; intros l1 l2 HP HF.
 Qed.
 
 Lemma PEperm_Type_Forall2 {A B} b (P : A -> B -> Prop) :
-  forall l1 l1' l2, PEperm_Type b l1 l1' -> Forall2_Type P l1 l2 -> 
-    { l2' : _ & PEperm_Type b l2 l2' & Forall2_Type P l1' l2' }.
+  forall l1 l1' l2, PEperm_Type b l1 l1' -> Forall2_inf P l1 l2 ->
+    { l2' : _ & PEperm_Type b l2 l2' & Forall2_inf P l1' l2' }.
 Proof.
 destruct b ; [ apply Permutation_Type_Forall2 | ].
 intros l1 l1' l2 HE HF ; simpl in HE ; subst.
@@ -490,7 +490,7 @@ destruct b ; intros l l' HP.
 Qed.
 
 Instance PEperm_Type_Forall_Type {A} b (P : A -> Type) :
-  Proper (PEperm_Type b ==> Basics.arrow) (Forall_Type P).
+  Proper (PEperm_Type b ==> Basics.arrow) (Forall_inf P).
 Proof with try eassumption.
 destruct b ; simpl ; intros l1 l2 HP HF.
 - eapply Permutation_Type_Forall_Type...
@@ -498,7 +498,7 @@ destruct b ; simpl ; intros l1 l2 HP HF.
 Qed.
 
 Instance PEperm_Type_Exists_Type {A} b (P : A -> Type) :
-  Proper (PEperm_Type b ==> Basics.arrow) (Exists_Type P).
+  Proper (PEperm_Type b ==> Basics.arrow) (Exists_inf P).
 Proof with try eassumption.
 destruct b ; simpl ; intros l1 l2 HP HF.
 - eapply Permutation_Type_Exists_Type...
@@ -566,4 +566,3 @@ rewrite HPhd.
 rewrite HPtl.
 reflexivity.
 Qed.
-

@@ -51,4 +51,3 @@ dichot_app_exec Hx ; dichot_app_exec Hy ; subst.
     try (rewrite <- ? app_assoc ; apply cperm_app_rot)...
   apply cperm.
 Qed.
-

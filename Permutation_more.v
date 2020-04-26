@@ -3,7 +3,7 @@
 (** * Add-ons for Permutation library
 Usefull properties apparently missing in the Permutation library. *)
 
-Require Import List funtheory.
+Require Import List_more funtheory.
 Require Export Permutation.
 
 Lemma Permutation_app_app_inv {A} : forall (l1 l2 l3 l4 : list A),
@@ -93,7 +93,7 @@ induction l1 ; intros l2 Hi HP.
   specialize IHl1 with (l0 ++ l6).
   rewrite map_app in IHl1.
   apply IHl1 in HP...
-  + apply Hi in Heq3 ; subst.
+  + symmetry in Heq3; apply Hi in Heq3; subst.
     * apply Permutation_cons_app...
     * apply in_eq.
     * apply in_elt.

@@ -1,7 +1,7 @@
 (* Infinite Types *)
 
 Require Import Bool PeanoNat Lia.
-Require Import List_more List_Type funtheory dectype.
+Require Import List_more funtheory dectype.
 
 Set Implicit Arguments.
 
@@ -140,10 +140,10 @@ Lemma pigeon_dectype : pigeon X.
 Proof.
 intros l1; induction l1; simpl; intros l2 Hnd Hl; [ exfalso; lia | ].
 destruct (in_dec eq_dt_dec a l2).
-- apply NoDup_NoDup_Type in Hnd.
+- apply NoDup_NoDup_inf in Hnd.
   inversion_clear Hnd as [ | ? ? Hnin Hnd2 ].
-  apply NoDup_Type_NoDup in Hnd2.
-  apply notin_Type_notin in Hnin.
+  apply NoDup_inf_NoDup in Hnd2.
+  apply notin_inf_notin in Hnin.
   apply IHl1 with (remove eq_dt_dec a l2) in Hnd2.
   + destruct Hnd2 as [b Hb Hnb].
     exists b.
@@ -151,7 +151,7 @@ destruct (in_dec eq_dt_dec a l2).
     * intros Hin; apply Hnb.
       apply in_in_remove; [ | assumption ].
       intros Heq; subst; intuition.
-  + apply remove_length with (Hdec:= eq_dt_dec) in i; lia.
+  + apply remove_length_lt with (eq_dec:= eq_dt_dec) in i; lia.
 - exists a; intuition.
 Qed.
 
@@ -476,4 +476,3 @@ Definition list_infdectype (D : InhDecType) := {|
   fresh_prop := (proj2_sig (@nat_injective_choice (list_dectype D) (nat_injective_list inh_dt)));
 |}.
 (* alternative definition could use: (x : D) : fresh := fun L => x :: concat L *)
-

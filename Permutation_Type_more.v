@@ -3,9 +3,9 @@
 (** * Add-ons for Permutation_Type library
 Usefull properties apparently missing in the Permutation_Type library. *)
 
-Require Import Plus Lia CMorphisms.
+Require Import PeanoNat Lia Permutation CMorphisms.
 
-Require Import List_more Permutation_more List_Type List_Type_more funtheory.
+Require Import List_more funtheory.
 Require Export Permutation_Type.
 
 
@@ -112,7 +112,7 @@ apply Permutation_Type_sym in HP.
 apply Permutation_Type_vs_cons_inv in HP.
 destruct HP as ((l1'', l2'') & HP).
 symmetry in HP.
-dichot_Type_elt_app_exec HP ; subst ;
+dichot_elt_app_inf_exec HP ; subst ;
 rewrite <- ? app_assoc ;
 rewrite <- ? app_comm_cons.
 - exists (l1'', l, l2'); right; reflexivity.
@@ -176,7 +176,7 @@ induction l1 ; intros l2 l3 l4 HP.
   apply Permutation_Type_sym in Heq.
   apply Permutation_Type_vs_cons_inv in Heq.
   destruct Heq as [(l1', l2') Heq].
-  dichot_Type_elt_app_exec Heq ; subst.
+  dichot_elt_app_inf_exec Heq ; subst.
   + rewrite <- ?app_comm_cons in HP.
     rewrite <- app_assoc in HP.
     rewrite <- app_comm_cons in HP.
@@ -209,7 +209,7 @@ Instance Permutation_Type_Forall {A} (P : A -> Prop) :
 Proof.
 intros l1 l2 H.
 apply Permutation_Type_Permutation in H.
-rewrite H ; reflexivity.
+rewrite H; reflexivity.
 Qed.
 
 Instance Permutation_Type_Exists {A} (P : A -> Prop) :
@@ -217,11 +217,11 @@ Instance Permutation_Type_Exists {A} (P : A -> Prop) :
 Proof.
 intros l1 l2 H.
 apply Permutation_Type_Permutation in H.
-rewrite H ; reflexivity.
+rewrite H; reflexivity.
 Qed.
 
 Instance Permutation_Type_Forall_Type {A} (P : A -> Type) :
-  Proper ((@Permutation_Type A) ==> Basics.arrow) (Forall_Type P).
+  Proper ((@Permutation_Type A) ==> Basics.arrow) (Forall_inf P).
 Proof with try assumption.
 intros l1 l2 H.
 induction H ; intro H1...
@@ -237,27 +237,27 @@ induction H ; intro H1...
 Qed.
 
 Instance Permutation_Type_Exists_Type {A} (P : A -> Type) :
-  Proper ((@Permutation_Type A) ==> Basics.arrow) (Exists_Type P).
+  Proper ((@Permutation_Type A) ==> Basics.arrow) (Exists_inf P).
 Proof with try assumption.
 intros l1 l2 H.
 induction H ; intro H1...
 - inversion H1 ; subst.
-  + apply Exists_Type_cons_hd...
+  + apply Exists_inf_cons_hd...
   + apply IHPermutation_Type in X.
-    apply Exists_Type_cons_tl...
+    apply Exists_inf_cons_tl...
 - inversion H1 ; [ | inversion X ] ; subst.
-  + apply Exists_Type_cons_tl.
-    apply Exists_Type_cons_hd...
-  + apply Exists_Type_cons_hd...
-  + apply Exists_Type_cons_tl.
-    apply Exists_Type_cons_tl...
+  + apply Exists_inf_cons_tl.
+    apply Exists_inf_cons_hd...
+  + apply Exists_inf_cons_hd...
+  + apply Exists_inf_cons_tl.
+    apply Exists_inf_cons_tl...
 - apply IHPermutation_Type2.
   apply IHPermutation_Type1...
 Qed.
 
 Lemma Permutation_Type_Forall2 {A B} (P : A -> B -> Type) :
-  forall l1 l1' l2, Permutation_Type l1 l1' -> Forall2_Type P l1 l2 ->
-    { l2' : _ & Permutation_Type l2 l2' & Forall2_Type P l1' l2' }.
+  forall l1 l1' l2, Permutation_Type l1 l1' -> Forall2_inf P l1 l2 ->
+    { l2' : _ & Permutation_Type l2 l2' & Forall2_inf P l1' l2' }.
 Proof.
 intros l1 l1' l2 HP.
 revert l2 ; induction HP ; intros l2 HF ; inversion HF ; subst.
@@ -288,7 +288,7 @@ induction l1 ; intros l2 HP.
   apply Permutation_Type_vs_cons_inv in Heq.
   destruct Heq as ((l1', l2') & Heq).
   symmetry in Heq.
-  decomp_map_Type Heq ; subst.
+  decomp_map_inf Heq ; subst.
   apply Permutation_Type_sym in HP.
   rewrite map_app in HP.
   apply Permutation_Type_cons_app_inv in HP.
@@ -314,7 +314,7 @@ intros f Hi l1 ; induction l1 ; intros l2 HP.
   apply Permutation_Type_vs_cons_inv in Heq.
   destruct Heq as ((l3 & l4) & Heq).
   symmetry in Heq.
-  decomp_map_Type Heq ; subst.
+  decomp_map_inf Heq ; subst.
   rewrite map_app in HP.
   simpl in HP.
   rewrite Heq3 in HP.
@@ -344,11 +344,11 @@ intros a l1 l2 l3 l4 f HP Hf.
 apply Permutation_Type_sym in HP.
 apply Permutation_Type_vs_elt_inv in HP.
 destruct HP as ((l', l'') & Heq).
-dichot_Type_elt_app_exec Heq.
+dichot_elt_app_inf_exec Heq.
 - subst.
   exists (l', l) ; reflexivity.
 - exfalso.
-  decomp_map_Type Heq1.
+  decomp_map_inf Heq1; symmetry in Heq1.
   apply Hf in Heq1.
   inversion Heq1.
 Qed.
@@ -394,8 +394,8 @@ intros l1 ; induction l1 ; intros l2 HP.
   simpl ; erewrite IHl1 ; [ | apply HP ].
   rewrite 2 list_sum_app.
   simpl.
-  rewrite 2 (plus_comm a).
-  rewrite plus_assoc...
+  rewrite 2 (Nat.add_comm a).
+  rewrite Nat.add_assoc...
 Qed.
 
 
@@ -507,4 +507,3 @@ unfold list_max.
 intros l1 l2 HP.
 induction HP ; simpl ; intuition ; try lia.
 Qed.
-

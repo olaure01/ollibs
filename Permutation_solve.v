@@ -20,7 +20,7 @@ Ltac pre_simpl_hyp_perm H :=
   try apply Permutation_cons_inv in H ;
   try apply Permutation_app_inv in H ;
   try apply Permutation_app_inv in H ;
-  try apply Permutation_app_middle_inv in H ;
+  try apply Permutation_app_inv_m in H ;
   try apply Permutation_cons_app_inv in H ;
   try (rewrite app_assoc in H ;
        apply Permutation_cons_app_inv in H) ;

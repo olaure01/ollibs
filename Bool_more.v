@@ -2,14 +2,14 @@
 
 (** * Add-ons for Bool library *)
 
-Require Export Bool.
-
-Require Import Eqdep_dec.
+(*
+Require Bool Eqdep_dec.
 
 (** * Uniqueness of Identity Proofs (UIP) at [bool] type *)
-Definition UIP_bool2 := UIP_dec bool_dec.
+Definition UIP_bool := Eqdep_dec.UIP_dec Bool.bool_dec.
+*)
 
-(* alternative direct proof:)
+(* alternative direct proof:
 (* begin hide *)
 Lemma eq_refl_bool_ext : forall b1 b2 : bool, b1 = b2 -> b1 = b2.
 Proof. destruct b1, b2; intros; ( reflexivity || assumption ). Defined.
