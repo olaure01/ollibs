@@ -1,18 +1,18 @@
-(* BOrders Library *)
-
 (** * Class of Boolean-valued total orders *)
 
 Require Import Bool PeanoNat Wf_nat Lia List Orders.
 Require Import funtheory.
 
+Set Implicit Arguments.
+
 Definition BRelation A := A -> A -> bool.
 
 Class BOrder := {
   carrier : Type ;
-  leqb : BRelation carrier ;
-  total : forall a b, leqb a b = false -> leqb b a = true ;
-  asym :  forall a b, leqb a b = true -> leqb b a = true -> a = b ;
-  trans : forall a b c, leqb a b = true -> leqb b c = true -> leqb a c = true
+  leb : BRelation carrier ;
+  total : forall a b, leb a b = false -> leb b a = true ;
+  asym :  forall a b, leb a b = true -> leb b a = true -> a = b ;
+  trans : forall a b c, leb a b = true -> leb b c = true -> leb a c = true
 }.
 
 (** Equivalence with UsualOrderedTypeFull. *)
@@ -24,7 +24,7 @@ Module BOrder_to_UsualOrderedTypeFull : UsualOrderedTypeFull.
   Definition eq := @eq (@carrier B).
   Definition eq_equiv : Equivalence eq := eq_equivalence.
   Local Coercion is_true : bool >-> Sortclass.
-  Definition lt x y := @leqb B x y /\ x <> y.
+  Definition lt x y := @leb B x y /\ x <> y.
 
   Lemma lt_strorder : StrictOrder lt.
   Proof.
@@ -36,55 +36,53 @@ Module BOrder_to_UsualOrderedTypeFull : UsualOrderedTypeFull.
   - intros a b c [Hleq1 Hneq1] [Hleq2 Hneq2] ; split.
     + eapply trans ; eassumption.
     + intros Heq ; subst.
-      case_eq (leqb b c) ; intros Heqbb ;
-        [ case_eq (leqb c b) ; intros Heqbb2 | ].
+      case_eq (leb b c); intros Heqbb ;
+        [ case_eq (leb c b); intros Heqbb2 | ].
       * apply asym in Heqbb ; try assumption ; subst.
         apply Hneq1 ; reflexivity.
-      * rewrite Heqbb2 in Hleq1 ; inversion Hleq1.
-      * rewrite Heqbb in Hleq2 ; inversion Hleq2.
+      * rewrite Heqbb2 in Hleq1; inversion Hleq1.
+      * rewrite Heqbb in Hleq2; inversion Hleq2.
   Qed.
 
   Lemma lt_compat : Proper (eq==>eq==>iff) lt.
   Proof.
-  intros a b H1 c d H2 ; unfold eq in H1 ; unfold eq in H2 ;
-    subst; reflexivity.
+  intros a b H1 c d H2; unfold eq in H1, H2; subst; reflexivity.
   Qed.
 
   Definition compare x y :=
-    if @leqb B x y then (if leqb y x then Eq else Lt) else Gt.
+    if @leb B x y then (if leb y x then Eq else Lt) else Gt.
 
   Lemma compare_spec : forall x y, CompSpec eq lt x y (compare x y).
   Proof.
   intros.
   unfold compare.
-  case_eq (leqb x y).
-  - case_eq (leqb y x) ; constructor.
-    + apply asym ; assumption.
-    + split ; try assumption.
-      intros Heq ; subst.
-      rewrite H0 in H ; inversion H.
+  case_eq (leb x y).
+  - case_eq (leb y x); constructor.
+    + apply asym; assumption.
+    + split; try assumption.
+      intros Heq; subst.
+      rewrite H0 in H; inversion H.
   - constructor.
     assert (Ht := total _ _ H).
-    split ; try assumption.
-    intros Heq ; subst.
-    rewrite Ht in H ; inversion H.
+    split; try assumption.
+    intros Heq; subst.
+    rewrite Ht in H; inversion H.
   Qed.
 
   Lemma eq_dec : forall x y, {eq x y} + {eq x y -> False}.
   Proof.
   intros.
-  case_eq (leqb x y) ; case_eq (leqb y x) ; intros Heq1 Heq2.
-  - apply asym in Heq1 ; try assumption ; subst.
-    left ; reflexivity.
-  - right ; intros Heq ; unfold eq in Heq ; subst.
-    rewrite Heq1 in Heq2 ; inversion Heq2.
-  - right ; intros Heq ; unfold eq in Heq ; subst.
-    rewrite Heq1 in Heq2 ; inversion Heq2.
+  case_eq (leb x y); case_eq (leb y x); intros Heq1 Heq2.
+  - apply asym in Heq1; subst; intuition.
+  - right; intros Heq; unfold eq in Heq; subst.
+    rewrite Heq1 in Heq2; inversion Heq2.
+  - right; intros Heq; unfold eq in Heq; subst.
+    rewrite Heq1 in Heq2; inversion Heq2.
   - apply total in Heq1.
-    rewrite Heq1 in Heq2 ; inversion Heq2.
+    rewrite Heq1 in Heq2; inversion Heq2.
   Qed.
 
-  Definition le x y := is_true (@leqb B x y).
+  Definition le x y := is_true (@leb B x y).
 
   Lemma le_lteq : forall x y, le x y <-> lt x y \/ eq x y.
   Proof.
@@ -95,12 +93,11 @@ Module BOrder_to_UsualOrderedTypeFull : UsualOrderedTypeFull.
     + left ; split ; assumption.
   - intros [[Hle Heq] | Heq]; auto.
     rewrite Heq.
-    case_eq (leqb y y) ; intros Heq2.
-    + unfold le.
-      rewrite Heq2 ; reflexivity.
+    case_eq (leb y y); intros Heq2.
+    + unfold le; rewrite Heq2; reflexivity.
     + exfalso.
       assert (Heq3 := total _ _ Heq2).
-      rewrite Heq2 in Heq3 ; inversion Heq3.
+      rewrite Heq2 in Heq3; inversion Heq3.
   Qed.
 
 End BOrder_to_UsualOrderedTypeFull.
@@ -207,65 +204,62 @@ split with nat Nat.leb; intros.
 Defined.
 
 Lemma border_inj {A B} (f : A -> @carrier B) (Hi : injective f) : BOrder.
-Proof with try eassumption.
-split with A (fun x y => leqb (f x) (f y)) ; intros.
-- apply total...
+Proof.
+split with A (fun x y => leb (f x) (f y)) ; intros.
+- now apply total.
 - apply Hi.
-  apply asym...
-- eapply trans...
+  now apply asym.
+- now apply trans with (f b).
 Defined.
-
-
 
 
 (** * Sorted lists over [BOrder] *)
 
 (** ** Insertion sort *)
 
-Fixpoint insert {B} (a : @carrier B) (l : list (@carrier B)) :=
+Fixpoint insert B (a : @carrier B) (l : list (@carrier B)) :=
 match l with
 | nil => a :: nil
-| b :: t => if (leqb a b) then a :: b :: t
-                          else b :: (insert a t)
+| b :: t => if (leb a b) then a :: b :: t
+                         else b :: (insert B a t)
 end.
+Arguments insert [_] _ _.
 
-Lemma insert_insert {B} : forall (x y : @carrier B) l,
+Lemma insert_insert B : forall (x y : @carrier B) l,
   insert y (insert x l) = insert x (insert y l).
-Proof with try reflexivity.
+Proof.
 induction l ; simpl.
-- case_eq (leqb x y) ; intros Heqbb1 ;
-  case_eq (leqb y x) ; intros Heqbb2...
-  + apply (asym _ _ Heqbb1) in Heqbb2 ; subst...
+- case_eq (leb x y); case_eq (leb y x); intros Heqbb1 Heqbb2; auto.
+  + now apply (asym _ _ Heqbb1) in Heqbb2; subst.
   + apply total in Heqbb1.
     rewrite Heqbb1 in Heqbb2 ; now discriminate Heqbb2.
-- case_eq (leqb x a) ; intros Heqbb1 ;
-  case_eq (leqb y a) ; intros Heqbb2 ; simpl ;
-    try rewrite Heqbb1 ; try rewrite Heqbb2...
-  + case_eq (leqb x y) ; intros Heqbb ;
-    case_eq (leqb y x) ; intros Heqbb' ;
-      try rewrite Heqbb1 ; try rewrite Heqbb2...
-    * apply (asym _ _ Heqbb) in Heqbb' ; subst...
+- case_eq (leb x a); case_eq (leb y a); intros Heqbb1 Heqbb2; simpl;
+    try rewrite Heqbb1; try rewrite Heqbb2.
+  + case_eq (leb x y); case_eq (leb y x); intros Heqbb Heqbb';
+      try rewrite Heqbb1; try rewrite Heqbb2; auto.
+    * now apply (asym _ _ Heqbb) in Heqbb'; subst.
     * apply total in Heqbb.
-      rewrite Heqbb in Heqbb' ; now discriminate Heqbb'.
-  + case_eq (leqb y x) ; intros Heqbb' ;
-      try rewrite Heqbb1 ; try rewrite Heqbb2...
-    apply (trans _ _ _ Heqbb') in Heqbb1.
+      rewrite Heqbb in Heqbb'; now discriminate Heqbb'.
+  + case_eq (leb y x); intros Heqbb';
+      try rewrite Heqbb1; try rewrite Heqbb2; auto.
+    apply (trans _ _ _ Heqbb') in Heqbb2.
     rewrite Heqbb1 in Heqbb2 ; now discriminate Heqbb2.
-  + case_eq (leqb x y) ; intros Heqbb ;
-      try rewrite Heqbb1 ; try rewrite Heqbb2...
-    apply (trans _ _ _ Heqbb) in Heqbb2.
+  + case_eq (leb x y); intros Heqbb;
+      try rewrite Heqbb1 ; try rewrite Heqbb2; auto.
+    apply (trans _ _ _ Heqbb) in Heqbb1.
     rewrite Heqbb1 in Heqbb2 ; now discriminate Heqbb2.
-  + rewrite IHl...
+  + now rewrite IHl.
 Qed.
 
 (** ** Sorted lists *)
 
-Fixpoint is_sorted {B} (l : list (@carrier B)) :=
+Fixpoint is_sorted B (l : list (@carrier B)) :=
 match l with
 | nil => true
 | a :: nil => true
-| a :: (b :: _) as r => leqb a b && is_sorted r
+| a :: (b :: _) as r => leb a b && is_sorted B r
 end.
+Arguments is_sorted [_] _.
 
 Lemma is_sorted_tail {B} : forall a l,
   @is_sorted B (a :: l) = true -> is_sorted l = true.
@@ -290,32 +284,31 @@ f_equal.
 apply (Eqdep_dec.UIP_dec bool_dec).
 Qed.
 
-Lemma insert_sorted {B} : forall s a (m : SortedList B),
+Lemma insert_sorted B : forall s a (m : SortedList B),
   length (proj1_sig m) = s ->
   let l := insert a (proj1_sig m) in
     is_sorted l = true /\ l <> nil
  /\ forall c, In c l -> In c (proj1_sig m) \/ c = a.
-Proof with try reflexivity ; try assumption.
+Proof.
 induction s as [s IH] using (well_founded_induction lt_wf).
 intros a m Hlen l.
 destruct m as [l0 Hsort].
-destruct l0 ; (split ; [ | split ])...
+destruct l0 ; (split ; [ | split ]); auto.
 - intro Heq ; discriminate Heq.
 - intros c Hc.
-  inversion Hc.
-  + right ; rewrite H...
-  + inversion H.
+  inversion Hc as [ -> | Hin ].
+  + now right.
+  + inversion Hin.
 - unfold l ; simpl.
-  case_eq (leqb a c) ; intros Heqbb.
-  + apply andb_true_iff ; split...
+  case_eq (leb a c) ; intros Heqbb.
+  + now apply andb_true_iff ; split.
   + destruct s ; inversion Hlen.
     destruct (IH s (le_n _) a (exist _ l0 (is_sorted_tail _ _ Hsort)) H0)
       as [Hsort' _].
     apply total in Heqbb.
-    destruct l0 ; try (apply andb_true_iff ; split)...
-    simpl.
-    simpl in Hsort'.
-    destruct (leqb a c0) ; apply andb_true_iff ; split...
+    destruct l0 ; try (apply andb_true_iff ; split); auto.
+    simpl; simpl in Hsort'.
+    destruct (leb a c0) ; apply andb_true_iff ; split; auto.
     clear Hlen l.
     simpl in Hsort.
     apply andb_true_iff in Hsort.
@@ -323,17 +316,19 @@ destruct l0 ; (split ; [ | split ])...
 - intro Heq.
   unfold l in Heq.
   simpl in Heq.
-  destruct (leqb a c) ; discriminate Heq.
+  destruct (leb a c) ; discriminate Heq.
 - intros d Hd.
   unfold l in Hd.
   simpl in Hd.
-  destruct (leqb a c).
-  + inversion Hd ; [ right ; rewrite H | left ]...
-  + inversion Hd.
-    * left ; left...
-    * destruct s ; inversion Hlen.
-      destruct (IH s (le_n _) a (exist _ l0 (is_sorted_tail _ _ Hsort)) H1)
-        as [_ Hin].
-      apply Hin in H.
-      destruct H ; [ left ; apply in_cons | right ]...
+  destruct (leb a c).
+  + now inversion Hd as [ -> | ] ; [ right | left ].
+  + inversion Hd as [ -> | Hin ].
+    * now left; left.
+    * destruct s; inversion Hlen as [ Hlen' ].
+      destruct (IH s (le_n _) a (exist _ l0 (is_sorted_tail _ _ Hsort)) Hlen')
+        as [_ Hin'].
+      apply Hin' in Hin.
+      now destruct Hin; [ left; apply in_cons | right ].
 Qed.
+
+Arguments insert_sorted [_] _ _ _.

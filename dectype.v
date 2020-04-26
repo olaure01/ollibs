@@ -100,7 +100,7 @@ Section DecTypes.
   Proof. intros x y Hneq u v; now destruct (eq_dt_dec x y). Qed.
 
 
-  (* Statements from [Module DecidableEqDep] in Eqdep_dec *)
+  (** Statements from [Module DecidableEqDep] in Eqdep_dec *)
   Lemma eq_rect_eq : forall x (P : X -> Type) p h, p = eq_rect x P p x h.
   Proof (Eqdep_dec.eq_rect_eq_dec eq_dt_dec).
 
@@ -124,14 +124,14 @@ End DecTypes.
 
 (** * Instances and Constructions *)
 
-(* the [Empty_set] instance *)
+(** the [Empty_set] instance *)
 Definition Empty_set_dectype := {|
   car := Empty_set;
   eqb := fun _ _ => true;
   eqb_eq := fun a b => match a with end
 |}.
 
-(* the [unit] instance *)
+(** the [unit] instance *)
 Definition unit_dectype := {|
   car := unit;
   eqb := fun _ _ => true;
@@ -140,21 +140,21 @@ Definition unit_dectype := {|
                        end
 |}.
 
-(* the [bool] instance *)
+(** the [bool] instance *)
 Definition bool_dectype := {|
   car := bool;
   eqb := Bool.eqb;
   eqb_eq := Bool.eqb_true_iff
 |}.
 
-(* the [nat] instance *)
+(** the [nat] instance *)
 Definition nat_dectype := {|
   car := nat;
   eqb := Nat.eqb;
   eqb_eq := Nat.eqb_eq
 |}.
 
-(* the [option] construction *)
+(** the [option] construction *)
 Scheme Equality for option.
 
 Definition option_dectype (D : DecType) := {|
@@ -165,7 +165,7 @@ Definition option_dectype (D : DecType) := {|
                       (@internal_option_dec_lb _ _ (fun x y => proj2 (D.(@eqb_eq) x y)) a b)
 |}.
 
-(* the [sum] construction *)
+(** the [sum] construction *)
 Scheme Equality for sum.
 
 Definition sum_dectype (D1 D2 : DecType) := {|
@@ -178,7 +178,7 @@ Definition sum_dectype (D1 D2 : DecType) := {|
                                                      (fun x y => proj2 (D2.(@eqb_eq) x y)) a b)
 |}.
 
-(* the [prod] construction *)
+(** the [prod] construction *)
 Scheme Equality for prod.
 
 Definition prod_dectype (D1 D2 : DecType) := {|
@@ -191,7 +191,7 @@ Definition prod_dectype (D1 D2 : DecType) := {|
                                                       (fun x y => proj2 (D2.(@eqb_eq) x y)) a b)
 |}.
 
-(* the [list] construction *)
+(** the [list] construction *)
 Scheme Equality for list.
 
 Definition list_dectype (D : DecType) := {|
@@ -202,8 +202,8 @@ Definition list_dectype (D : DecType) := {|
                        (@internal_list_dec_lb _ _ (fun x y => proj2 (D.(@eqb_eq) x y)) a b)
 |}.
 
-(* the [minus] construction *)
-(*   remove an element from a DecType *)
+(** the [minus] construction *)
+(**   remove an element from a DecType *)
 Section Minus.
 
   Context { D : DecType }.
@@ -229,7 +229,7 @@ End Minus.
 
 (** * Tactics *)
 
-(* a tactic for automatic case analysis on equalities on a [DecType] *)
+(** a tactic for automatic case analysis on equalities on a [DecType] *)
 Ltac case_analysis :=
 let Heq := fresh "Heq" in
 let Heqeq := fresh "Heqeq" in
@@ -247,7 +247,7 @@ end; simpl.
 
 
 (** * Inhabited Decidable Types *)
-(* types with a boolean binary predicate equivalent to equality *)
+(** types with a boolean binary predicate equivalent to equality *)
 
 Record InhDecType := {
   inhcar :> DecType;
@@ -296,4 +296,3 @@ Definition list_inhdectype (D : DecType) := {|
   inhcar := list_dectype D;
   inh_dt := inhabited_Type_list D
 |}.
-
