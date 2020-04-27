@@ -1,8 +1,8 @@
 (** * Add-ons for List library
 Usefull tactics and properties apparently missing in the List library. *)
 
-Require Export List.
 Require Import PeanoNat.
+Require Export List.
 Import EqNotations.
 
 Set Implicit Arguments.
@@ -451,14 +451,14 @@ end.
 (* TODO in_concat from List is enough? (iff shape)
 Lemma in_concat {A} : forall (l : list A) (L : list (list A)) a, In a l -> In l L -> In a (concat L).
 Proof.
-  intros l L a Hin1 Hin2.
-  induction L; simpl; inversion_clear Hin2; subst.
-  - clear IHL; induction l; inversion_clear Hin1; [left|right]; intuition.
-  - apply in_or_app; intuition.
+intros l L a Hin1 Hin2.
+induction L; simpl; inversion_clear Hin2; subst.
+- clear IHL; induction l; inversion_clear Hin1; [left|right]; intuition.
+- apply in_or_app; intuition.
 Qed.
 *)
 
-(* an iff shape exists with same name in stdlib
+(* TODO an iff shape exists with same name in stdlib
 Lemma in_flat_map {A B} : forall (f : A -> list B) x a l,
   In x (f a) -> In a l -> In x (flat_map f l).
 Proof.
@@ -493,40 +493,37 @@ Lemma concat_vs_elt {A} : forall (a : A) L l1 l2,
     {'(L1,L2,l1',l2') | l1 = concat L1 ++ l1' /\ l2 = l2' ++ concat L2
                       /\ L = L1 ++ (l1' ++ a :: l2') :: L2 }.
 Proof.
-  intros a L.
-  induction L; intros l1 l2 eq.
-  - destruct l1; inversion eq.
-  - simpl in eq.
-    dichot_elt_app_inf_exec eq.
-    + split with (nil,L,l1,l).
-      subst.
-      split; [ | split]; reflexivity.
-    + destruct IHL with l0 l2 as ((((L1,L2),l1'),l2') & (eqb & eqt & eq)) ; [symmetry ; apply eq1 |].
-      split with ((a0 :: L1),L2,l1',l2').
-      subst.
-      split ; [ | split]; try reflexivity.
-      apply app_assoc.
+intros a L.
+induction L; intros l1 l2 eq.
+- destruct l1; inversion eq.
+- simpl in eq.
+  dichot_elt_app_inf_exec eq.
+  + split with (nil,L,l1,l).
+    subst.
+    split; [ | split]; reflexivity.
+  + destruct IHL with l0 l2 as ((((L1,L2),l1'),l2') & (eqb & eqt & eq)) ; [symmetry ; apply eq1 |].
+    split with ((a0 :: L1),L2,l1',l2').
+    subst.
+    split ; [ | split]; try reflexivity.
+    apply app_assoc.
 Qed.
 
 Lemma concat_Forall2_inf {A B} : forall (L : list (list A)) (l : list B) R,
     Forall2_inf R (concat L) l ->
     { L' & concat L' = l & Forall2_inf (Forall2_inf R) L L' }.
-Proof with try assumption.
-  induction L; intros l R F2R.
-  - inversion F2R; subst.
-    split with nil.
-    + reflexivity.
-    + apply Forall2_inf_nil.
-  - simpl in F2R.
-    destruct Forall2_inf_app_inv_l with A B R a (concat L) l...
-    destruct x.
-    destruct y.
-    simpl in *.
-    destruct IHL with l1 R as [L' p1 p2]...
-    split with (l0 :: L').
-    + simpl; rewrite p1...
-      symmetry...
-    + apply Forall2_inf_cons...
+Proof.
+induction L; intros l R F2R.
+- inversion F2R; subst.
+  split with nil.
+  + reflexivity.
+  + apply Forall2_inf_nil.
+- simpl in F2R.
+  destruct Forall2_inf_app_inv_l with A B R a (concat L) l; auto.
+  destruct x, y; simpl in *.
+  destruct IHL with l1 R as [L' p1 p2]; auto.
+  split with (l0 :: L').
+  + simpl; rewrite p1; auto.
+  + now apply Forall2_inf_cons.
 Qed.
 
 (** ** [flat_map] *)
@@ -542,21 +539,21 @@ Qed.
 
 Lemma Forall_map {A B} : forall (f : A -> B) l,
   Forall (fun x => exists y, x = f y) l <-> exists l0, l = map f l0.
-Proof with try reflexivity.
+Proof.
 induction l ; split ; intro H.
-- exists (@nil A)...
+- now exists (@nil A).
 - constructor.
 - inversion H ; subst.
   destruct H2 as [y Hy] ; subst.
   apply IHl in H3.
   destruct H3 as [l0 Hl0] ; subst.
-  exists (y :: l0)...
+  now exists (y :: l0).
 - destruct H as [l0 Heq].
   destruct l0 ; inversion Heq ; subst.
   constructor.
-  + exists a0...
+  + now exists a0.
   + apply IHl.
-    exists l0...
+    now exists l0.
 Qed.
 
 (* TODO easy consequence of Forall_impl
@@ -567,11 +564,11 @@ Proof.
 intros P l i j Hinc HP Hle; apply (@Forall_impl _ (P i)); intuition.
 now apply (Hinc i).
 Qed.
-Proof with try eassumption.
+Proof.
 intros P l i j Hinc.
-induction l ; intros H Hl ; constructor ; inversion H.
-- eapply Hinc...
-- apply IHl...
+induction l; intros H Hl; constructor; inversion H.
+- now apply Hinc with i.
+- now apply IHl.
 Qed.
 *)
 
@@ -600,9 +597,9 @@ Defined.
 Lemma Forall_to_list_length T P (l : list T) (Fl : Forall_inf P l) :
   length (Forall_to_list Fl) = length l.
 Proof.
-  induction Fl.
-  - reflexivity.
-  - simpl; rewrite IHFl; reflexivity.
+induction Fl.
+- reflexivity.
+- simpl; rewrite IHFl; reflexivity.
 Qed.
 
 Lemma Forall_to_list_to_Forall T P : forall L FL,
@@ -611,50 +608,50 @@ Proof.
 induction FL ; simpl.
 - reflexivity.
 - transitivity (Forall_inf_cons x p
-                (rew [Forall_inf P] Forall_to_list_support FL in 
-                    list_to_Forall (Forall_to_list FL))).
-   + clear.
-     destruct (Forall_to_list_support FL) ; reflexivity.
-   + rewrite IHFL ; reflexivity.
+               (rew [Forall_inf P] Forall_to_list_support FL in 
+                   list_to_Forall (Forall_to_list FL))).
+  + clear.
+    destruct (Forall_to_list_support FL) ; reflexivity.
+  + rewrite IHFL ; reflexivity.
 Qed.
 
 (** *** Properties about [Forall2_inf] *)
 
 Lemma Forall2_inf_length A B : forall l1 l2 (R : A -> B -> Type),
   Forall2_inf R l1 l2 -> length l1 = length l2.
-Proof with try assumption ; try reflexivity.
-  intros l1 l2 R HF; induction HF...
-  simpl; rewrite IHHF...
+Proof.
+  intros l1 l2 R HF; induction HF; auto.
+  now simpl; rewrite IHHF.
 Qed.
 
 Lemma Forall2_inf_in_l A B : forall l1 l2 a (R : A -> B -> Type),
   Forall2_inf R l1 l2 -> In_inf a l1 -> {b & prod (In_inf b l2) (R a b)}.
-Proof with try assumption ; try reflexivity.
-  intros l1 l2 a R HF.
-  induction HF ; intro Hin; inversion Hin.
-  - subst.
-    split with y.
-    split...
-    left...
-  - destruct IHHF as (b & Hinb & HRab)...
-    split with b.
-    split...
-    right...
+Proof.
+intros l1 l2 a R HF.
+induction HF ; intro Hin; inversion Hin.
+- subst.
+  split with y.
+  split; auto.
+  now left.
+- destruct IHHF as (b & Hinb & HRab); auto.
+  split with b.
+  split; auto.
+  now right.
 Qed.
 
 Lemma Forall2_inf_in_r A B : forall l1 l2 b (R : A -> B -> Type),
   Forall2_inf R l1 l2 -> In_inf b l2 -> {a & prod (In_inf a l1) (R a b)}.
-Proof with try assumption ; try reflexivity.
-  intros l1 l2 b R HF.
-  induction HF ; intro Hin; inversion Hin.
-  - subst.
-    split with x.
-    split...
-    left...
-  - destruct IHHF as (a & Hina & HRab)...
-    split with a.
-    split...
-    right...
+Proof.
+intros l1 l2 b R HF.
+induction HF ; intro Hin; inversion Hin.
+- subst.
+  split with x.
+  split; auto.
+  now left.
+- destruct IHHF as (a & Hina & HRab); auto.
+  split with a.
+  split; auto.
+  now right.
 Qed.
 
 (*** *** [In_Forall_inf] *)
@@ -670,43 +667,39 @@ Section In_Forall_inf.
 
   Lemma In_Forall_inf_elt: forall l1 l2 a (Fl : Forall_inf P (l1 ++ a :: l2)),
       {Pa : P a & In_Forall_inf Pa Fl}.
-  Proof with try assumption.
-    intros l1.
-    induction l1; intros l2 a' Fl.
-    - simpl in Fl.
-      remember (a' :: l2).
-      destruct Fl; inversion Heql.
-      subst.
-      split with p.
-      left.
-      reflexivity.
-    - remember ((a :: l1) ++ a' :: l2).
-      destruct Fl; inversion Heql.
-      subst.
-      destruct IHl1 with l2 a' Fl as (Pa , Hin)...
-      split with Pa.
-      right...
+  Proof.
+  induction l1; intros l2 a' Fl.
+  - simpl in Fl.
+    remember (a' :: l2).
+    destruct Fl; inversion Heql.
+    subst.
+    split with p.
+    now left.
+  - remember ((a :: l1) ++ a' :: l2).
+    destruct Fl; inversion Heql.
+    subst.
+    destruct IHl1 with l2 a' Fl as (Pa , Hin); auto.
+    split with Pa.
+    now right.
   Qed.
 
   Lemma In_Forall_inf_in : forall l a (Fl : Forall_inf P l),
-      In_inf a l ->
-      {Pa : P a & In_Forall_inf Pa Fl}.
-  Proof with try assumption.
-    intros l.
-    induction l; intros a' Fl Hin; inversion Hin.
-    - subst.
-      remember (a' :: l) as l'.
-      destruct Fl; inversion Heql'.
-      subst.
-      split with p.
-      left.
-      reflexivity.
-    - remember (a :: l) as l'.
-      destruct Fl; inversion Heql'.
-      subst.
-      destruct IHl with a' Fl as (Pa & Hin')...
-      split with Pa.
-      right...
+    In_inf a l -> {Pa : P a & In_Forall_inf Pa Fl}.
+  Proof.
+  intros l.
+  induction l; intros a' Fl Hin; inversion Hin.
+  - subst.
+    remember (a' :: l) as l'.
+    destruct Fl; inversion Heql'.
+    subst.
+    split with p.
+    now left.
+  - remember (a :: l) as l'.
+    destruct Fl; inversion Heql'.
+    subst.
+    destruct IHl with a' Fl as (Pa & Hin'); auto.
+    split with Pa.
+    now right.
   Qed.
 
   Fixpoint Forall_inf_sum (f : forall a, P a -> nat) (l : list A) (Pl : Forall_inf P l) :=
@@ -726,19 +719,19 @@ Section In_Forall_inf.
       Forall_inf_sum f (Forall_inf_App Pl1 Pl2)
     = Forall_inf_sum f Pl1 + Forall_inf_sum f Pl2.
   Proof.
-    intros f l1 l2 Pl1 Pl2.
-    induction Pl1.
-    - reflexivity.
-    - simpl; rewrite IHPl1.
-      apply Nat.add_assoc.
+  intros f l1 l2 Pl1 Pl2.
+  induction Pl1.
+  - reflexivity.
+  - simpl; rewrite IHPl1.
+    apply Nat.add_assoc.
   Qed.
 
   Lemma In_Forall_inf_to_In_inf : forall l (L : list A) (p : P l) (PL : Forall_inf P L),
     In_Forall_inf p PL -> In_inf l L.
-  Proof with try assumption ; try reflexivity.
-    intros l L p PL Hin; induction PL; inversion Hin.
-    - left; inversion H; subst...
-    - right; apply IHPL...
+  Proof.
+  intros l L p PL Hin; induction PL; inversion Hin.
+  - now left; inversion H; subst.
+  - now right; apply IHPL.
   Qed.
 
 End In_Forall_inf.
@@ -754,41 +747,37 @@ Fixpoint map2 {A B C} (f : A -> B -> C) l1 l2 :=
 
 Lemma map2_length {A B C} : forall (f : A -> B -> C) l1 l2,
   length l1 = length l2 -> length (map2 f l1 l2) = length l2.
-Proof with try assumption ; try reflexivity.
-induction l1 ; intros...
+Proof.
+induction l1; intros; auto.
 destruct l2.
-+ inversion H.
-+ simpl in H.
-  injection H ; intro H'.
-  apply IHl1 in H'.
-  simpl...
-  rewrite H'...
+- inversion H.
+- simpl in H; injection H; intro H'.
+  apply IHl1 in H'; simpl; auto.
 Qed.
 
 Lemma length_map2 {A B C} : forall (f : A -> B -> C) l1 l2,
   length (map2 f l1 l2) <= length l1 /\ length (map2 f l1 l2) <= length l2.
 Proof.
-induction l1 ; intros.
-- split ; apply le_0_n.
+induction l1; intros.
+- split; apply le_0_n.
 - destruct l2.
-  + split ; apply le_0_n.
+  + split; apply le_0_n.
   + destruct (IHl1 l2) as [H1 H2].
-    split ; simpl ; apply le_n_S ; assumption.
+    now split; simpl; apply le_n_S.
 Qed.
 
 Lemma nth_map2 {A B C} : forall (f : A -> B -> C) l1 l2 i a b c,
   i < length (map2 f l1 l2) ->
     nth i (map2 f l1 l2) c = f (nth i l1 a) (nth i l2 b).
-Proof with try assumption ; try reflexivity.
-induction l1 ; intros.
+Proof.
+induction l1; intros.
 - inversion H.
 - destruct l2.
   + inversion H.
-  + destruct i...
-    simpl.
+  + destruct i; simpl; auto.
     apply IHl1.
     simpl in H.
-    apply Nat.succ_lt_mono...
+    now apply Nat.succ_lt_mono.
 Qed.
 
 (** * [fold_right] *)

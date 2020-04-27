@@ -42,15 +42,15 @@ Ltac PCperm_solve :=
 (** *** Properties *)
 
 Instance PCperm_perm A b : Proper (PCperm b ==> (@Permutation A)) id.
-Proof with try assumption.
-destruct b ; intros l l' HP...
-apply CPermutation_Permutation...
+Proof.
+destruct b; intros l l' HP; auto.
+now apply CPermutation_Permutation.
 Qed.
 
 Instance cperm_PCperm A b : Proper (@CPermutation A ==> PCperm b) (@id (list A)).
-Proof with try assumption.
-destruct b ; intros l l' HC...
-apply CPermutation_Permutation...
+Proof.
+destruct b ; intros l l' HC; auto.
+now apply CPermutation_Permutation.
 Qed.
 
 Lemma PCperm_monot A : forall b1 b2, Bool.leb b1 b2 ->
@@ -62,19 +62,13 @@ apply CPermutation_Permutation.
 Qed.
 
 Instance PCperm_refl A b : Reflexive (@PCperm A b).
-Proof.
-destruct b ; intros l ; reflexivity.
-Qed.
+Proof. destruct b; intros l; reflexivity. Qed.
 
 Instance PCperm_sym A b : Symmetric (@PCperm A b).
-Proof.
-destruct b ; intros l l' ; symmetry ; assumption.
-Qed.
+Proof. destruct b; intros l l'; now symmetry. Qed.
 
 Instance PCperm_trans A b : Transitive (@PCperm A b).
-Proof.
-destruct b ; intros l l' l'' ; etransitivity ; eassumption.
-Qed.
+Proof. destruct b; intros l l' l''; now transitivity l'. Qed.
 
 Instance PCperm_equiv A b : Equivalence (@PCperm A b).
 Proof.
@@ -86,83 +80,73 @@ Qed.
 
 Lemma PCperm_swap A b : forall (a1 : A) a2,
   PCperm b (a1 :: a2 :: nil) (a2 :: a1 :: nil).
-Proof.
-destruct b ; intros.
-- apply perm_swap.
-- apply CPermutation_swap.
-Qed.
+Proof. destruct b; intros; [ apply perm_swap | apply CPermutation_swap ]. Qed.
 
 Lemma PCperm_last A b : forall (a : A) l, PCperm b (a :: l) (l ++ a :: nil).
 Proof.
-destruct b ; intros ;
-  rewrite <- (app_nil_l l) ; rewrite app_comm_cons.
+destruct b; intros; rewrite <- (app_nil_l l), app_comm_cons.
 - apply Permutation_cons_append.
 - apply CPermutation_cons_append.
 Qed.
 
 Lemma PCperm_app_comm A b : forall l l', @PCperm A b (l ++ l') (l' ++ l).
-Proof.
-destruct b ; intros.
-- apply Permutation_app_comm.
-- apply cperm.
-Qed.
+Proof. destruct b; intros; [ apply Permutation_app_comm | apply cperm ]. Qed.
 
 Lemma PCperm_app_rot A b : forall l1 l2 l3,
   @PCperm A b  (l1 ++ l2 ++ l3) (l2 ++ l3 ++ l1).
-Proof.
-destruct b ; intros.
+Proof. 
+destruct b; intros.
 - apply Permutation_app_rot.
 - apply CPermutation_app_rot.
 Qed.
 
 Lemma PCperm_nil A b : forall l, @PCperm A b nil l -> l = nil.
-Proof with try assumption.
+Proof.
 destruct b ; intros.
-- apply Permutation_nil...
-- apply CPermutation_nil...
+- now apply Permutation_nil.
+- now apply CPermutation_nil.
 Qed.
 
 Lemma PCperm_nil_cons A b : forall l (a : A), ~ PCperm b nil (a :: l).
-Proof with try assumption.
-destruct b ; intros.
-- apply Permutation_nil_cons...
-- apply CPermutation_nil_cons...
+Proof.
+destruct b; intros.
+- now apply Permutation_nil_cons.
+- now apply CPermutation_nil_cons.
 Qed.
 
 Lemma PCperm_length_1_inv A b : forall (a : A) l,
   PCperm b (a :: nil) l -> l = a :: nil.
-Proof with try assumption.
-destruct b ; intros.
-- apply Permutation_length_1_inv...
-- apply CPermutation_length_1_inv...
+Proof.
+destruct b; intros.
+- now apply Permutation_length_1_inv.
+- now apply CPermutation_length_1_inv.
 Qed.
 
 Lemma PCperm_length_2_inv A b : forall (a1 : A) a2 l,
   PCperm b (a1 :: a2 :: nil) l -> l = a1 :: a2 :: nil \/ l = a2 :: a1 :: nil.
-Proof with try assumption.
-destruct b ; intros.
-- apply Permutation_length_2_inv...
-- apply CPermutation_length_2_inv...
+Proof.
+destruct b; intros.
+- now apply Permutation_length_2_inv.
+- now apply CPermutation_length_2_inv.
 Qed.
 
 Lemma PCperm_vs_elt_inv A b : forall (a : A) l l1 l2,
   PCperm b l (l1 ++ a :: l2) ->  exists l' l'',
     PEperm b (l2 ++ l1) (l'' ++ l') /\ l = l' ++ a :: l''.
-Proof with try reflexivity.
+Proof.
 destruct b ; intros a l l1 l2 HC.
 - assert (Heq := HC).
   apply Permutation_vs_elt_inv in Heq.
   destruct Heq as (l' & l'' & Heq) ; subst.
-  exists l' ; exists l'' ; split...
+  exists l', l''; split; auto.
   apply Permutation_app_inv in HC.
   symmetry in HC.
   etransitivity ; [ eapply Permutation_app_comm | ].
   etransitivity ; [ eassumption | ].
   apply Permutation_app_comm.
 - apply CPermutation_vs_elt_inv in HC.
-  destruct HC as (l' & l'' & Heq1 & Heq2) ; subst.
-  exists l' ; exists l'' ; split...
-  rewrite Heq1...
+  destruct HC as (l' & l'' & Heq1 & ->).
+  exists l', l'' ; split; auto.
 Qed.
 
 Lemma PCperm_vs_cons_inv A b : forall (a : A) l l1,
@@ -172,11 +156,9 @@ Proof.
 intros a l l1 HP.
 rewrite <- app_nil_l in HP.
 apply PCperm_vs_elt_inv in HP.
-destruct HP as (l' & l'' & HP & Heq) ; subst.
-exists l' ; exists l'' ; split.
-- rewrite app_nil_r in HP.
-  apply HP.
-- reflexivity.
+destruct HP as (l' & l'' & HP & ->).
+exists l', l'' ; split; auto.
+rewrite app_nil_r in HP; apply HP.
 Qed.
 
 Lemma PCperm_cons_cons_inv A b : forall (a : A) l l1, ~ In a l -> ~ In a l1 ->
@@ -197,56 +179,52 @@ Qed.
 
 Instance PCperm_map A B (f : A -> B) b :
   Proper (PCperm b ==> PCperm b) (map f).
-Proof with try assumption.
-destruct b ; intros l1 l2 HC.
-- apply Permutation_map...
-- apply CPermutation_map...
+Proof.
+destruct b; intros l1 l2 HC.
+- now apply Permutation_map.
+- now apply CPermutation_map.
 Qed.
 
 Lemma PCperm_map_inv A B b : forall (f : A -> B) l1 l2,
   PCperm b l1 (map f l2) -> exists l3, l1 = map f l3 /\ PCperm b l2 l3.
 Proof.
-destruct b ; intros.
-- eapply Permutation_map_inv ; eassumption.
-- eapply CPermutation_map_inv ; eassumption.
+destruct b; intros f l1 l2.
+- apply Permutation_map_inv.
+- apply CPermutation_map_inv.
 Qed.
 
 Instance PCperm_in A b (a : A) : Proper (PCperm b ==> Basics.impl) (In a).
-Proof with try eassumption.
-destruct b ; intros l l' HP HIn.
-- eapply Permutation_in...
-- eapply CPermutation_in...
+Proof.
+destruct b; intros l l' HP Hin.
+- now apply Permutation_in with l.
+- now apply CPermutation_in with l.
 Qed.
 
 Instance PCperm_Forall A b (P : A -> Prop) :
   Proper (PCperm b ==> Basics.impl) (Forall P).
-Proof with try eassumption.
-destruct b ; intros l1 l2 HP HF.
-- eapply Permutation_Forall...
-- eapply CPermutation_Forall...
+Proof.
+destruct b.
+- apply Permutation_Forall.
+- apply CPermutation_Forall.
 Qed.
 
 Instance PCperm_Exists A b (P : A -> Prop) :
   Proper (PCperm b ==> Basics.impl) (Exists P).
-Proof with try eassumption.
-destruct b ; intros l1 l2 HP HE.
-- eapply Permutation_Exists...
-- eapply CPermutation_Exists...
+Proof.
+destruct b; [ apply Permutation_Exists | apply CPermutation_Exists ].
 Qed.
 
 Lemma PCperm_Forall2 A B b (P : A -> B -> Prop) :
   forall l1 l1' l2, PCperm b l1 l1' -> Forall2 P l1 l2 -> exists l2',
     PCperm b l2 l2' /\ Forall2 P l1' l2'.
 Proof.
-destruct b ; [ apply Permutation_Forall2 | apply CPermutation_Forall2 ].
+destruct b; [ apply Permutation_Forall2 | apply CPermutation_Forall2 ].
 Qed.
 
 Lemma PCperm_image A B b : forall (f : A -> B) a l l',
   PCperm b (a :: l) (map f l') -> exists a', a = f a'.
-Proof with try eassumption.
-destruct b ; intros.
-- eapply Permutation_image...
-- eapply CPermutation_image...
+Proof.
+destruct b; [ apply Permutation_image | apply CPermutation_image ].
 Qed.
 
 
@@ -274,7 +252,7 @@ Ltac PEperm_solve :=
 
 Instance PEperm_perm A b : Proper (PEperm b ==> (@Permutation A)) id.
 Proof.
-destruct b ; intros l l' HP ; simpl in HP ; now subst.
+destruct b; intros l l' HP; simpl in HP; now subst.
 Qed.
 
 Lemma PEperm_monot A : forall b1 b2, Bool.leb b1 b2 ->
@@ -282,7 +260,7 @@ Lemma PEperm_monot A : forall b1 b2, Bool.leb b1 b2 ->
 Proof.
 intros b1 b2 Hleb l1 l2.
 destruct b1; destruct b2; try (now inversion Hleb).
-simpl; intros HP; subst; reflexivity.
+now simpl; intros HP; subst.
 Qed.
 
 Instance PEperm_refl A b : Reflexive (@PEperm A b).
@@ -292,9 +270,7 @@ Instance PEperm_sym A b : Symmetric (@PEperm A b).
 Proof. now destruct b. Qed.
 
 Instance PEperm_trans A b : Transitive (@PEperm A b).
-Proof.
-destruct b ; intros l l' l'' ; etransitivity ; eassumption.
-Qed.
+Proof. now destruct b ; intros l l' l'' ; transitivity l'. Qed.
 
 Instance PEperm_equiv A b : Equivalence (@PEperm A b).
 Proof.
@@ -310,14 +286,14 @@ Proof. intuition. Qed.
 Instance PEperm_cons A b :
   Proper (eq ==> PEperm b ==> PEperm b) (@cons A).
 Proof.
-destruct b ; intros x y Heq l1 l2 HP ; subst.
+destruct b; intros x y -> l1 l2 HP.
 - now apply Permutation_cons.
 - now rewrite HP.
 Qed.
 
 Instance PEperm_app A b : Proper (PEperm b ==> PEperm b ==> PEperm b) (@app A).
 Proof.
-destruct b ; simpl ; intros l m HP1 l' m' HP2.
+destruct b; simpl; intros l m HP1 l' m' HP2.
 - now apply Permutation_app.
 - now subst.
 Qed.
@@ -325,7 +301,7 @@ Qed.
 Lemma PEperm_app_tail A b : forall l l' tl,
   @PEperm A b l l' -> PEperm b (l ++ tl) (l' ++ tl).
 Proof.
-destruct b ; simpl ; intros l l' tl HP.
+destruct b; simpl; intros l l' tl HP.
 - now apply Permutation_app_tail.
 - now subst.
 Qed.
@@ -333,7 +309,7 @@ Qed.
 Lemma PEperm_app_head A b : forall l tl tl',
   @PEperm A b tl tl' -> PEperm b (l ++ tl) (l ++ tl').
 Proof.
-destruct b ; simpl ; intros l tl tl' HP.
+destruct b; simpl; intros l tl tl' HP.
 - now apply Permutation_app_head.
 - now subst.
 Qed.
@@ -341,39 +317,39 @@ Qed.
 Lemma PEperm_add_inside A b : forall (a : A) l l' tl tl',
   PEperm b l l' -> PEperm b tl tl' -> PEperm b (l ++ a :: tl) (l' ++ a :: tl').
 Proof.
-destruct b ; simpl ; intros a l l' tl tl' HP1 HP2.
+destruct b; simpl; intros a l l' tl tl' HP1 HP2.
 - now apply Permutation_add_inside.
 - now subst.
 Qed.
 
 Lemma PEperm_nil A b : forall l, @PEperm A b nil l -> l = nil.
-Proof with try assumption.
+Proof.
 destruct b ; intros.
-- apply Permutation_nil...
-- symmetry...
+- now apply Permutation_nil.
+- now symmetry.
 Qed.
 
 Lemma PEperm_nil_cons A b : forall l (a : A), ~ PEperm b nil (a :: l).
-Proof with try assumption.
+Proof.
 destruct b ; intros.
-- apply Permutation_nil_cons...
-- intro Heq ; inversion Heq.
+- apply Permutation_nil_cons.
+- intro Heq; inversion Heq.
 Qed.
 
 Lemma PEperm_length_1_inv A b : forall (a : A) l,
   PEperm b (a :: nil) l -> l = a :: nil.
-Proof with try assumption.
+Proof.
 destruct b ; intros.
-- apply Permutation_length_1_inv...
-- symmetry...
+- now apply Permutation_length_1_inv.
+- now symmetry.
 Qed.
 
 Lemma PEperm_length_2_inv A b : forall (a1 : A) a2 l,
   PEperm b (a1 :: a2 :: nil) l -> l = a1 :: a2 :: nil \/ l = a2 :: a1 :: nil.
-Proof with try assumption.
-destruct b ; intros.
-- apply Permutation_length_2_inv...
-- left ; symmetry...
+Proof.
+destruct b; intros.
+- now apply Permutation_length_2_inv.
+- now left; symmetry.
 Qed.
 
 Lemma PEperm_vs_elt_inv A b : forall (a : A) l l1 l2,
@@ -386,12 +362,8 @@ destruct b ; intros a l l1 l2 HP.
   destruct HP' as (l' & l'' & Heq) ; subst.
   apply Permutation_app_inv in HP.
   symmetry in HP.
-  eexists ; eexists ; split.
-  + eassumption.
-  + reflexivity.
-- exists l1 ; exists l2.
-  rewrite HP.
-  split ; reflexivity.
+  exists l', l'' ; auto.
+- exists l1, l2; intuition.
 Qed.
 
 Lemma PEperm_vs_cons_inv A b : forall (a : A) l l1,
@@ -400,8 +372,7 @@ Lemma PEperm_vs_cons_inv A b : forall (a : A) l l1,
 Proof.
 intros a l l1 HP.
 rewrite <- (app_nil_l l1).
-eapply PEperm_vs_elt_inv.
-assumption.
+now apply PEperm_vs_elt_inv.
 Qed.
 
 Instance PEperm_in A b (a : A) : Proper (PEperm b ==> Basics.impl) (In a).
@@ -430,26 +401,23 @@ Lemma PEperm_Forall2 A B b (P : A -> B -> Prop) :
 Proof.
 destruct b ; [ apply Permutation_Forall2 | ].
 intros l1 l1' l2 HE HF ; simpl in HE ; subst.
-exists l2 ; split ; [ reflexivity | assumption ].
+now exists l2.
 Qed.
 
 Instance PEperm_map A B (f : A -> B) b :
   Proper (PEperm b ==> PEperm b) (map f).
 Proof.
-destruct b ; intros l l' HP.
-- apply Permutation_map.
-  assumption.
-- simpl in HP ; subst.
-  reflexivity.
+destruct b; intros l l' HP.
+- now apply Permutation_map.
+- now simpl in HP; subst.
 Qed.
 
 Lemma PEperm_map_inv A B b : forall (f : A -> B) l1 l2,
   PEperm b l1 (map f l2) -> exists l3, l1 = map f l3 /\ PEperm b l2 l3.
 Proof.
-destruct b ; simpl ; intros f l1 l2 HP.
-- eapply Permutation_map_inv ; eassumption.
-- subst.
-  exists l2 ; split ; reflexivity.
+destruct b; simpl; intros f l1 l2 HP.
+- now apply Permutation_map_inv.
+- subst; exists l2; auto.
 Qed.
 
 Instance PEperm_rev A b : Proper (PEperm b ==> PEperm b) (@rev A).
@@ -461,28 +429,25 @@ Qed.
 
 Lemma PEperm_map_inv_inj A B b : forall f : A -> B, injective f ->
   forall l1 l2, PEperm b (map f l1) (map f l2) -> PEperm b l1 l2.
-Proof with try assumption.
+Proof.
 destruct b ; intros f Hi l1 l2 HP.
-- apply Permutation_map_inv_inj in HP...
-- apply map_injective in HP...
+- now apply Permutation_map_inv_inj in HP.
+- now apply map_injective in HP.
 Qed.
 
 Lemma PEperm_image A B b : forall (f : A -> B) a l l',
   PEperm b (a :: l) (map f l') -> exists a', a = f a'.
 Proof.
 destruct b ; intros.
-- eapply Permutation_image ; eassumption.
-- destruct l' ; inversion H ; subst.
-  exists a0 ; reflexivity.
+- now apply Permutation_image with l l'.
+- now destruct l'; inversion H; subst; exists a0.
 Qed.
 
 
 (** ** From PEperm to PCperm *)
 
 Instance PEperm_PCperm A b : Proper (PEperm b ==> PCperm b) (@id (list A)).
-Proof.
-destruct b ; simpl ; intros l l' HP ; now subst.
-Qed.
+Proof. destruct b; simpl; intros l l' HP; now subst. Qed.
 
 Instance PEperm_PCperm_cons A b :
   Proper (eq ==> PEperm b ==> PCperm b) (@cons A).

@@ -1,55 +1,51 @@
-(* CPermutation_Type library *)
-
-
 (** * Cyclic Permutations
 Definition and basic properties of cyclic permutations in Type. *)
 
 Require Import CMorphisms.
 Require Import List_more Permutation_Type_more.
 
+Set Implicit Arguments.
+
 (** Definition *)
-Inductive CPermutation_Type {A} : list A -> list A -> Type :=
+Inductive CPermutation_Type A : list A -> list A -> Type :=
 | cperm_Type : forall l1 l2, CPermutation_Type (l1 ++ l2) (l2 ++ l1).
 
-Instance cperm_perm_Type {A} : Proper (CPermutation_Type ==> (@Permutation_Type A)) id.
+Instance cperm_perm_Type A : Proper (@CPermutation_Type A ==> @Permutation_Type A) id.
 Proof.
 intros l1 l2 HC.
 inversion HC.
 apply Permutation_Type_app_comm.
 Qed.
 
-Instance cperm_Type_refl {A} : Reflexive (@CPermutation_Type A).
+Instance cperm_Type_refl A : Reflexive (@CPermutation_Type A).
 Proof.
 intros l.
 assert (CPermutation_Type (nil ++ l) (l ++ nil))
   as HC by (eapply cperm_Type).
 simpl in HC.
-rewrite app_nil_r in HC.
-assumption.
+now rewrite app_nil_r in HC.
 Qed.
 
-Instance cperm_Type_sym {A} : Symmetric (@CPermutation_Type A).
+Instance cperm_Type_sym A : Symmetric (@CPermutation_Type A).
 Proof.
 intros l1 l2 HC.
 inversion HC.
-eapply cperm_Type.
+apply cperm_Type.
 Qed.
 
-Instance cperm_Type_trans {A} : Transitive (@CPermutation_Type A).
+Instance cperm_Type_trans A : Transitive (@CPermutation_Type A).
 Proof.
 intros l1 l2 l3 HC1 HC2.
 inversion HC1 ; inversion HC2 ; subst.
 apply dichot_app_inf in H1.
 destruct H1 as [[l2' [Hl1 Hl2]] | [l4' [Hr1 Hr2]]] ; subst.
-- rewrite <- app_assoc.
-  rewrite app_assoc.
-  eapply cperm_Type.
-- rewrite <- app_assoc.
-  rewrite (app_assoc l6).
-  eapply cperm_Type.
+- rewrite <- app_assoc, app_assoc.
+  apply cperm_Type.
+- rewrite <- app_assoc, (app_assoc l6).
+  apply cperm_Type.
 Qed.
 
-Instance cperm_Type_equiv {A} : Equivalence (@CPermutation_Type A).
+Instance cperm_Type_equiv A : Equivalence (@CPermutation_Type A).
 Proof.
 split.
 - apply cperm_Type_refl.
@@ -57,15 +53,15 @@ split.
 - apply cperm_Type_trans.
 Qed.
 
-Lemma cperm_Type_app {A} : forall l1 l2 l3 : list A,
+Lemma cperm_Type_app A : forall l1 l2 l3 : list A,
   CPermutation_Type (l1 ++ l2) l3 -> CPermutation_Type (l2 ++ l1) l3.
 Proof.
 intros l1 l2 l3 HC.
-apply (cperm_Type_trans _ (l1 ++ l2)) ; try assumption.
-eapply cperm_Type.
+refine (cperm_Type_trans _ HC).
+apply cperm_Type.
 Qed.
 
-Lemma cperm_Type_app_rot {A} : forall (l1 : list A) l2 l3,
+Lemma cperm_Type_app_rot A : forall (l1 : list A) l2 l3,
    CPermutation_Type (l1 ++ l2 ++ l3) (l2 ++ l3 ++ l1).
 Proof.
 intros l1 l2 l3.
@@ -73,16 +69,15 @@ rewrite (app_assoc l2).
 apply cperm_Type.
 Qed.
 
-Lemma cperm_Type_last {A} : forall (a : A) l,
+Lemma cperm_Type_last A : forall (a : A) l,
   CPermutation_Type (a :: l) (l ++ a :: nil).
 Proof.
 intros.
-rewrite <- (app_nil_l l).
-rewrite app_comm_cons.
+rewrite <- (app_nil_l l), app_comm_cons.
 apply cperm_Type.
 Qed.
 
-Lemma cperm_Type_swap {A} : forall a b : A,
+Lemma cperm_Type_swap A : forall a b : A,
   CPermutation_Type (a :: b :: nil) (b :: a :: nil).
 Proof.
 intros.
@@ -91,47 +86,37 @@ change (b :: a :: nil) with ((b :: nil) ++ (a :: nil)).
 apply cperm_Type.
 Qed.
 
-Lemma cperm_Type_cons {A} : forall l1 (a : A) l2,
+Lemma cperm_Type_cons A : forall l1 (a : A) l2,
   CPermutation_Type (l1 ++ a :: nil) l2 -> CPermutation_Type (a :: l1) l2.
 Proof.
 intros l1 a l2 HC.
-apply (cperm_Type_app l1 (a :: nil)) ; assumption.
+now apply (cperm_Type_app l1 (a :: nil)).
 Qed.
 
-Lemma cperm_Type_morph_cons {A} : forall P : list A -> Prop,
+Lemma cperm_Type_morph_cons A : forall P : list A -> Prop,
   (forall a l, P (l ++ a :: nil) -> P (a :: l)) ->
-  Proper (CPermutation_Type ==> Basics.impl) P.
-Proof with try eassumption.
+  Proper (@CPermutation_Type A ==> Basics.impl) P.
+Proof.
 assert (forall P : list A -> Prop,
          (forall a l, P (l ++ a :: nil) -> P (a :: l)) ->
          forall l1 l2, CPermutation_Type l1 l2 -> P l1 -> P l2)
   as Himp.
-{
-intros P HP l1 l2 HC.
-inversion HC ; subst ; clear HC.
-revert l0 ; induction l3 using rev_ind ; intros l0 HPl.
-- rewrite app_nil_r in HPl...
-- rewrite app_assoc in HPl.
-  apply HP in HPl.
-  rewrite <- app_assoc.
-  rewrite <- app_comm_cons.
-  rewrite app_nil_l...
-  apply IHl3...
-}
+{ intros P HP l1 l2 HC.
+  inversion HC ; subst ; clear HC.
+  revert l0 ; induction l3 using rev_ind ; intros l0 HPl.
+  - now rewrite app_nil_r in HPl.
+  - rewrite app_assoc in HPl.
+    apply HP in HPl.
+    rewrite <- app_assoc, <- app_comm_cons, app_nil_l; auto. }
 intros P HP l1 l2 HC H.
-eapply Himp...
+now apply Himp with l1.
 Qed.
 
-Lemma cperm_Type_nil {A} : forall l : list A,
+Lemma cperm_Type_nil A : forall l : list A,
   CPermutation_Type nil l -> l = nil.
-Proof.
-intros.
-apply Permutation_Type_nil.
-apply cperm_perm_Type.
-assumption.
-Qed.
+Proof. now intros; apply Permutation_Type_nil, cperm_perm_Type. Qed.
 
-Lemma cperm_Type_nil_cons {A} : forall l (a : A),
+Lemma cperm_Type_nil_cons A : forall l (a : A),
   CPermutation_Type nil (a :: l) -> False.
 Proof.
 intros l a HC.
@@ -139,59 +124,37 @@ apply cperm_Type_nil in HC.
 inversion HC.
 Qed.
 
-Lemma cperm_Type_one {A} : forall a b : A,
+Lemma cperm_Type_one A : forall a b : A,
   CPermutation_Type (a :: nil) (b :: nil) -> a = b.
-Proof.
-intros.
-apply Permutation_Type_length_1.
-apply cperm_perm_Type.
-assumption.
-Qed.
+Proof. now intros; apply Permutation_Type_length_1, cperm_perm_Type. Qed.
 
-Lemma cperm_Type_two {A} : forall a1 a2 b1 b2 : A,
+Lemma cperm_Type_two A : forall a1 a2 b1 b2 : A,
   CPermutation_Type (a1 :: a2 :: nil) (b1 :: b2 :: nil) ->
     { a1 = b1 /\ a2 = b2 } + { a1 = b2 /\ a2 = b1 }.
-Proof.
-intros.
-apply Permutation_Type_length_2.
-apply cperm_perm_Type.
-assumption.
-Qed.
+Proof. now intros; apply Permutation_Type_length_2, cperm_perm_Type. Qed.
 
-Lemma cperm_Type_one_inv {A} : forall l (a : A),
+Lemma cperm_Type_one_inv A : forall l (a : A),
   CPermutation_Type (a :: nil) l -> l = a :: nil.
-Proof.
-intros.
-apply Permutation_Type_length_1_inv.
-apply cperm_perm_Type.
-assumption.
-Qed.
+Proof. now intros; apply Permutation_Type_length_1_inv, cperm_perm_Type. Qed.
 
-Lemma cperm_Type_two_inv {A} : forall (a : A) b l,
+Lemma cperm_Type_two_inv A : forall (a : A) b l,
   CPermutation_Type (a :: b :: nil) l ->
   { l = a :: b :: nil } + { l = b :: a :: nil }.
-Proof.
-intros.
-apply Permutation_Type_length_2_inv.
-apply cperm_perm_Type.
-assumption.
-Qed.
+Proof. now intros; apply Permutation_Type_length_2_inv, cperm_perm_Type. Qed.
 
-Lemma cperm_Type_vs_elt_inv {A} : forall (a : A) l l1 l2,
+Lemma cperm_Type_vs_elt_inv A : forall (a : A) l l1 l2,
   CPermutation_Type l (l1 ++ a :: l2) ->
     {'(l1',l2') | l2 ++ l1 = l2' ++ l1' & l = l1' ++ a :: l2' }.
 Proof.
 intros a l l1 l2 HC.
-inversion HC ; subst.
+inversion HC; subst.
 symmetry in H1.
-dichot_elt_app_inf_exec H1 ; subst.
-- exists (l0 ++ l1, l) ; simpl ;
-    rewrite <- app_assoc ; reflexivity.
-- exists (l4, l2 ++ l3) ; simpl ;
-    rewrite <- app_assoc ; reflexivity.
+dichot_elt_app_inf_exec H1; subst.
+- now exists (l0 ++ l1, l); simpl; rewrite <- app_assoc.
+- now exists (l4, l2 ++ l3); simpl; rewrite <- app_assoc.
 Qed.
 
-Lemma cperm_Type_vs_cons_inv {A} : forall (a : A) l l1,
+Lemma cperm_Type_vs_cons_inv A : forall (a : A) l l1,
   CPermutation_Type l (a :: l1) ->
     {'(l1',l2') | l1 = l2' ++ l1' & l = l1' ++ a :: l2' }.
 Proof.
@@ -200,10 +163,10 @@ rewrite <- (app_nil_l (a::_)) in HC.
 apply cperm_Type_vs_elt_inv in HC.
 destruct HC as [(l1',l2') H1 H2].
 rewrite app_nil_r in H1 ; subst.
-exists (l1', l2') ; split ; reflexivity.
+now exists (l1', l2').
 Qed.
 
-Lemma cperm_Type_app_app_inv {A} : forall l1 l2 l3 l4 : list A,
+Lemma cperm_Type_app_app_inv A : forall l1 l2 l3 l4 : list A,
   CPermutation_Type (l1 ++ l2) (l3 ++ l4) ->
      {'(l1',l2',l3',l4') : _ & prod
         (prod  (CPermutation_Type l1 (l1' ++ l3'))
@@ -226,151 +189,125 @@ Lemma cperm_Type_app_app_inv {A} : forall l1 l2 l3 l4 : list A,
         (CPermutation_Type l2 (l3 ++ l1'))
         (CPermutation_Type l4 (l1 ++ l2')))
         (CPermutation_Type l1' l2') }.
-Proof with try assumption.
+Proof.
 intros l1 l2 l3 l4 HC.
 inversion HC as [lx ly Hx Hy].
-dichot_app_inf_exec Hx ; dichot_app_inf_exec Hy ; subst.
-- left ; left ; left ; right.
-  exists (l ++ l0, l0 ++ l).
-  simpl ; split ; [ split | ] ; 
-    try (rewrite <- ? app_assoc ; apply cperm_Type_app_rot).
-  apply cperm_Type.
-- dichot_app_inf_exec Hy0 ; subst.
-  + left ; left ; left ; left.
-    exists (l, l0, lx, l5).
-    simpl ; split ; [ split | split ] ; try apply cperm_Type...
-    * apply cperm_Type_refl.
-    * apply cperm_Type_refl.
-  + left ; right.
-    exists (l1 ++ lx , lx ++ l1).
-    split ; [ split | ] ; 
-      try (rewrite <- ? app_assoc ; apply cperm_Type_app_rot)...
-    apply cperm_Type.
+dichot_app_inf_exec Hx; dichot_app_inf_exec Hy; subst.
+- left; left; left; right; exists (l ++ l0, l0 ++ l); repeat split;
+    rewrite <- ? app_assoc; apply cperm_Type_app_rot.
+- dichot_app_inf_exec Hy0; subst.
+  + left; left; left; left; exists (l, l0, lx, l5); repeat split;
+      apply cperm_Type_refl.
+  + left; right; exists (l1 ++ lx , lx ++ l1); repeat split;
+      rewrite <- ? app_assoc ; apply cperm_Type_app_rot.
 - dichot_app_inf_exec Hy1 ; subst.
-  + left ; left ; right.
-    exists (ly ++ l2, l2 ++ ly).
-    split ; [ split | ] ; 
-      try (rewrite <- ? app_assoc ; apply cperm_Type_app_rot)...
-    apply cperm_Type.
-  + left ; left ; left ; left.
-    exists (l, ly, l3, l0).
-    simpl ; split ; [ split | split ] ; try apply cperm_Type...
-    * apply cperm_Type_refl.
-    * apply cperm_Type_refl.
-- right.
-  exists (l5 ++ l0, l0 ++ l5).
-  split ; [ split | ] ; 
-    try (rewrite <- ? app_assoc ; apply cperm_Type_app_rot)...
-  apply cperm_Type.
+  + left; left; right; exists (ly ++ l2, l2 ++ ly); repeat split;
+      rewrite <- ? app_assoc; apply cperm_Type_app_rot.
+  + left; left; left; left; exists (l, ly, l3, l0); repeat split;
+      apply cperm_Type_refl.
+- right; exists (l5 ++ l0, l0 ++ l5); repeat split;
+    rewrite <- ? app_assoc; apply cperm_Type_app_rot.
 Qed.
 
 (** [rev], [in], [map], [Forall], [Exists], etc. *)
-Instance cperm_Type_rev {A} : Proper (CPermutation_Type ==> CPermutation_Type) (@rev A).
+Instance cperm_Type_rev A : Proper (@CPermutation_Type A ==> @CPermutation_Type A) (@rev A).
 Proof.
-intro l ; induction l ; intros l' HC.
-- apply cperm_Type_nil in HC ; subst ; apply cperm_Type_refl.
+intros l; induction l; intros l' HC.
+- apply cperm_Type_nil in HC; subst; apply cperm_Type_refl.
 - apply cperm_Type_sym in HC.
   apply cperm_Type_vs_cons_inv in HC.
-  destruct HC as [(l1 & l2) Heq1 Heq2] ; subst.
-  simpl ; rewrite ? rev_app_distr ; simpl.
-  rewrite <- app_assoc.
-  apply cperm_Type.
+  destruct HC as [(l1 & l2) -> ->].
+  now simpl; rewrite ? rev_app_distr; simpl; rewrite <- app_assoc.
 Qed.
 
-Instance cperm_Type_in {A} (a : A) : Proper (CPermutation_Type ==> Basics.impl) (In a).
-Proof with try eassumption.
+Instance cperm_Type_in A (a : A) : Proper (@CPermutation_Type A ==> Basics.impl) (In a).
+Proof.
 intros l l' HC Hin.
-eapply Permutation_Type_in...
-apply cperm_perm_Type...
+apply Permutation_Type_in with l; auto.
+now apply cperm_perm_Type.
 Qed.
 
-Instance cperm_Type_map {A B} (f : A -> B) :
-   Proper (CPermutation_Type ==> CPermutation_Type) (map f).
+Instance cperm_Type_map A B (f : A -> B) :
+   Proper (@CPermutation_Type A ==> @CPermutation_Type B) (map f).
 Proof.
 intros l l' HC.
-inversion HC ; subst ; rewrite ? map_app.
-apply cperm_Type.
+now inversion HC; subst; rewrite ? map_app.
 Qed.
 
-Lemma cperm_Type_map_inv {A B} : forall(f : A -> B) l1 l2,
+Lemma cperm_Type_map_inv A B : forall(f : A -> B) l1 l2,
   CPermutation_Type l1 (map f l2) ->
-    { l : _ & l1 = map f l & (CPermutation_Type l2 l) }.
-Proof with try assumption.
-induction l1 ; intros l2 HP.
-- exists nil ; try reflexivity.
-  simpl ; destruct l2...
+    { l & l1 = map f l & (CPermutation_Type l2 l) }.
+Proof.
+induction l1; intros l2 HP.
+- exists nil; auto.
+  simpl; destruct l2; auto.
   + apply cperm_Type_refl.
   + apply cperm_Type_nil in HP.
     inversion HP.
 - apply cperm_Type_sym in HP.
-  assert (Heq := HP).
-  apply cperm_Type_vs_cons_inv in Heq.
-  destruct Heq as [(l3 & l4) Heq1 Heq2].
-  simpl in Heq1 ; simpl in Heq2 ; symmetry in Heq2.
-  decomp_map_inf Heq2 ; subst ; simpl.
-  exists (x :: l6 ++ l0).
-  + simpl ; rewrite ? map_app ; reflexivity.
+  destruct (cperm_Type_vs_cons_inv HP) as [(l3 & l4) -> Heq2].
+  symmetry in Heq2; decomp_map_inf Heq2; subst; simpl.
+  exists (x :: l5 ++ l0).
+  + now simpl; rewrite ? map_app.
   + constructor.
 Qed.
 
-Instance cperm_Type_Forall {A} (P : A -> Prop) :
-  Proper (CPermutation_Type ==> Basics.impl) (Forall P).
-Proof with try eassumption.
+Instance cperm_Type_Forall A (P : A -> Prop) :
+  Proper (@CPermutation_Type A ==> Basics.impl) (Forall P).
+Proof.
 intros l1 l2 HC HF.
-eapply Permutation_Type_Forall...
-apply cperm_perm_Type...
+apply Permutation_Type_Forall with l1; auto.
+now apply cperm_perm_Type.
 Qed.
 
-Instance cperm_Type_Exists {A} (P : A -> Prop) :
-  Proper (CPermutation_Type ==> Basics.impl) (Exists P).
-Proof with try eassumption.
+Instance cperm_Type_Exists A (P : A -> Prop) :
+  Proper (@CPermutation_Type A ==> Basics.impl) (Exists P).
+Proof.
 intros l1 l2 HC HE.
-eapply Permutation_Type_Exists...
-apply cperm_perm_Type...
+apply Permutation_Type_Exists with l1; auto.
+now apply cperm_perm_Type.
 Qed.
 
-Instance cperm_Type_Forall_Type {A} (P : A -> Type) :
-  Proper (CPermutation_Type ==> Basics.arrow) (Forall_inf P).
-Proof with try eassumption.
+Instance cperm_Type_Forall_Type A (P : A -> Type) :
+  Proper (@CPermutation_Type A ==> Basics.arrow) (Forall_inf P).
+Proof.
 intros l1 l2 HC HF.
-eapply Permutation_Type_Forall_Type...
-apply cperm_perm_Type...
+apply Permutation_Type_Forall_Type with l1; auto.
+now apply cperm_perm_Type.
 Qed.
 
-Instance cperm_Type_Exists_Type {A} (P : A -> Type) :
-  Proper (CPermutation_Type ==> Basics.arrow) (Exists_inf P).
-Proof with try eassumption.
+Instance cperm_Type_Exists_Type A (P : A -> Type) :
+  Proper (@CPermutation_Type A ==> Basics.arrow) (Exists_inf P).
+Proof.
 intros l1 l2 HC HE.
-eapply Permutation_Type_Exists_Type...
-apply cperm_perm_Type...
+apply Permutation_Type_Exists_Type with l1; auto.
+now apply cperm_perm_Type.
 Qed.
 
-Lemma cperm_Type_Forall2 {A B} (P : A -> B -> Type) :
+Lemma cperm_Type_Forall2 A B (P : A -> B -> Type) :
   forall l1 l1' l2, CPermutation_Type l1 l1' -> Forall2_inf P l1 l2 ->
-    { l2' : _ & CPermutation_Type l2 l2' & Forall2_inf P l1' l2' }.
+    { l2' & CPermutation_Type l2 l2' & Forall2_inf P l1' l2' }.
 Proof.
 intros l1 l1' l2 HP.
-revert l2 ; induction HP ; intros l2' HF ; inversion HF ; subst.
-- exists nil ; auto.
+revert l2; induction HP; intros l2' HF; inversion HF; subst.
+- exists nil; auto.
   + reflexivity.
-  + symmetry in H0 ; apply app_eq_nil in H0 as [Heq1 Heq2] ; subst.
-    constructor.
-- destruct l1 ; inversion H0 ; subst.
-  + rewrite app_nil_l in H0 ; subst.
+  + now symmetry in H0; apply app_eq_nil in H0 as [Heq1 Heq2]; subst.
+- destruct l1 ; inversion H0; subst.
+  + rewrite app_nil_l in H0; subst.
     exists (y :: l').
     * reflexivity.
-    * rewrite app_nil_l in HF ; simpl ; rewrite app_nil_r ; assumption.
-  + apply Forall2_inf_app_inv_l in X0 as [(la, lb) [HF1 HF2] Heq].
-    simpl in Heq ; rewrite Heq.
+    * now rewrite app_nil_l in HF; simpl; rewrite app_nil_r.
+  + apply Forall2_inf_app_inv_l in X0 as [(la, lb) [HF1 HF2] ->].
     exists (lb ++ y :: la).
-    * rewrite app_comm_cons ; constructor.
-    * apply Forall2_inf_app ; auto.
+    * rewrite app_comm_cons; constructor.
+    * apply Forall2_inf_app; auto.
 Qed.
 
-Lemma cperm_Type_image {A B} : forall (f : A -> B) a l l',
+Lemma cperm_Type_image A B : forall (f : A -> B) a l l',
   CPermutation_Type (a :: l) (map f l') -> { a' | a = f a' }.
 Proof.
 intros f a l l' HP.
-eapply Permutation_Type_image.
-apply cperm_perm_Type ; eassumption.
+apply Permutation_Type_image with l l'.
+now apply cperm_perm_Type.
 Qed.

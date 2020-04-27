@@ -1,7 +1,8 @@
 (** * Factorized statements for different notions of permutation *)
 
 Require Import List CMorphisms.
-Require Import funtheory Permutation_Type_more Permutation_Type_solve CPermutation_Type CPermutation_Type_solve.
+Require Import funtheory Permutation_Type_more Permutation_Type_solve
+               CPermutation_Type CPermutation_Type_solve.
 
 Set Implicit Arguments.
 
@@ -40,15 +41,15 @@ Ltac PCperm_Type_solve :=
 (** *** Properties *)
 
 Instance PCperm_perm_Type A b : Proper (PCperm_Type b ==> (@Permutation_Type A)) id.
-Proof with try assumption.
-destruct b ; intros l l' HP...
-apply cperm_perm_Type...
+Proof.
+destruct b; intros l l' HP; auto.
+now apply cperm_perm_Type.
 Qed.
 
-Instance cperm_PCperm_Type A b : Proper (CPermutation_Type ==> PCperm_Type b) (@id (list A)).
-Proof with try assumption.
-destruct b ; intros l l' HC...
-apply cperm_perm_Type...
+Instance cperm_PCperm_Type A b : Proper (@CPermutation_Type A ==> PCperm_Type b) (@id (list A)).
+Proof.
+destruct b; intros l l' HC; auto.
+now apply cperm_perm_Type.
 Qed.
 
 Lemma PCperm_Type_monot A : forall b1 b2, Bool.leb b1 b2 ->
@@ -61,23 +62,23 @@ Qed.
 
 Instance PCperm_Type_refl A b : Reflexive (@PCperm_Type A b).
 Proof.
-destruct b ; intros l.
+destruct b; intros l.
 - apply Permutation_Type_refl.
 - apply cperm_Type_refl.
 Qed.
 
 Instance PCperm_Type_sym A b : Symmetric (@PCperm_Type A b).
-Proof with try assumption.
-destruct b ; intros l l' H.
-- apply Permutation_Type_sym...
-- apply cperm_Type_sym...
+Proof.
+destruct b; intros l l' H.
+- now apply Permutation_Type_sym.
+- now apply cperm_Type_sym.
 Qed.
 
 Instance PCperm_Type_trans A b : Transitive (@PCperm_Type A b).
-Proof with try eassumption.
+Proof.
 destruct b ; intros l l' l'' H1 H2.
-- eapply Permutation_Type_trans...
-- eapply cperm_Type_trans...
+- now apply Permutation_Type_trans with l'.
+- now apply cperm_Type_trans with l'.
 Qed.
 
 Instance PCperm_Type_equiv A b : Equivalence (@PCperm_Type A b).
@@ -131,36 +132,36 @@ Qed.
 Lemma PCperm_Type_nil_cons A b : forall l (a : A),
   PCperm_Type b nil (a :: l) -> False.
 Proof.
-destruct b; intros.
-- now apply Permutation_Type_nil_cons with _ l a.
-- now apply cperm_Type_nil_cons with l a.
+destruct b; intros l a.
+- now apply Permutation_Type_nil_cons.
+- now apply cperm_Type_nil_cons.
 Qed.
 
 Lemma PCperm_Type_length_1_inv A b : forall (a : A) l,
   PCperm_Type b (a :: nil) l -> l = a :: nil.
-Proof with try assumption.
-destruct b ; intros.
-- apply Permutation_Type_length_1_inv...
-- apply cperm_Type_one_inv...
+Proof.
+destruct b; intros.
+- now apply Permutation_Type_length_1_inv.
+- now apply cperm_Type_one_inv.
 Qed.
 
 Lemma PCperm_Type_length_2_inv A b : forall (a1 : A) a2 l,
   PCperm_Type b (a1 :: a2 :: nil) l -> { l = a1 :: a2 :: nil } + { l = a2 :: a1 :: nil }.
-Proof with try assumption.
-destruct b ; intros.
-- apply Permutation_Type_length_2_inv...
-- apply cperm_Type_two_inv...
+Proof.
+destruct b; intros.
+- now apply Permutation_Type_length_2_inv.
+- now apply cperm_Type_two_inv.
 Qed.
 
 Lemma PCperm_Type_vs_elt_inv A b : forall (a : A) l l1 l2,
   PCperm_Type b l (l1 ++ a :: l2) ->
   {' (l1',l2') : _ & l = l1' ++ a :: l2' & PEperm_Type b (l2 ++ l1) (l2' ++ l1') }.
-Proof with try reflexivity.
+Proof.
 destruct b ; intros a l l1 l2 HC.
 - assert (Heq := HC).
   apply Permutation_Type_vs_elt_inv in Heq.
   destruct Heq as ((l' & l'') & Heq) ; subst.
-  exists (l',l'')...
+  exists (l',l''); auto.
   simpl in HC ; simpl.
   apply Permutation_Type_app_inv in HC.
   apply Permutation_Type_sym in HC.
@@ -169,21 +170,19 @@ destruct b ; intros a l l1 l2 HC.
   apply Permutation_Type_app_comm.
 - apply cperm_Type_vs_elt_inv in HC.
   destruct HC as [(l' & l'') Heq1 Heq2] ; subst.
-  exists (l',l'')...
-  assumption.
+  now exists (l',l'').
 Qed.
 
 Lemma PCperm_Type_vs_cons_inv A b : forall (a : A) l l1,
   PCperm_Type b l (a :: l1) ->
   {' (l1',l2') : _ & l = l1' ++ a :: l2' & PEperm_Type b l1 (l2' ++ l1') }.
-Proof with try reflexivity.
+Proof.
 intros a l l1 HP.
 rewrite <- app_nil_l in HP.
 apply PCperm_Type_vs_elt_inv in HP.
 destruct HP as [(l' & l'') HP Heq] ; subst.
-exists (l',l'')...
 rewrite app_nil_r in Heq.
-assumption.
+now exists (l',l'').
 Qed.
 
 Lemma PCperm_Type_cons_vs_cons A B : forall (a b : A) la lb,
@@ -259,17 +258,17 @@ Qed.
 Instance PCperm_Type_Forall_Type A b (P : A -> Type) :
   Proper (PCperm_Type b ==> Basics.arrow) (Forall_inf P).
 Proof.
-destruct b; intros l1 l2 HP HF.
-- now apply Permutation_Type_Forall_Type with l1.
-- now apply cperm_Type_Forall_Type with l1.
+destruct b; intros l1 l2 HP.
+- now apply Permutation_Type_Forall_Type.
+- now apply cperm_Type_Forall_Type.
 Qed.
 
 Instance PCperm_Type_Exists_Type A b (P : A -> Type) :
   Proper (PCperm_Type b ==> Basics.arrow) (Exists_inf P).
 Proof.
-destruct b; intros l1 l2 HP HE.
-- now apply Permutation_Type_Exists_Type with l1.
-- now apply cperm_Type_Exists_Type with l1.
+destruct b; intros l1 l2 HP.
+- now apply Permutation_Type_Exists_Type.
+- now apply cperm_Type_Exists_Type.
 Qed.
 
 
@@ -303,27 +302,19 @@ Lemma PEperm_Type_monot A : forall b1 b2, Bool.leb b1 b2 ->
 Proof.
 intros b1 b2 Hleb l1 l2.
 destruct b1; destruct b2; try (now inversion Hleb).
-simpl; intros HP; subst; reflexivity.
+now simpl; intros HP; subst.
 Qed.
 
 Instance PEperm_Type_refl A b : Reflexive (@PEperm_Type A b).
-Proof.
-destruct b ; intros l.
-- apply Permutation_Type_refl.
-- reflexivity.
-Qed.
+Proof. destruct b ; intros l; reflexivity. Qed.
 
 Instance PEperm_Type_sym A b : Symmetric (@PEperm_Type A b).
-Proof.
-destruct b ; intros l l' HP.
-- now apply Permutation_Type_sym.
-- now symmetry.
-Qed.
+Proof. destruct b; intros l l' HP; now symmetry. Qed.
 
 Instance PEperm_Type_trans A b : Transitive (@PEperm_Type A b).
 Proof.
-destruct b; intros l l' l'' HP1 HP2.
-- now apply Permutation_Type_trans with l'.
+destruct b; intros l l' l''.
+- now apply Permutation_Type_trans.
 - now transitivity l'.
 Qed.
 
@@ -336,23 +327,19 @@ split.
 Qed.
 
 Instance eq_PEperm_Type A b : Proper (eq ==> PEperm_Type b) (@id (list A)).
-Proof.
-destruct b; intros l l' Heq; subst.
-- apply Permutation_Type_refl.
-- reflexivity.
-Qed.
+Proof. destruct b; intros l l' Heq; subst; reflexivity. Qed.
 
 Instance PEperm_Type_cons A b :
   Proper (eq ==> PEperm_Type b ==> PEperm_Type b) (@cons A).
 Proof.
-destruct b ; intros x y Heq l1 l2 HP ; subst.
+destruct b; intros x y Heq l1 l2 HP; subst.
 - now apply Permutation_Type_cons.
 - now rewrite HP.
 Qed.
 
 Instance PEperm_Type_app A b : Proper (PEperm_Type b ==> PEperm_Type b ==> PEperm_Type b) (@app A).
 Proof.
-destruct b ; simpl ; intros l m HP1 l' m' HP2.
+destruct b; simpl; intros l m HP1 l' m' HP2.
 - now apply Permutation_Type_app.
 - now subst.
 Qed.
@@ -360,7 +347,7 @@ Qed.
 Lemma PEperm_Type_app_tail A b : forall l l' tl : list A,
   PEperm_Type b l l' -> PEperm_Type b (l ++ tl) (l' ++ tl).
 Proof.
-destruct b ; simpl ; intros l l' tl HP.
+destruct b; simpl; intros l l' tl HP.
 - now apply Permutation_Type_app_tail.
 - now subst.
 Qed.
@@ -368,7 +355,7 @@ Qed.
 Lemma PEperm_Type_app_head A b : forall l tl tl' : list A,
   PEperm_Type b tl tl' -> PEperm_Type b (l ++ tl) (l ++ tl').
 Proof.
-destruct b ; simpl ; intros l tl tl' HP.
+destruct b; simpl; intros l tl tl' HP.
 - now apply Permutation_Type_app_head.
 - now subst.
 Qed.
@@ -376,7 +363,7 @@ Qed.
 Lemma PEperm_Type_add_inside A b : forall (a : A) l l' tl tl',
   PEperm_Type b l l' -> PEperm_Type b tl tl' -> PEperm_Type b (l ++ a :: tl) (l' ++ a :: tl').
 Proof.
-destruct b ; simpl ; intros a l l' tl tl' HP1 HP2.
+destruct b; simpl; intros a l l' tl tl' HP1 HP2.
 - now apply Permutation_Type_add_inside.
 - now subst.
 Qed.
@@ -417,7 +404,7 @@ Lemma PEperm_Type_vs_elt_inv A b : forall (a : A) l l1 l2,
   {'(l1', l2') & l = l1' ++ a :: l2' & PEperm_Type b (l1 ++ l2) (l1' ++ l2') }.
 Proof.
 destruct b; simpl; intros a l l1 l2 HP; subst.
-- destruct (Permutation_Type_vs_elt_inv _ _ _ _ HP) as ((l',l'') & Heq) ; subst.
+- destruct (Permutation_Type_vs_elt_inv _ _ _ HP) as ((l',l'') & Heq) ; subst.
   apply Permutation_Type_app_inv, Permutation_Type_sym in HP.
   now exists (l', l'').
 - now exists (l1, l2).
