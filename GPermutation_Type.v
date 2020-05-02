@@ -4,6 +4,7 @@ From Coq Require Import List CMorphisms.
 From OLlibs Require Import funtheory ComparisonOrder List_more
                            Permutation_Type_more Permutation_Type_solve
                            CPermutation_Type CPermutation_Type_solve.
+From OLlibs Require GPermutation.
 
 Set Implicit Arguments.
 
@@ -35,6 +36,21 @@ Section GPermutation.
   Ltac case_perm_tri := unfold PCEPermutation_Type; destruct c.
   Ltac case_perm := unfold PCPermutation_Type, PEPermutation_Type; destruct b.
 
+  Lemma PCEPermutation_Type_PCEPermutation : forall l1 l2,
+    PCEPermutation_Type l1 l2 -> GPermutation.PCEPermutation c l1 l2.
+  Proof.
+  now case_perm_tri; [ apply CPermutation_Type_CPermutation | | apply Permutation_Type_Permutation ].
+  Qed.
+
+  Lemma PCPermutation_Type_PCPermutation : forall l1 l2,
+    PCPermutation_Type l1 l2 -> GPermutation.PCPermutation b l1 l2.
+  Proof.
+  case_perm; [ apply Permutation_Type_Permutation | apply CPermutation_Type_CPermutation ].
+  Qed.
+
+  Lemma PEPermutation_Type_PEPermutation : forall l1 l2,
+    PEPermutation_Type l1 l2 -> GPermutation.PEPermutation b l1 l2.
+  Proof. now case_perm; [ apply Permutation_Type_Permutation | ]. Qed.
 
   Global Instance PEPermutation_PCPermutation_Type :
     Proper (PEPermutation_Type ==> PCPermutation_Type) id.
@@ -50,13 +66,16 @@ Section GPermutation.
     Proper (PCPermutation_Type ==> (@Permutation_Type A)) id.
   Proof. now case_perm; [ | apply CPermutation_Permutation_Type ]. Qed.
 
+  Global Instance PEPermutation_Permutation_Type :
+    Proper (PEPermutation_Type ==> (@Permutation_Type A)) id.
+  Proof. case_perm; simpl; intros l l' HP; now subst. Qed.
+
   Global Instance CPermutation_Type_PCPermutation_Type :
     Proper (@CPermutation_Type A ==> PCPermutation_Type) id.
   Proof. now case_perm; [ apply CPermutation_Permutation_Type | ]. Qed.
 
-  Global Instance PEPermutation_Permutation_Type :
-    Proper (PEPermutation_Type ==> (@Permutation_Type A)) id.
-  Proof. case_perm; simpl; intros l l' HP; now subst. Qed.
+  Global Instance eq_PCEPermutation_Type : Proper (eq ==> PCEPermutation_Type) id.
+  Proof. case_perm_tri; intuition. Qed.
 
   Global Instance eq_PEPermutation_Type : Proper (eq ==> PEPermutation_Type) id.
   Proof. case_perm; intuition. Qed.

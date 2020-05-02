@@ -700,7 +700,7 @@ Notation Permutation_Type_app_swap := Permutation_Type_app_comm (only parsing).
 (* end hide *)
 
 
-Lemma Permutation_Type_Permutation {A} : forall l1 l2 : list A,
+Lemma Permutation_Type_Permutation A : forall l1 l2 : list A,
   Permutation_Type l1 l2 -> Permutation.Permutation l1 l2.
 Proof.
 intros l1 l2 HP.

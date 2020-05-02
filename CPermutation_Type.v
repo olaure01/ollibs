@@ -357,6 +357,6 @@ subst; constructor.
 Qed.
 
 
-Lemma CPermutation_Type_CPermutation {A} : forall l1 l2 : list A,
+Lemma CPermutation_Type_CPermutation A : forall l1 l2 : list A,
   CPermutation_Type l1 l2 -> CPermutation.CPermutation l1 l2.
 Proof. intros l1 l2 HP; inversion HP; constructor. Qed.

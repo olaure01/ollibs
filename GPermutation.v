@@ -45,12 +45,15 @@ Section GPermutation.
   Global Instance PCPermutation_Permutation : Proper (PCPermutation ==> (@Permutation A)) id.
   Proof. now case_perm; [ | apply CPermutation_Permutation ]. Qed.
 
+  Global Instance PEPermutation_Permutation : Proper (PEPermutation ==> (@Permutation A)) id.
+  Proof. case_perm; simpl; intros l l' HP; now subst. Qed.
+
   Global Instance CPermutation_PCPermutation :
     Proper (@CPermutation A ==> PCPermutation) id.
   Proof. now case_perm; [ apply CPermutation_Permutation | ]. Qed.
 
-  Global Instance PEPermutation_Permutation : Proper (PEPermutation ==> (@Permutation A)) id.
-  Proof. case_perm; simpl; intros l l' HP; now subst. Qed.
+  Global Instance eq_PCEPermutation : Proper (eq ==> PCEPermutation) id.
+  Proof. case_perm_tri; intuition. Qed.
 
   Global Instance eq_PEPermutation : Proper (eq ==> PEPermutation) id.
   Proof. case_perm; intuition. Qed.
