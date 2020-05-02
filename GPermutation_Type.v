@@ -11,10 +11,20 @@ Set Implicit Arguments.
 Section GPermutation.
 
   Variable A : Type.
+  Variable c : comparison.
   Variable b : bool.
 
   (** ** Definitions
    parametrized by a boolean. *)
+
+  (** Permutation or cyclic permutation or equality *)
+
+  Definition PCEPermutation_Type :=
+  match c with
+  | Lt => @eq (list A)
+  | Eq => @CPermutation_Type A
+  | Gt => @Permutation_Type A
+  end.
 
   (** Permutation or cyclic permutation *)
   Definition PCPermutation_Type := if b then @Permutation_Type A else @CPermutation_Type A.
@@ -22,10 +32,19 @@ Section GPermutation.
   (** Permutation or equality *)
   Definition PEPermutation_Type := if b then @Permutation_Type A else @eq (list A).
 
+  Ltac case_perm_tri := unfold PCEPermutation_Type; destruct c.
   Ltac case_perm := unfold PCPermutation_Type, PEPermutation_Type; destruct b.
 
 
-  (** ** Permutation_Type or cyclic permutation *)
+  Global Instance PEPermutation_PCPermutation_Type :
+    Proper (PEPermutation_Type ==> PCPermutation_Type) id.
+  Proof.  now case_perm; simpl; intros l l' HP; [ | subst ]. Qed.
+
+  Global Instance PCEPermutation_Permutation_Type :
+    Proper (PCEPermutation_Type ==> (@Permutation_Type A)) id.
+  Proof.
+  case_perm_tri; intros l1 l2 HP; [ apply CPermutation_Permutation_Type | subst | ]; auto.
+  Qed.
 
   Global Instance PCPermutation_Permutation_Type :
     Proper (PCPermutation_Type ==> (@Permutation_Type A)) id.
@@ -34,6 +53,89 @@ Section GPermutation.
   Global Instance CPermutation_Type_PCPermutation_Type :
     Proper (@CPermutation_Type A ==> PCPermutation_Type) id.
   Proof. now case_perm; [ apply CPermutation_Permutation_Type | ]. Qed.
+
+  Global Instance PEPermutation_Permutation_Type :
+    Proper (PEPermutation_Type ==> (@Permutation_Type A)) id.
+  Proof. case_perm; simpl; intros l l' HP; now subst. Qed.
+
+  Global Instance eq_PEPermutation_Type : Proper (eq ==> PEPermutation_Type) id.
+  Proof. case_perm; intuition. Qed.
+
+
+  (** ** Properties of [PCEPermutation_Type] *)
+
+  Global Instance PCEPermutation_Type_refl : Reflexive PCEPermutation_Type.
+  Proof. case_perm_tri; intros l; reflexivity. Qed.
+
+  Global Instance PCEPermutation_Type_sym : Symmetric PCEPermutation_Type.
+  Proof. case_perm_tri; intros l l'; now symmetry. Qed.
+
+  Global Instance PCEPermutation_Type_trans : Transitive PCEPermutation_Type.
+  Proof. case_perm_tri; intros l l' l''; now transitivity l'. Qed.
+
+  Global Instance PCEPermutation_Type_equiv : Equivalence PCEPermutation_Type.
+  Proof.
+  split;
+  [ apply PCEPermutation_Type_refl
+  | apply PCEPermutation_Type_sym
+  | apply PCEPermutation_Type_trans ].
+  Qed.
+
+  Lemma PCEPermutation_Type_nil : forall l, PCEPermutation_Type nil l -> l = nil.
+  Proof.
+  now case_perm_tri; [ apply CPermutation_Type_nil | intros; subst | apply Permutation_Type_nil ].
+  Qed.
+
+  Lemma PCEPermutation_Type_nil_cons : forall l a, PCEPermutation_Type nil (a :: l) -> False.
+  Proof.
+  case_perm_tri;
+    [ apply CPermutation_Type_nil_cons
+    | intros l a Heq; inversion Heq | apply Permutation_Type_nil_cons ].
+  Qed.
+
+  Lemma PCEPermutation_Type_length_1_inv : forall a l,
+    PCEPermutation_Type (a :: nil) l -> l = a :: nil.
+  Proof.
+  now case_perm_tri;
+    [ apply CPermutation_Type_length_1_inv | intros; subst | apply Permutation_Type_length_1_inv ].
+  Qed.
+
+  Global Instance PCEPermutation_Type_in a : Proper (PCEPermutation_Type ==> Basics.impl) (In a).
+  Proof.
+  now case_perm_tri; intros l l' HP Hin;
+    [ apply CPermutation_Type_in with l | subst | apply Permutation_Type_in with l ].
+  Qed.
+
+  Global Instance PCEPermutation_Type_Forall (P : A -> Prop) :
+    Proper (PCEPermutation_Type ==> Basics.impl) (Forall P).
+  Proof.
+  now case_perm_tri;
+    [ apply CPermutation_Type_Forall | intros ? ? -> | apply Permutation_Type_Forall ].
+  Qed.
+
+  Global Instance PCEPermutation_Exists_Type (P : A -> Prop) :
+    Proper (PCEPermutation_Type ==> Basics.impl) (Exists P).
+  Proof.
+  now case_perm_tri;
+    [ apply CPermutation_Type_Exists | intros ? ? -> | apply Permutation_Type_Exists ].
+  Qed.
+
+  Global Instance PCEPermutation_Type_Forall_inf (P : A -> Type) :
+    Proper (PCEPermutation_Type ==> Basics.arrow) (Forall_inf P).
+  Proof.
+  now case_perm_tri;
+    [ apply CPermutation_Type_Forall_inf | intros ? ? -> | apply Permutation_Type_Forall_inf ].
+  Qed.
+
+  Global Instance PCEPermutation_Type_Exists_inf (P : A -> Type) :
+    Proper (PCEPermutation_Type ==> Basics.arrow) (Exists_inf P).
+  Proof.
+  now case_perm_tri;
+    [ apply CPermutation_Type_Exists_inf | intros ? ? -> | apply Permutation_Type_Exists_inf ].
+  Qed.
+
+
+  (** ** Properties of [PCPermutation_Type] *)
 
   Global Instance PCPermutation_Type_refl : Reflexive PCPermutation_Type.
   Proof. case_perm; intros l; reflexivity. Qed.
@@ -111,11 +213,7 @@ Section GPermutation.
   Qed.
 
 
-  (** ** Permutation_Type or equality *)
-
-  Global Instance PEPermutation_Permutation_Type :
-    Proper (PEPermutation_Type ==> (@Permutation_Type A)) id.
-  Proof. case_perm; simpl; intros l l' HP; now subst. Qed.
+  (** ** Properties of [PEPermutation] *)
 
   Global Instance PEPermutation_Type_refl : Reflexive PEPermutation_Type.
   Proof. now case_perm. Qed.
@@ -131,9 +229,6 @@ Section GPermutation.
   split;
   [ apply PEPermutation_Type_refl | apply PEPermutation_Type_sym | apply PEPermutation_Type_trans ].
   Qed.
-
-  Global Instance eq_PEPermutation_Type : Proper (eq ==> PEPermutation_Type) id.
-  Proof. intuition. Qed.
 
   Global Instance PEPermutation_Type_cons :
     Proper (eq ==> PEPermutation_Type ==> PEPermutation_Type) cons.
@@ -226,11 +321,7 @@ Section GPermutation.
   Proof. now case_perm; intros l1 l2 HP; [ apply Permutation_Type_rev' | subst ].  Qed.
 
 
-  (** ** From PEPermutation_Type to PCPermutation_Type *)
-
-  Global Instance PEPermutation_PCPermutation_Type :
-    Proper (PEPermutation_Type ==> PCPermutation_Type) id.
-  Proof.  now case_perm; simpl; intros l l' HP; [ | subst ]. Qed.
+  (** ** From [PEPermutation_Type] to [PCPermutation_Type] *)
 
   Global Instance PEPermutation_PCPermutation_Type_cons :
     Proper (eq ==> PEPermutation_Type ==> PCPermutation_Type) cons.
@@ -303,7 +394,16 @@ End GPermutation.
 Section MultiGPermutation.
 
   Variable A B : Type.
+  Variable c : comparison.
   Variable b : bool.
+
+  Lemma PCEPermutation_Type_Forall2_inf (P : A -> B -> Type) : forall l1 l1' l2,
+    PCEPermutation_Type c l1 l1' -> Forall2_inf P l1 l2 -> 
+      { l2' & PCEPermutation_Type c l2 l2' & Forall2_inf P l1' l2' }.
+  Proof.
+  destruct c; [ apply CPermutation_Type_Forall2_inf | | apply Permutation_Type_Forall2_inf ].
+  now simpl; intros l1 l1' l2 -> HF; exists l2.
+  Qed.
 
   Lemma PCPermutation_Type_Forall2_inf (P : A -> B -> Type) : forall l1 l1' l2,
     PCPermutation_Type b l1 l1' -> Forall2_inf P l1 l2 -> 
@@ -321,6 +421,10 @@ Section MultiGPermutation.
 
   Variable f : A -> B.
 
+  Global Instance PCEPermutation_Type_map :
+    Proper (PCEPermutation_Type c ==> PCEPermutation_Type c) (map f).
+  Proof. now destruct c; intros l1 l2 ->. Qed.
+
   Global Instance PCPermutation_Type_map :
     Proper (PCPermutation_Type b ==> PCPermutation_Type b) (map f).
   Proof. now destruct b; intros l1 l2 ->. Qed.
@@ -329,6 +433,13 @@ Section MultiGPermutation.
     Proper (PEPermutation_Type b ==> PEPermutation_Type b) (map f).
   Proof. now destruct b; simpl; intros l1 l2 HP; [ apply Permutation_Type_map | subst ]. Qed.
 
+  Lemma PCEPermutation_Type_map_inv : forall l1 l2,
+    PCEPermutation_Type c l1 (map f l2) -> { l3 & l1 = map f l3 & PCEPermutation_Type c l2 l3 }.
+  Proof.
+  destruct c; [ apply CPermutation_Type_map_inv | | apply Permutation_Type_map_inv ].
+  now simpl; intros l1 l2 ->; exists l2.
+  Qed.
+
   Lemma PCPermutation_Type_map_inv : forall l1 l2,
     PCPermutation_Type b l1 (map f l2) -> { l3 & l1 = map f l3 & PCPermutation_Type b l2 l3 }.
   Proof. destruct b; [ apply Permutation_Type_map_inv | apply CPermutation_Type_map_inv ]. Qed.
@@ -336,6 +447,13 @@ Section MultiGPermutation.
   Lemma PEPermutation_Type_map_inv : forall l1 l2,
     PEPermutation_Type b l1 (map f l2) -> { l3 & l1 = map f l3 & PEPermutation_Type b l2 l3 }.
   Proof. now destruct b; [ apply Permutation_Type_map_inv | intros l1 l2; exists l2 ]. Qed.
+
+  Lemma PCEPermutation_Type_map_inv_inj : injective f -> forall l1 l2,
+    PCEPermutation_Type c (map f l1) (map f l2) -> PCEPermutation_Type c l1 l2.
+  Proof.
+  destruct c;
+  [ apply CPermutation_Type_map_inv_inj | apply map_injective | apply Permutation_Type_map_inv_inj ].
+  Qed.
 
   Lemma PCPermutation_Type_map_inv_inj : injective f -> forall l1 l2,
     PCPermutation_Type b (map f l1) (map f l2) -> PCPermutation_Type b l1 l2.
@@ -346,6 +464,13 @@ Section MultiGPermutation.
   Lemma PEPermutation_Type_map_inv_inj : injective f -> forall l1 l2,
     PEPermutation_Type b (map f l1) (map f l2) -> PEPermutation_Type b l1 l2.
   Proof. now destruct b; [ apply Permutation_Type_map_inv_inj | apply map_injective ]. Qed.
+
+  Lemma PCEPermutation_Type_image : forall a l l',
+    PCEPermutation_Type c (a :: l) (map f l') -> { a' | a = f a' }.
+  Proof.
+  destruct c; [ apply CPermutation_Type_image | | apply Permutation_Type_image ].
+  now simpl; intros a l l' Heq; destruct l' as [|a' l']; inversion Heq; subst; exists a'.
+  Qed.
 
   Lemma PCPermutation_Type_image : forall a l l',
     PCPermutation_Type b (a :: l) (map f l') -> { a' | a = f a' }.
@@ -358,19 +483,27 @@ Section MultiGPermutation.
   now simpl; intros a l l' HP; destruct l' as [|a' l']; inversion HP; subst; exists a'.
   Qed.
 
+  Variable c' : comparison.
   Variable b' : bool.
 
-  Lemma PCPermutation_Type_monot : forall b b', Bool.leb b b' ->
-    forall l1 l2 : list A, PCPermutation_Type b l1 l2 -> PCPermutation_Type b' l1 l2.
+  Lemma PCEPermutation_Type_monot : ComparisonOrder.le c c' ->
+    forall l1 l2 : list A, PCEPermutation_Type c l1 l2 -> PCEPermutation_Type c' l1 l2.
   Proof.
-  intros b1 b2 Hleb l1 l2; destruct b1; destruct b2; try (now inversion Hleb).
+  intros Hle l1 l2; destruct c, c'; simpl; try (now inversion Hle); try (now intros; subst).
   apply CPermutation_Permutation_Type.
   Qed.
 
-  Lemma PEPermutation_Type_monot : forall b b', Bool.leb b b' ->
+  Lemma PCPermutation_Type_monot : Bool.leb b b' ->
+    forall l1 l2 : list A, PCPermutation_Type b l1 l2 -> PCPermutation_Type b' l1 l2.
+  Proof.
+  intros Hle l1 l2; destruct b, b'; try (now inversion Hle).
+  apply CPermutation_Permutation_Type.
+  Qed.
+
+  Lemma PEPermutation_Type_monot : Bool.leb b b' ->
     forall l1 l2 : list A, PEPermutation_Type b l1 l2 -> PEPermutation_Type b' l1 l2.
   Proof.
-  intros b1 b2 Hleb l1 l2; destruct b1; destruct b2; try (now inversion Hleb).
+  intros Hle l1 l2; destruct b, b'; try (now inversion Hle).
   now simpl; intros ->.
   Qed.
 
@@ -382,6 +515,8 @@ End MultiGPermutation.
 (** unfolding into [Permutation_Type], [CPermutation_Type] or [eq] *)
 Ltac hyps_GPermutation_Type_unfold :=
   match goal with
+  | H : PCEPermutation_Type _ _ _ |- _ => unfold PCEPermutation_Type in H;
+                                          hyps_GPermutation_Type_unfold
   | H : PCPermutation_Type _ _ _ |- _ => unfold PCPermutation_Type in H;
                                          hyps_GPermutation_Type_unfold
   | H : PEPermutation_Type _ _ _ |- _ => unfold PEPermutation_Type in H;
@@ -393,6 +528,8 @@ Ltac hyps_GPermutation_Type_unfold :=
 Ltac GPermutation_Type_solve :=
   hyps_GPermutation_Type_unfold; simpl;
   match goal with
+  | |- PCEPermutation_Type ?c _ _ => unfold PCEPermutation_Type; destruct c; simpl;
+                                     GPermutation_Type_solve
   | |- PCPermutation_Type ?b _ _ => unfold PCPermutation_Type; destruct b; simpl;
                                     GPermutation_Type_solve
   | |- PEPermutation_Type ?b _ _ => unfold PEPermutation_Type; destruct b; simpl;

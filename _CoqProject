@@ -2,6 +2,7 @@
 
 AFC.v
 BOrders.v
+ComparisonOrder.v
 CPermutation_more.v
 CPermutation_solve.v
 CPermutation_Type_solve.v
