@@ -4,8 +4,8 @@
    An implementation of the axioms is provided by sorted lists
    for every type equiped with a Boolean-valued total order relation *)
 
-Require Import Bool List Morphisms.
-Require Import BOrders Permutation_more.
+From Coq Require Import Bool List Morphisms.
+From OLlibs Require Import BOrders Permutation_more.
 
 Set Implicit Arguments.
 

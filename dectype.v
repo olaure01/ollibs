@@ -1,8 +1,8 @@
 (* Types with decidable equality formalized as types with Boolean valued equality *)
 (*   this is based on records rather than modules (as opposed to stdlib) *)
 
-Require Import Bool PeanoNat.
-Require Eqdep_dec.
+From Coq Require Import Bool PeanoNat.
+From Coq Require Eqdep_dec.
 
 Set Implicit Arguments.
 

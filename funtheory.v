@@ -1,6 +1,6 @@
 (** Properties of functions *)
 
-Require Import Program.Basics Relations RelationClasses List.
+From Coq Require Import Program.Basics Relations RelationClasses List.
 
 Set Implicit Arguments.
 

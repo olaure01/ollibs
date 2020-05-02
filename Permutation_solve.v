@@ -1,19 +1,9 @@
-(* Permutation_solve library *)
-(* v 0.1  2017/07/18   Olivier Laurent *)
-
-
-(* Release Notes
-     v0.1: use of cons2app instead of cons_to_app_perm
-           cons2app added in hypotheses
-           some simplifications
-*)
-
+(** Automatic tactics for [Permutation] *)
 
 (** * Some tactics for tentative automatic solving of [Permutation] goals
-The main tactic is [perm_solve] which fails is the goal is not solved. *)
+The main tactic is [Permutation_solve] which fails is the goal is not solved. *)
 
-Require Import List_more.
-Require Import Permutation_more.
+From OLlibs Require Import List_more Permutation_more.
 
 
 Ltac pre_simpl_hyp_perm H :=
@@ -107,5 +97,3 @@ with perm_run :=
           | instantiate ]
   | _ => idtac
   end ).
-
-

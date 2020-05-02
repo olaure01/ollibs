@@ -1,9 +1,9 @@
 (** * Factorized statements for different notions of permutation *)
 
-Require Import List CMorphisms.
-Require Import funtheory List_more
-               Permutation_Type_more Permutation_Type_solve
-               CPermutation_Type CPermutation_Type_solve.
+From Coq Require Import List CMorphisms.
+From OLlibs Require Import funtheory ComparisonOrder List_more
+                           Permutation_Type_more Permutation_Type_solve
+                           CPermutation_Type CPermutation_Type_solve.
 
 Set Implicit Arguments.
 

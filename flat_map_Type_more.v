@@ -1,7 +1,7 @@
 (** * Add-ons for [List] library
-Properties of flat_map. *)
+Properties of [flat_map]. *)
 
-Require Import funtheory List_more Permutation_Type_more CPermutation_Type.
+From OLlibs Require Import funtheory List_more Permutation_Type_more CPermutation_Type.
 
 Set Implicit Arguments.
 

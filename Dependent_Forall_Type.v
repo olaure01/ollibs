@@ -1,7 +1,7 @@
 (** * Generalization of [Forall_Type] to dependent product *)
 
-Require Export Eqdep_dec.
-Require Import List_more.
+From Coq Require Export Eqdep_dec.
+From OLlibs Require Import List_more.
 
 Set Implicit Arguments.
 

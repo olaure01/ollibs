@@ -4,8 +4,8 @@
    An implementation of the axioms is provided for every type 
    by lists up to permutation (with output in [Type]. *)
 
-Require Import CMorphisms List.
-Require Import Permutation_Type.
+From Coq Require Import CMorphisms List.
+From OLlibs Require Import Permutation_Type.
 
 Set Implicit Arguments.
 

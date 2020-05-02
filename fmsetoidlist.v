@@ -4,7 +4,7 @@
    An implementation of the axioms is provided for every type 
    by lists up to permutation. *)
 
-Require Import Relations Morphisms List Permutation.
+From Coq Require Import Relations Morphisms List Permutation.
 
 Set Implicit Arguments.
 

@@ -1,9 +1,10 @@
 (** Transposition function on elements of a list *)
 
-Require Import List Lia.
-Require Import funtheory List_more Permutation_Type.
+From Coq Require Import List Lia.
+From OLlibs Require Import funtheory List_more Permutation_Type.
 
 Set Implicit Arguments.
+
 
 (* Transpose elements of index n and n+1 in l *)
 Fixpoint transp A n (l : list A) :=

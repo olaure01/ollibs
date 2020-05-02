@@ -1,12 +1,9 @@
-(* Permutation_solve library *)
+(** Automatic tactics for [Permutation_Type] *)
 
-(* output in Types *)
+(** * Some tactics for tentative automatic solving of [Permutation_Type] goals
+The main tactic is [Permutation_Type_solve] which fails is the goal is not solved. *)
 
-(** * Some tactics for tentative automatic solving of [Permutation] goals
-The main tactic is [perm_solve] which fails is the goal is not solved. *)
-
-Require Import List_more.
-Require Import Permutation_Type_more.
+From OLlibs Require Import List_more Permutation_Type_more.
 
 
 Ltac pre_simpl_hyp_perm_Type H :=
@@ -100,5 +97,3 @@ with perm_Type_run :=
           | instantiate ]
   | _ => idtac
   end ).
-
-

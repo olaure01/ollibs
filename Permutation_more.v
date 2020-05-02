@@ -1,8 +1,8 @@
 (** * Add-ons for Permutation library
 Usefull properties apparently missing in the Permutation library. *)
 
-Require Import List_more funtheory.
-Require Export Permutation.
+From Coq Require Export Permutation.
+From OLlibs Require Import List_more funtheory.
 
 Set Implicit Arguments.
 

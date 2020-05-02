@@ -1,9 +1,8 @@
-(* natree Library *)
+(** [nat]-labelled binary trees and embedding into [nat] *)
 
-(** * [nat]-labelled binary trees and embedding into [nat] *)
+From Coq Require Import PeanoNat Lia.
+From OLlibs Require Import funtheory.
 
-Require Import PeanoNat Lia.
-Require Import funtheory.
 
 (** * Coding of pairs of [nat] *)
 
@@ -196,4 +195,3 @@ destruct y.
   destruct Hm' as [t2 H2] ; subst.
   exists (Bnt n t1 t2); assumption.
 Qed.
-

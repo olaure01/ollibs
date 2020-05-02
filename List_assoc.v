@@ -4,7 +4,8 @@
    and https://caml.inria.fr/pub/docs/manual-ocaml/libref/List.html#1_Associationlists
    for more global approaches *)
 
-Require Export List dectype.
+From Coq Require Export List.
+From OLlibs Require Export dectype.
 
 Section Types.
 

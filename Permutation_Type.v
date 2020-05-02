@@ -1,7 +1,7 @@
 (* This file is directly inspired by the corresponding Coq file
    Sorting/Permutation.v *)
 
-Require Import List Compare_dec CMorphisms FinFun Permutation.
+From Coq Require Import List Compare_dec CMorphisms FinFun Permutation.
 Import ListNotations. (* For notations [] and [a;b;c] *)
 Set Implicit Arguments.
 (* Set Universe Polymorphism. *)

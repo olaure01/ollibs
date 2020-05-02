@@ -1,9 +1,9 @@
 (** * Cyclic Permutations
 Definition and basic properties of cyclic permutations in Type. *)
 
-Require Import CMorphisms.
-Require Import List_more Permutation_Type_more funtheory.
-Require CPermutation.
+From Coq Require Import CMorphisms.
+From Coq Require CPermutation.
+From OLlibs Require Import List_more Permutation_Type_more funtheory.
 
 Set Implicit Arguments.
 

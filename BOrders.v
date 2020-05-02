@@ -1,7 +1,7 @@
 (** * Class of Boolean-valued total orders *)
 
-Require Import Bool PeanoNat Wf_nat Lia List Orders.
-Require Import funtheory.
+From Coq Require Import Bool PeanoNat Wf_nat Lia List Orders.
+From OLlibs Require Import funtheory.
 
 Set Implicit Arguments.
 
