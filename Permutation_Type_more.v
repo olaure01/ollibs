@@ -238,7 +238,7 @@ induction l1; intros l2 HP.
   destruct l2; inversion HP.
   now exists nil.
 - apply Permutation_Type_sym in HP.
-  destruct (Permutation_Type_vs_cons_inv HP) as ((l1', l2') & Heq); symmetry in Heq.
+  destruct (Permutation_Type_vs_cons_inv HP) as ((l1', l2') & Heq).
   decomp_map_inf Heq; subst.
   apply Permutation_Type_sym in HP.
   rewrite map_app in HP.
@@ -261,8 +261,7 @@ intros f Hi l1; induction l1; intros l2 HP.
 - assert (Heq := HP).
   apply Permutation_Type_sym in Heq.
   apply Permutation_Type_vs_cons_inv in Heq.
-  destruct Heq as ((l3 & l4) & Heq).
-  symmetry in Heq.
+  destruct Heq as [(l3, l4) Heq].
   decomp_map_inf Heq; subst.
   rewrite map_app in HP; simpl in HP.
   rewrite Heq3 in HP.
@@ -296,7 +295,7 @@ dichot_elt_app_inf_exec Heq.
 - subst.
   exists (l', l) ; reflexivity.
 - exfalso.
-  decomp_map_inf Heq1; symmetry in Heq1.
+  symmetry in Heq1; decomp_map_inf Heq1; symmetry in Heq1.
   apply Hf in Heq1.
   inversion Heq1.
 Qed.

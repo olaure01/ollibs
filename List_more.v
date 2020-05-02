@@ -86,16 +86,14 @@ Ltac cons2app_all := cons2app_hyps ; cons2app.
 
 Lemma decomp_length_plus A : forall (l : list A) n m,
     length l = n + m ->
-    {' (l1 , l2) : _ & prod (length l1 = n) (prod (length l2 = m) (l = l1 ++ l2))}.
+    {'(l1, l2) | length l1 = n /\ length l2 = m /\ l = l1 ++ l2 }.
 Proof.
 intros l n; revert l; induction n; intros l m Heq.
 - split with (nil, l); auto.
 - destruct l; try inversion Heq.
-  specialize (IHn l m H0) as ((l1 & l2) & (Heql1 & (Heql2 & HeqL))).
-  split with (a :: l1 , l2).
-  split ; [ | split ]; auto.
-  + now simpl; rewrite Heql1.
-  + now simpl; rewrite HeqL.
+  specialize (IHn l m H0) as ((l1, l2) & Heql1 & Heql2 & HeqL).
+  split with (a :: l1, l2).
+  now repeat split; simpl; subst.
 Qed.
 
 Ltac unit_vs_elt_inv H := 
@@ -389,14 +387,12 @@ Ltac decomp_map_eq H Heq :=
 
 Ltac decomp_map H :=
   match type of H with
-  | _ = map _ ?l => symmetry in H;
-                    let l' := fresh "l" in
+  | map _ ?l = _ => let l' := fresh "l" in
                     let Heq := fresh H in
-                    remember l as l' eqn:Heq in H ;
-                    decomp_map_eq H Heq ;
+                    remember l as l' eqn:Heq in H;
+                    decomp_map_eq H Heq;
                     let H' := fresh H in
-                    clear l' ;
-                    rename Heq into H'
+                    clear l'; rename Heq into H'
   end.
 
 Ltac decomp_map_inf_eq H Heq :=
@@ -424,14 +420,12 @@ Ltac decomp_map_inf_eq H Heq :=
 
 Ltac decomp_map_inf H :=
   match type of H with
-  | _ = map _ ?l => symmetry in H;
-                    let l' := fresh "l" in
+  | map _ ?l = _ => let l' := fresh "l" in
                     let Heq := fresh H in
-                    remember l as l' eqn:Heq in H ;
-                    decomp_map_inf_eq H Heq ;
+                    remember l as l' eqn:Heq in H;
+                    decomp_map_inf_eq H Heq;
                     let H' := fresh H in
-                    clear l' ;
-                    rename Heq into H'
+                    clear l'; rename Heq into H'
   end.
 
 (** ** [Forall] *)

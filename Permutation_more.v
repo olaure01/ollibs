@@ -6,6 +6,7 @@ Require Export Permutation.
 
 Set Implicit Arguments.
 
+
 Lemma Permutation_app_app_inv A : forall (l1 l2 l3 l4 : list A),
   Permutation (l1 ++ l2) (l3 ++ l4) -> exists l3' l3'' l4' l4'',
     Permutation l1 (l3' ++ l4')  /\ Permutation l2 (l3'' ++ l4'') /\
@@ -55,7 +56,7 @@ intros f Hi l1; induction l1; intros l2 HP.
   now destruct l2; inversion HP.
 - symmetry in HP.
   destruct (Permutation_vs_cons_inv HP) as (l3 & l4 & Heq).
-  symmetry in Heq; decomp_map Heq; subst.
+  decomp_map Heq; subst.
   rewrite map_app in HP; simpl in HP.
   rewrite Heq3 in HP; symmetry in HP.
   apply Permutation_cons_app_inv in HP.
@@ -77,7 +78,6 @@ induction l1 ; intros l2 Hi HP.
   symmetry in Heq.
   apply Permutation_vs_cons_inv in Heq.
   destruct Heq as (l3 & l4 & Heq).
-  symmetry in Heq.
   decomp_map Heq; subst.
   rewrite map_app in HP; simpl in HP.
   rewrite Heq3 in HP.

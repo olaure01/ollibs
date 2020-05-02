@@ -45,6 +45,7 @@ Lemma CPermutation_map_inv_inj {A B} : forall f : A -> B, injective f ->
   forall l1 l2, CPermutation (map f l1) (map f l2) -> CPermutation l1 l2.
 Proof.
 intros f Hi l1 l2 HP; inversion HP as [l3 l4 Heq1 Heq2].
+symmetry in Heq1; symmetry in Heq2.
 decomp_map Heq1; decomp_map Heq2; subst.
 apply map_injective in Heq5; auto.
 apply map_injective in Heq6; auto.
@@ -56,6 +57,7 @@ Lemma CPermutation_map_inv_inj_local A B : forall (f : A -> B) l1 l2,
     CPermutation (map f l1) (map f l2) -> CPermutation l1 l2.
 Proof.
 intros f l1 l2 Hi HP; inversion HP as [l3 l4 Heq1 Heq2].
+symmetry in Heq1; symmetry in Heq2.
 decomp_map Heq1; decomp_map Heq2; subst.
 symmetry in Heq5; symmetry in Heq6.
 apply map_injective_in in Heq5.
