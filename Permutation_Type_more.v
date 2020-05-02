@@ -183,7 +183,7 @@ apply Permutation_Type_Permutation in H.
 rewrite H; reflexivity.
 Qed.
 
-Instance Permutation_Type_Forall_Type A (P : A -> Type) :
+Instance Permutation_Type_Forall_inf A (P : A -> Type) :
   Proper ((@Permutation_Type A) ==> Basics.arrow) (Forall_inf P).
 Proof.
 intros l1 l2 H.
@@ -194,7 +194,7 @@ induction H; intro H1; auto.
   now repeat constructor.
 Qed.
 
-Instance Permutation_Type_Exists_Type A (P : A -> Type) :
+Instance Permutation_Type_Exists_inf A (P : A -> Type) :
   Proper ((@Permutation_Type A) ==> Basics.arrow) (Exists_inf P).
 Proof.
 intros l1 l2 H.
@@ -209,7 +209,7 @@ induction H; intro H1; auto.
   + now apply Exists_inf_cons_tl, Exists_inf_cons_tl.
 Qed.
 
-Lemma Permutation_Type_Forall2 A B (P : A -> B -> Type) :
+Lemma Permutation_Type_Forall2_inf A B (P : A -> B -> Type) :
   forall l1 l1' l2, Permutation_Type l1 l1' -> Forall2_inf P l1 l2 ->
     { l2' : _ & Permutation_Type l2 l2' & Forall2_inf P l1' l2' }.
 Proof.

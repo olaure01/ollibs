@@ -14,8 +14,8 @@ fmsetlist.v
 fmsetoidlist_Type.v
 fmsetoidlist.v
 funtheory.v
-genperm_Type.v
-genperm.v
+GPermutation_Type.v
+GPermutation.v
 infinite.v
 List_assoc.v
 List_more.v
@@ -25,5 +25,4 @@ Permutation_solve.v
 Permutation_Type_more.v
 Permutation_Type_solve.v
 Permutation_Type.v
-Wf_nat_more.v
 wf_prod.v

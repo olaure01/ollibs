@@ -50,23 +50,19 @@ Qed.
 Lemma Permutation_map_inv_inj {A B} : forall f : A -> B, injective f ->
   forall l1 l2, Permutation (map f l1) (map f l2) -> Permutation l1 l2.
 Proof.
-intros f Hi l1 ; induction l1 ; intros l2 HP.
+intros f Hi l1; induction l1; intros l2 HP.
 - apply Permutation_nil in HP.
-  now destruct l2 ; inversion HP.
-- assert (Heq := HP).
-  symmetry in Heq.
-  apply Permutation_vs_cons_inv in Heq.
-  destruct Heq as (l3 & l4 & Heq).
-  symmetry in Heq.
-  decomp_map Heq ; subst.
-  rewrite map_app in HP.
-  simpl in HP.
-  rewrite Heq3 in HP.
+  now destruct l2; inversion HP.
+- symmetry in HP.
+  destruct (Permutation_vs_cons_inv HP) as (l3 & l4 & Heq).
+  symmetry in Heq; decomp_map Heq; subst.
+  rewrite map_app in HP; simpl in HP.
+  rewrite Heq3 in HP; symmetry in HP.
   apply Permutation_cons_app_inv in HP.
   specialize IHl1 with (l0 ++ l6).
   rewrite map_app in IHl1.
   apply IHl1 in HP.
-  apply Hi in Heq3 ; subst.
+  apply Hi in Heq3; subst.
   now apply Permutation_cons_app.
 Qed.
 

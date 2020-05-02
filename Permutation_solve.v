@@ -50,7 +50,7 @@ Ltac perm_rot :=
 
 (** The parameter [20] below is an arbitrary
  the higher, the longer, the more powerful *)
-Ltac perm_solve :=
+Ltac Permutation_solve :=
   match goal with
   | |- Permutation _ _ =>
     list_simpl ;

@@ -1,17 +1,7 @@
-(* CPermutation_solve library *)
-(* v 0.1  2017/07/18   Olivier Laurent *)
-
-
-
-(* Release Notes
-     v0.1: use of cons2app instead of cons_to_app_cperm
-           cons2app added in hypotheses
-           some simplifications
-*)
-
+(** Automatic tactics for [CPermutation] *)
 
 (** * Some tactics for tentative automatic solving of [CPermutation] goals
-The main tactic is [cperm_solve] which fails is the goal is not solved. *)
+The main tactic is [CPermutation_solve] which fails is the goal is not solved. *)
 
 Require Import CPermutation.
 Require Import List_more.
@@ -26,7 +16,7 @@ Ltac cperm_rot :=
 
 (** The parameter [20] below is an arbitrary
  the higher, the longer, the more powerful *)
-Ltac cperm_solve :=
+Ltac CPermutation_solve :=
   match goal with
   | |- CPermutation _ _ =>
     list_simpl ;
