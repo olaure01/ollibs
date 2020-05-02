@@ -1,7 +1,7 @@
 (** * Cyclic Permutations
 Definition and basic properties of cyclic permutations in Type. *)
 
-From Coq Require Import CMorphisms.
+From Coq Require Import CMorphisms PeanoNat.
 From Coq Require CPermutation.
 From OLlibs Require Import List_more Permutation_Type_more funtheory.
 
@@ -52,6 +52,23 @@ split.
 - apply CPermutation_Type_refl.
 - apply CPermutation_Type_sym.
 - apply CPermutation_Type_trans.
+Qed.
+
+Lemma CPermutation_Type_split A : forall l1 l2 : list A,
+  CPermutation_Type l1 l2 -> { n | l2 = skipn n l1 ++ firstn n l1 }.
+Proof.
+intros l1 l2 [l1' l2'].
+exists (length l1').
+rewrite skipn_app, skipn_all, Nat.sub_diag; simpl; f_equal.
+now rewrite firstn_app, firstn_all, Nat.sub_diag; simpl; rewrite app_nil_r.
+Qed.
+
+Lemma CPermutation_Type_skipn_firstn A : forall (l : list A) n,
+  CPermutation_Type l (skipn n l ++ firstn n l).
+Proof.
+intros l n.
+transitivity (firstn n l ++ skipn n l); [ | constructor ].
+now rewrite (firstn_skipn n).
 Qed.
 
 Lemma CPermutation_Type_app A : forall l1 l2 l3 : list A,
