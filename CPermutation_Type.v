@@ -7,6 +7,7 @@ From OLlibs Require Import List_more Permutation_Type_more funtheory.
 
 Set Implicit Arguments.
 
+
 (** Definition *)
 Inductive CPermutation_Type A : list A -> list A -> Type :=
 | cperm_Type : forall l1 l2, CPermutation_Type (l1 ++ l2) (l2 ++ l1).
@@ -330,7 +331,7 @@ apply Permutation_Type_image with l l'.
 now apply CPermutation_Permutation_Type.
 Qed.
 
-Lemma CPermutation_Type_map_inv_inj {A B} : forall f : A -> B, injective f ->
+Lemma CPermutation_Type_map_inv_inj A B : forall f : A -> B, injective f ->
   forall l1 l2, CPermutation_Type (map f l1) (map f l2) -> CPermutation_Type l1 l2.
 Proof.
 intros f Hi l1 l2 HP; inversion HP as [l3 l4 Heq1 Heq2].

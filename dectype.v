@@ -1,5 +1,5 @@
-(* Types with decidable equality formalized as types with Boolean valued equality *)
-(*   this is based on records rather than modules (as opposed to stdlib) *)
+(** Types with decidable equality formalized as types with Boolean valued equality
+this is based on records rather than modules (as opposed to stdlib) *)
 
 From Coq Require Import Bool PeanoNat.
 From Coq Require Eqdep_dec.
@@ -9,46 +9,46 @@ Set Implicit Arguments.
 
 (** * Inhabitation *)
 
-Inductive inhabited_Type (A:Type) : Type := inhabits_Type : A -> inhabited_Type A.
-Arguments inhabits_Type {_} _.
+Inductive inhabited_inf A : Type := inhabits_inf : A -> inhabited_inf A.
+Arguments inhabits_inf [_] _.
 
-Definition inhabitant_Type {A:Type} (Hinh : inhabited_Type A) :=
-  match Hinh with
-  | inhabits_Type a => a
-  end.
+Definition inhabitant_inf A (Hinh : inhabited_inf A) :=
+  match Hinh with inhabits_inf a => a end.
 
-Lemma inhabited_Type_unit : inhabited_Type unit.
-Proof (inhabits_Type tt).
+Lemma inhabited_inf_unit : inhabited_inf unit.
+Proof (inhabits_inf tt).
 
-Lemma inhabited_Type_bool : inhabited_Type bool.
-Proof (inhabits_Type false).
+Lemma inhabited_inf_bool : inhabited_inf bool.
+Proof (inhabits_inf false).
 
-Lemma inhabited_Type_nat : inhabited_Type nat.
-Proof (inhabits_Type 0).
+Lemma inhabited_inf_nat : inhabited_inf nat.
+Proof (inhabits_inf 0).
 
-Lemma inhabited_Type_option A : inhabited_Type (option A).
-Proof (inhabits_Type None).
+Lemma inhabited_inf_option A : inhabited_inf (option A).
+Proof (inhabits_inf None).
 
-Lemma inhabited_Type_suml {A B} : inhabited_Type A -> inhabited_Type (sum A B).
-Proof (fun Hinh => inhabits_Type (inl (inhabitant_Type Hinh))).
+Lemma inhabited_inf_suml A B : inhabited_inf A -> inhabited_inf (sum A B).
+Proof (fun Hinh => inhabits_inf (inl (inhabitant_inf Hinh))).
+Arguments inhabited_inf_suml [_] {_} _.
 
-Lemma inhabited_Type_sumr {A B} : inhabited_Type B -> inhabited_Type (sum A B).
-Proof (fun Hinh => inhabits_Type (inr (inhabitant_Type Hinh))).
+Lemma inhabited_inf_sumr A B : inhabited_inf B -> inhabited_inf (sum A B).
+Proof (fun Hinh => inhabits_inf (inr (inhabitant_inf Hinh))).
+Arguments inhabited_inf_sumr {_} [_] _.
 
-Lemma inhabited_Type_prod {A B} : inhabited_Type A -> inhabited_Type B -> inhabited_Type (prod A B).
-Proof (fun HinhA HinhB => inhabits_Type (inhabitant_Type HinhA, inhabitant_Type HinhB)).
+Lemma inhabited_inf_prod A B : inhabited_inf A -> inhabited_inf B -> inhabited_inf (prod A B).
+Proof (fun HinhA HinhB => inhabits_inf (inhabitant_inf HinhA, inhabitant_inf HinhB)).
 
-Lemma inhabited_Type_list A : inhabited_Type (list A).
-Proof (inhabits_Type nil).
+Lemma inhabited_inf_list A : inhabited_inf (list A).
+Proof (inhabits_inf nil).
 
-Lemma inhabited_Type_fun {A B} (f : A -> B) : inhabited_Type A -> inhabited_Type B.
-Proof (fun Hinh => inhabits_Type (f (inhabitant_Type Hinh))).
+Lemma inhabited_inf_fun A B (f : A -> B) : inhabited_inf A -> inhabited_inf B.
+Proof (fun Hinh => inhabits_inf (f (inhabitant_inf Hinh))).
 
-Lemma inhabited_Type_img {A B} : inhabited_Type B -> inhabited_Type (A -> B).
-Proof (fun Hinh => inhabits_Type (fun _ => (inhabitant_Type Hinh))).
+Lemma inhabited_inf_img A B : inhabited_inf B -> inhabited_inf (A -> B).
+Proof (fun Hinh => inhabits_inf (fun _ => (inhabitant_inf Hinh))).
 
-Lemma inhabited_Type_id {A} : inhabited_Type (A -> A).
-Proof (inhabits_Type id).
+Lemma inhabited_inf_id A : inhabited_inf (A -> A).
+Proof (inhabits_inf id).
 
 
 (** * Decidable Types *)
@@ -59,12 +59,12 @@ Record DecType := {
   eqb : car -> car -> bool;
   eqb_eq : forall x y, eqb x y = true <-> x = y
 }.
-Arguments eqb {_}.
-Arguments eqb_eq {_}.
+Arguments eqb [_].
+Arguments eqb_eq [_].
 
 Section DecTypes.
 
-  Context { X : DecType }.
+  Variable X : DecType.
   Implicit Type x y : X.
 
   Lemma eqb_refl : forall x, eqb x x = true.
@@ -77,7 +77,7 @@ Section DecTypes.
   - subst; rewrite eqb_refl in Heq; inversion Heq.
   Qed.
 
-  Lemma eq_dt_dec : forall x y, { x = y } + { x <> y }.
+  Lemma eq_dt_dec : forall x y, {x = y} + {x <> y}.
   Proof.
   intros x y; case_eq (eqb x y); intros Heq; [ left | right ].
   - now apply eqb_eq in Heq.
@@ -91,11 +91,11 @@ Section DecTypes.
   - now apply ReflectF, eqb_neq.
   Qed.
 
-  Lemma if_eq_dt_dec_refl {A}: forall x (u v : A),
+  Lemma if_eq_dt_dec_refl A : forall x (u v : A),
     (if eq_dt_dec x x then u else v) = u.
   Proof. intros x u v; now destruct (eq_dt_dec x x). Qed.
 
-  Lemma if_eq_dt_dec_neq {A}: forall x y, x <> y -> forall (u v : A),
+  Lemma if_eq_dt_dec_neq A : forall x y, x <> y -> forall (u v : A),
     (if eq_dt_dec x y then u else v) = v.
   Proof. intros x y Hneq u v; now destruct (eq_dt_dec x y). Qed.
 
@@ -120,6 +120,9 @@ Section DecTypes.
   Proof (EqdepFacts.eq_dep_eq__inj_pairT2 X eq_dep_eq).
 
 End DecTypes.
+
+Arguments eq_dt_dec {_} _ _.
+Arguments eq_dt_reflect {_} _ _.
 
 
 (** * Instances and Constructions *)
@@ -206,7 +209,7 @@ Definition list_dectype (D : DecType) := {|
 (**   remove an element from a DecType *)
 Section Minus.
 
-  Context { D : DecType }.
+  Variable D : DecType.
   Variable d : D.
 
   Lemma minus_eqb_eq : forall (a b : { z | eqb d z = false }),
@@ -225,6 +228,8 @@ Section Minus.
   |}.
 
 End Minus.
+
+Arguments minus [_] _.
 
 
 (** * Tactics *)
@@ -251,48 +256,48 @@ end; simpl.
 
 Record InhDecType := {
   inhcar :> DecType;
-  inh_dt : inhabited_Type inhcar
+  inh_dt : inhabited_inf inhcar
 }.
 Arguments inh_dt {_}.
 
 Definition unit_inhdectype := {|
   inhcar := unit_dectype;
-  inh_dt := inhabited_Type_unit
+  inh_dt := inhabited_inf_unit
 |}.
 
 Definition bool_inhdectype := {|
   inhcar := bool_dectype;
-  inh_dt := inhabited_Type_bool
+  inh_dt := inhabited_inf_bool
 |}.
 
 Definition nat_inhdectype := {|
   inhcar := nat_dectype;
-  inh_dt := inhabited_Type_nat
+  inh_dt := inhabited_inf_nat
 |}.
 
 Definition option_inhdectype (D : DecType) := {|
   inhcar := option_dectype D;
-  inh_dt := inhabited_Type_option D
+  inh_dt := inhabited_inf_option D
 |}.
 
 Definition suml_inhdectype (D1 : InhDecType) (D2 : DecType) := {|
   inhcar := sum_dectype D1 D2;
-  inh_dt := inhabited_Type_suml inh_dt
+  inh_dt := inhabited_inf_suml inh_dt
 |}.
 
 Definition sumr_inhdectype (D1 : DecType) (D2 : InhDecType) := {|
   inhcar := sum_dectype D1 D2;
-  inh_dt := inhabited_Type_sumr inh_dt
+  inh_dt := inhabited_inf_sumr inh_dt
 |}.
 
 Definition sum_inhdectype (D1 D2 : InhDecType) := suml_inhdectype D1 D2.
 
 Definition prod_inhdectype (D1 D2 : InhDecType) := {|
   inhcar := prod_dectype D1 D2;
-  inh_dt := inhabited_Type_prod inh_dt inh_dt
+  inh_dt := inhabited_inf_prod inh_dt inh_dt
 |}.
 
 Definition list_inhdectype (D : DecType) := {|
   inhcar := list_dectype D;
-  inh_dt := inhabited_Type_list D
+  inh_dt := inhabited_inf_list D
 |}.

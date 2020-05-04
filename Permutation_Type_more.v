@@ -139,7 +139,7 @@ eapply Permutation_Type_trans.
 Qed.
 
 Lemma Permutation_Type_app_app_inv A : forall (l1 l2 l3 l4 : list A),
-  Permutation_Type (l1 ++ l2) (l3 ++ l4) -> {'(l1', l2', l3', l4') : _ & prod (prod
+  Permutation_Type (l1 ++ l2) (l3 ++ l4) -> {'(l1', l2', l3', l4') & prod (prod
     (Permutation_Type l1 (l1' ++ l3'))
     (Permutation_Type l2 (l2' ++ l4'))) (prod
     (Permutation_Type l3 (l1' ++ l2'))
@@ -212,7 +212,7 @@ Qed.
 
 Lemma Permutation_Type_Forall2_inf A B (P : A -> B -> Type) :
   forall l1 l1' l2, Permutation_Type l1 l1' -> Forall2_inf P l1 l2 ->
-    { l2' : _ & Permutation_Type l2 l2' & Forall2_inf P l1' l2' }.
+    { l2' & Permutation_Type l2 l2' & Forall2_inf P l1' l2' }.
 Proof.
 intros l1 l1' l2 HP.
 revert l2 ; induction HP ; intros l2 HF ; inversion HF ; subst.
@@ -232,7 +232,7 @@ revert l2 ; induction HP ; intros l2 HF ; inversion HF ; subst.
 Qed.
 
 Lemma Permutation_Type_map_inv A B : forall(f : A -> B) l1 l2,
-  Permutation_Type l1 (map f l2) -> { l : _ & l1 = map f l & (Permutation_Type l2 l) }.
+  Permutation_Type l1 (map f l2) -> { l & l1 = map f l & (Permutation_Type l2 l) }.
 Proof.
 induction l1; intros l2 HP.
 - apply Permutation_Type_nil in HP.
@@ -373,7 +373,7 @@ induction HP ; try reflexivity.
 - etransitivity ; eassumption.
 Qed.
 
-Lemma perm_perm_t_Type {A} : forall l1 l2 : list A,
+Lemma perm_perm_t_Type A : forall l1 l2 : list A,
   Permutation_Type l1 l2 -> Permutation_Type_transp l1 l2.
 Proof.
 intros l1 l2 HP; induction HP.

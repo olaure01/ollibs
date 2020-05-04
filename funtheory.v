@@ -1,6 +1,6 @@
 (** Properties of functions *)
 
-From Coq Require Import Program.Basics Relations RelationClasses List.
+From Coq Require Import Program.Basics Relation_Definitions RelationClasses List.
 
 Set Implicit Arguments.
 
@@ -229,4 +229,4 @@ Definition injective2 A B C (f : A -> B -> C) :=
   forall x y x' y', f x y = f x' y' -> x = x' /\ y = y'.
 
 Definition surjective2 A B C (f : A -> B -> C) :=
-  forall z, {'(x,y) | z = f x y }.
+  forall z, {'(x, y) | z = f x y }.

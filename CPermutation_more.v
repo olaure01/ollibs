@@ -41,7 +41,7 @@ dichot_app_exec Hx; dichot_app_exec Hy; subst.
   repeat split; rewrite <- ? app_assoc; apply CPermutation_app_rot.
 Qed.
 
-Lemma CPermutation_map_inv_inj {A B} : forall f : A -> B, injective f ->
+Lemma CPermutation_map_inv_inj A B : forall f : A -> B, injective f ->
   forall l1 l2, CPermutation (map f l1) (map f l2) -> CPermutation l1 l2.
 Proof.
 intros f Hi l1 l2 HP; inversion HP as [l3 l4 Heq1 Heq2].

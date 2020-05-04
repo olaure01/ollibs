@@ -5,11 +5,11 @@ From OLlibs Require Import funtheory.
 
 Set Implicit Arguments.
 
-Definition BRelation A := A -> A -> bool.
+Definition brelation A := A -> A -> bool.
 
 Class BOrder := {
   carrier : Type ;
-  leb : BRelation carrier ;
+  leb : brelation carrier ;
   total : forall a b, leb a b = false -> leb b a = true ;
   asym :  forall a b, leb a b = true -> leb b a = true -> a = b ;
   trans : forall a b c, leb a b = true -> leb b c = true -> leb a c = true
@@ -203,7 +203,7 @@ split with nat Nat.leb; intros.
   apply Nat.leb_le; lia.
 Defined.
 
-Lemma border_inj {A B} (f : A -> @carrier B) (Hi : injective f) : BOrder.
+Lemma border_inj A B (f : A -> @carrier B) (Hi : injective f) : BOrder.
 Proof.
 split with A (fun x y => leb (f x) (f y)) ; intros.
 - now apply total.
@@ -261,7 +261,7 @@ match l with
 end.
 Arguments is_sorted [_] _.
 
-Lemma is_sorted_tail {B} : forall a l,
+Lemma is_sorted_tail B : forall a l,
   @is_sorted B (a :: l) = true -> is_sorted l = true.
 Proof.
 intros a l Hs.
@@ -303,7 +303,7 @@ destruct l0 ; (split ; [ | split ]); auto.
   case_eq (leb a c) ; intros Heqbb.
   + now apply andb_true_iff ; split.
   + destruct s ; inversion Hlen.
-    destruct (IH s (le_n _) a (exist _ l0 (is_sorted_tail _ _ Hsort)) H0)
+    destruct (IH s (le_n _) a (exist _ l0 (is_sorted_tail _ _ _ Hsort)) H0)
       as [Hsort' _].
     apply total in Heqbb.
     destruct l0 ; try (apply andb_true_iff ; split); auto.
@@ -325,7 +325,7 @@ destruct l0 ; (split ; [ | split ]); auto.
   + inversion Hd as [ -> | Hin ].
     * now left; left.
     * destruct s; inversion Hlen as [ Hlen' ].
-      destruct (IH s (le_n _) a (exist _ l0 (is_sorted_tail _ _ Hsort)) Hlen')
+      destruct (IH s (le_n _) a (exist _ l0 (is_sorted_tail _ _ _ Hsort)) Hlen')
         as [_ Hin'].
       apply Hin' in Hin.
       now destruct Hin; [ left; apply in_cons | right ].

@@ -1,14 +1,15 @@
-(** * Finite Multiset over Lists
-   We define an axiomatization of finite multisets through their relation with lists.
-   Equality is required to be Coq equality.
-   Permutation are with output in [Type].
-   An implementation of the axioms is provided by sorted lists
-   for every type equiped with a Boolean-valued total order relation *)
+(** Finite Multiset over Lists
+We define an axiomatization of finite multisets through their relation with lists.
+Equality is required to be Coq equality.
+Permutation are with output in [Type].
+An implementation of the axioms is provided by sorted lists
+for every type equiped with a Boolean-valued total order relation. *)
 
 From Coq Require Import Bool List CMorphisms.
 From OLlibs Require Import BOrders Permutation_Type_more.
 
 Set Implicit Arguments.
+
 
 (** * Axiomatization *)
 

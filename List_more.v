@@ -1,4 +1,4 @@
-(** * Add-ons for List library
+(** Add-ons for List library
 Usefull tactics and properties apparently missing in the List library. *)
 
 From Coq Require Import PeanoNat.
@@ -443,7 +443,7 @@ end.
 (** ** [In] *)
 
 (* TODO in_concat from List is enough? (iff shape)
-Lemma in_concat {A} : forall (l : list A) (L : list (list A)) a, In a l -> In l L -> In a (concat L).
+Lemma in_concat A : forall (l : list A) (L : list (list A)) a, In a l -> In l L -> In a (concat L).
 Proof.
 intros l L a Hin1 Hin2.
 induction L; simpl; inversion_clear Hin2; subst.
@@ -453,7 +453,7 @@ Qed.
 *)
 
 (* TODO an iff shape exists with same name in stdlib
-Lemma in_flat_map {A B} : forall (f : A -> list B) x a l,
+Lemma in_flat_map A B : forall (f : A -> list B) x a l,
   In x (f a) -> In a l -> In x (flat_map f l).
 Proof.
 intros f x a l Hinx Hina.
@@ -465,7 +465,7 @@ Qed.
 (** ** [remove] *)
 
 (* TODO easy consequence of in_remove
-Lemma incl_remove {A} : forall Hdec l (x : A), incl (remove Hdec x l) l.
+Lemma incl_remove A : forall Hdec l (x : A), incl (remove Hdec x l) l.
 Proof.
 intros.
 intros a Hin.
@@ -482,9 +482,9 @@ Qed.
 
 (** ** [concat] *)
 
-Lemma concat_vs_elt {A} : forall (a : A) L l1 l2,
+Lemma concat_vs_elt A : forall (a : A) L l1 l2,
     concat L = l1 ++ a :: l2 ->
-    {'(L1,L2,l1',l2') | l1 = concat L1 ++ l1' /\ l2 = l2' ++ concat L2
+    {'(L1, L2, l1', l2') | l1 = concat L1 ++ l1' /\ l2 = l2' ++ concat L2
                       /\ L = L1 ++ (l1' ++ a :: l2') :: L2 }.
 Proof.
 intros a L.
@@ -502,7 +502,7 @@ induction L; intros l1 l2 eq.
     apply app_assoc.
 Qed.
 
-Lemma concat_Forall2_inf {A B} : forall (L : list (list A)) (l : list B) R,
+Lemma concat_Forall2_inf A B : forall (L : list (list A)) (l : list B) R,
     Forall2_inf R (concat L) l ->
     { L' & concat L' = l & Forall2_inf (Forall2_inf R) L L' }.
 Proof.
@@ -531,7 +531,7 @@ Qed.
 
 (** ** [Forall] and [Exists] *)
 
-Lemma Forall_map {A B} : forall (f : A -> B) l,
+Lemma Forall_map A B : forall (f : A -> B) l,
   Forall (fun x => exists y, x = f y) l <-> exists l0, l = map f l0.
 Proof.
 induction l ; split ; intro H.
@@ -551,7 +551,7 @@ induction l ; split ; intro H.
 Qed.
 
 (* TODO easy consequence of Forall_impl
-Lemma inc_Forall {A} : forall (P : nat -> A -> Prop) l i j,
+Lemma inc_Forall A : forall (P : nat -> A -> Prop) l i j,
   (forall i j a, P i a -> i <= j -> P j a) ->
     Forall (P i) l -> i <= j -> Forall (P j) l.
 Proof.
@@ -619,7 +619,7 @@ Proof.
 Qed.
 
 Lemma Forall2_inf_in_l A B : forall l1 l2 a (R : A -> B -> Type),
-  Forall2_inf R l1 l2 -> In_inf a l1 -> {b & prod (In_inf b l2) (R a b)}.
+  Forall2_inf R l1 l2 -> In_inf a l1 -> { b & prod (In_inf b l2) (R a b) }.
 Proof.
 intros l1 l2 a R HF.
 induction HF ; intro Hin; inversion Hin.
@@ -634,7 +634,7 @@ induction HF ; intro Hin; inversion Hin.
 Qed.
 
 Lemma Forall2_inf_in_r A B : forall l1 l2 b (R : A -> B -> Type),
-  Forall2_inf R l1 l2 -> In_inf b l2 -> {a & prod (In_inf a l1) (R a b)}.
+  Forall2_inf R l1 l2 -> In_inf b l2 -> { a & prod (In_inf a l1) (R a b) }.
 Proof.
 intros l1 l2 b R HF.
 induction HF ; intro Hin; inversion Hin.
@@ -648,98 +648,17 @@ induction HF ; intro Hin; inversion Hin.
   now right.
 Qed.
 
-(*** *** [In_Forall_inf] *)
-Section In_Forall_inf.
-  Variable A : Type.
-  Variable P : A -> Type.
-
-  Fixpoint In_Forall_inf l (a : A) (Pa : P a) (Fl : Forall_inf P l) : Type :=
-    match Fl with
-    | Forall_inf_nil _ => False
-    | Forall_inf_cons b Pb Fl => ((existT P a Pa) = (existT P b Pb)) + In_Forall_inf Pa Fl
-    end.
-
-  Lemma In_Forall_inf_elt: forall l1 l2 a (Fl : Forall_inf P (l1 ++ a :: l2)),
-      {Pa : P a & In_Forall_inf Pa Fl}.
-  Proof.
-  induction l1; intros l2 a' Fl.
-  - simpl in Fl.
-    remember (a' :: l2).
-    destruct Fl; inversion Heql.
-    subst.
-    split with p.
-    now left.
-  - remember ((a :: l1) ++ a' :: l2).
-    destruct Fl; inversion Heql.
-    subst.
-    destruct IHl1 with l2 a' Fl as (Pa , Hin); auto.
-    split with Pa.
-    now right.
-  Qed.
-
-  Lemma In_Forall_inf_in : forall l a (Fl : Forall_inf P l),
-    In_inf a l -> {Pa : P a & In_Forall_inf Pa Fl}.
-  Proof.
-  intros l.
-  induction l; intros a' Fl Hin; inversion Hin.
-  - subst.
-    remember (a' :: l) as l'.
-    destruct Fl; inversion Heql'.
-    subst.
-    split with p.
-    now left.
-  - remember (a :: l) as l'.
-    destruct Fl; inversion Heql'.
-    subst.
-    destruct IHl with a' Fl as (Pa & Hin'); auto.
-    split with Pa.
-    now right.
-  Qed.
-
-  Fixpoint Forall_inf_sum (f : forall a, P a -> nat) (l : list A) (Pl : Forall_inf P l) :=
-    match Pl with
-    | Forall_inf_nil _ => 0
-    | @Forall_inf_cons _ _ x l Px Pl => (f x Px) + (Forall_inf_sum f Pl)
-    end.
-
-  Fixpoint Forall_inf_App l1 l2 Pl1 Pl2 :=
-    match Pl1 with
-    | Forall_inf_nil _ => Pl2
-    | @Forall_inf_cons _ _ x l Px Pl => @Forall_inf_cons _ P x (l ++ l2) Px
-                                                         (Forall_inf_App l l2 Pl Pl2)
-    end.
-
-  Lemma Forall_inf_sum_app : forall f l1 l2 (Pl1 : Forall_inf P l1) (Pl2 : Forall_inf P l2),
-      Forall_inf_sum f (Forall_inf_App Pl1 Pl2)
-    = Forall_inf_sum f Pl1 + Forall_inf_sum f Pl2.
-  Proof.
-  intros f l1 l2 Pl1 Pl2.
-  induction Pl1.
-  - reflexivity.
-  - simpl; rewrite IHPl1.
-    apply Nat.add_assoc.
-  Qed.
-
-  Lemma In_Forall_inf_to_In_inf : forall l (L : list A) (p : P l) (PL : Forall_inf P L),
-    In_Forall_inf p PL -> In_inf l L.
-  Proof.
-  intros l L p PL Hin; induction PL; inversion Hin.
-  - now left; inversion H; subst.
-  - now right; apply IHPL.
-  Qed.
-
-End In_Forall_inf.
 
 (** ** Map for functions with two arguments : [map2] *)
 
-Fixpoint map2 {A B C} (f : A -> B -> C) l1 l2 :=
+Fixpoint map2 A B C (f : A -> B -> C) l1 l2 :=
   match l1 , l2 with
   | nil , _ => nil
   | _ , nil => nil
   | a1::r1 , a2::r2 => (f a1 a2)::(map2 f r1 r2)
   end.
 
-Lemma map2_length {A B C} : forall (f : A -> B -> C) l1 l2,
+Lemma map2_length A B C : forall (f : A -> B -> C) l1 l2,
   length l1 = length l2 -> length (map2 f l1 l2) = length l2.
 Proof.
 induction l1; intros; auto.
@@ -749,7 +668,7 @@ destruct l2.
   apply IHl1 in H'; simpl; auto.
 Qed.
 
-Lemma length_map2 {A B C} : forall (f : A -> B -> C) l1 l2,
+Lemma length_map2 A B C : forall (f : A -> B -> C) l1 l2,
   length (map2 f l1 l2) <= length l1 /\ length (map2 f l1 l2) <= length l2.
 Proof.
 induction l1; intros.
@@ -760,7 +679,7 @@ induction l1; intros.
     now split; simpl; apply le_n_S.
 Qed.
 
-Lemma nth_map2 {A B C} : forall (f : A -> B -> C) l1 l2 i a b c,
+Lemma nth_map2 A B C : forall (f : A -> B -> C) l1 l2 i a b c,
   i < length (map2 f l1 l2) ->
     nth i (map2 f l1 l2) c = f (nth i l1 a) (nth i l2 b).
 Proof.
@@ -776,7 +695,7 @@ Qed.
 
 (** * [fold_right] *)
 
-Lemma fold_right_app_assoc2 {A B} f (g : B -> A) h (e : A) l1 l2 :
+Lemma fold_right_app_assoc2 A B f (g : B -> A) h (e : A) l1 l2 :
     (forall x y z, h (g x) (f y z) = f (h (g x) y) z) ->
     (f e (fold_right (fun x => h (g x)) e l2) = (fold_right (fun x => h (g x)) e l2)) ->
   fold_right (fun x => h (g x)) e (l1 ++ l2) =
@@ -791,21 +710,12 @@ induction l1; simpl.
   f_equal; assumption.
 Qed.
 
-Lemma fold_right_app_assoc {A} f (e : A) l1 l2 :
+Lemma fold_right_app_assoc A f (e : A) l1 l2 :
   (forall x y z, f x (f y z) = f (f x y) z) -> (forall x, f e x = x) ->
   fold_right f e (l1 ++ l2) = f (fold_right f e l1) (fold_right f e l2).
 Proof. intros Hassoc Hunit; apply fold_right_app_assoc2; [ assumption | apply Hunit ]. Qed.
 
 
-(* TODO add filterpair :
-    Fixpoint filterpair {A B : Type} (f:A->bool) (l:list (prod A B)) : list (prod A B) :=
-      match l with
-        | nil => nil
-        | (x,v) as p :: l => if f x then p::(filterpair f l) else filterpair f l
-      end.
+(* TODO PR #12237 submitted, remove once merged *)
 
-with lemmas copied from [filter]
-define remove_snd using filterpair (rename as remove_key?)
-take lemmas remove_snd_remove remove_snd_notin snd_remove_snd NoDup_remove_snd
-   (from quantifiers work: foformulas.v)
-have a look on OCaml standard library about filter and association pairs *)
+Section Filter.

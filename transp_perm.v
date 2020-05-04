@@ -1,7 +1,7 @@
 (** Transposition function on elements of a list *)
 
 From Coq Require Import List Lia.
-From OLlibs Require Import funtheory List_more Permutation_Type.
+From OLlibs Require Import funtheory Permutation_Type.
 
 Set Implicit Arguments.
 
@@ -59,8 +59,8 @@ induction n; intros l Hlt.
 Qed.
 
 Lemma transp_decomp A : forall n (l : list A), n + 1 < length l ->
-  {'(l1,l2,a,b) : _ & length l1 = n & prod (l = l1 ++ a :: b :: l2)
-                                           (transp n l = l1 ++ b :: a :: l2) }.
+  {'(l1, l2, a, b) & length l1 = n & prod (l = l1 ++ a :: b :: l2)
+                                          (transp n l = l1 ++ b :: a :: l2) }.
 Proof.
 induction n; intros l Hlt; destruct l ; try (exfalso; inversion Hlt ; fail).
 - destruct l ; try (exfalso; simpl in Hlt ; lia; fail).
@@ -87,7 +87,7 @@ apply Permutation_Type_swap.
 Qed.
 
 Lemma perm_transp A: forall l1 l2 : list A,
-  Permutation_Type l1 l2 -> {l & l2 = fold_right transp l1 l}.
+  Permutation_Type l1 l2 -> { l & l2 = fold_right transp l1 l }.
 Proof.
 intros l1 l2 HP; induction HP.
 - now exists nil.

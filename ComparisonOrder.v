@@ -3,6 +3,9 @@
 
 From Coq Require Import Orders.
 
+Set Implicit Arguments.
+
+
 Ltac destr_comparison :=
   intros; destruct_all comparison; simpl in *; trivial; try discriminate.
 

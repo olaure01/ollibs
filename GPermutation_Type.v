@@ -360,7 +360,7 @@ Section GPermutation.
 
   Lemma PCPermutation_Type_vs_elt_inv : forall a l l1 l2,
     PCPermutation_Type l (l1 ++ a :: l2) ->
-      {'(l',l'') & PEPermutation_Type (l2 ++ l1) (l'' ++ l') & l = l' ++ a :: l'' }.
+      {'(l', l'') & PEPermutation_Type (l2 ++ l1) (l'' ++ l') & l = l' ++ a :: l'' }.
   Proof.
   case_perm; intros a l l1 l2 HP.
   - destruct (Permutation_Type_vs_elt_inv _ _ _ HP) as ((l',l'') & ->).
@@ -387,7 +387,7 @@ Section GPermutation.
   Lemma PCPermutation_Type_cons_cons_inv : forall a1 a2 l1 l2,
     PCPermutation_Type (a1 :: l1) (a2 :: l2) ->
       (a1 = a2) * PEPermutation_Type l1 l2
-    + { '(l3,l4) & PEPermutation_Type l1 (l4 ++ a2 :: l3) & l2 = l3 ++ a1 :: l4 }.
+    + {'(l3, l4) & PEPermutation_Type l1 (l4 ++ a2 :: l3) & l2 = l3 ++ a1 :: l4 }.
   Proof.
   intros a1 a2 l1 l2 HP; symmetry in HP.
   apply PCPermutation_Type_vs_cons_inv in HP.

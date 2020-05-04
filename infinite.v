@@ -1,7 +1,7 @@
 (** Infinite Types *)
 
-From Coq Require Import Bool PeanoNat Lia.
-From OLlibs Require Import List_more funtheory dectype.
+From Coq Require Import Bool PeanoNat Lia List.
+From OLlibs Require Import funtheory dectype.
 
 Set Implicit Arguments.
 
@@ -28,7 +28,7 @@ Section Infinite.
   (* bijection with nat *)
   Definition nat_bijective := { f : nat -> X & bijective f }.
   (* section with nat *)
-  Definition nat_section := {'(i,s) : (nat -> X) * (X -> nat) | retract s i }.
+  Definition nat_section := {'(i, s) : (nat -> X) * (X -> nat) | retract s i }.
   (* non-surjective self injection *)
   Definition self_injective := { f : X -> X & injective f & { x | forall y, x <> f y } }.
   (* injection from nat *)
@@ -201,7 +201,7 @@ End InfiniteDec.
 Arguments self_injective_minus [_] _.
 
 Definition nat_of_self (X : DecType) (pi : self_injective X) (n : nat) :
-   { x : X | x = Nat.iter n (projT1 (sigT_of_sigT2 pi)) (proj1_sig (projT3 pi)) }
+   { x | x = Nat.iter n (projT1 (sigT_of_sigT2 pi)) (proj1_sig (projT3 pi)) }
  * { Y : DecType & self_injective Y }.
 Proof.
 remember pi as HX; destruct pi as [f Hinj [i Hi]].
@@ -255,7 +255,7 @@ Arguments fresh_prop {_}.
 
 Section InfDecTypes.
 
-  Context { X : InfDecType }.
+  Variable X : InfDecType.
 
   Lemma infinite_nat_injective : nat_injective X.
   Proof.
@@ -334,11 +334,12 @@ Section InfDecTypes.
 
   Definition Inh_of_InfDecType := {|
     inhcar := X;
-    inh_dt := inhabits_Type (fresh nil)
+    inh_dt := inhabits_inf (fresh nil)
   |}.
 
 End InfDecTypes.
 
+Arguments infinite_nat_injective {_}.
 Arguments Inh_of_InfDecType _ : clear implicits.
 
 
@@ -428,7 +429,7 @@ Section Prod.
   Variable (ID : InfDecType) (D : InhDecType).
 
   Definition prodl_fresh : list (prod ID D) -> prod ID D :=
-    fun l => (fresh (map fst l), inhabitant_Type inh_dt).
+    fun l => (fresh (map fst l), inhabitant_inf inh_dt).
 
   Lemma notin_prodl_fresh : forall l, ~ In (prodl_fresh l) l.
   Proof.
@@ -444,7 +445,7 @@ Section Prod.
   |}.
 
   Definition prodr_fresh : list (prod D ID) -> prod D ID :=
-    fun l => (inhabitant_Type inh_dt, fresh (map snd l)).
+    fun l => (inhabitant_inf inh_dt, fresh (map snd l)).
 
   Lemma notin_prodr_fresh : forall l, ~ In (prodr_fresh l) l.
   Proof.
@@ -465,7 +466,7 @@ Definition prod_infdectype (ID1 ID2 : InfDecType) :=
   prodl_infdectype ID1 (Inh_of_InfDecType ID2).
 
 (* [list] construction of [InfDecType] *)
-Lemma nat_injective_list (T : Type) : inhabited_Type T -> nat_injective (list T).
+Lemma nat_injective_list (T : Type) : inhabited_inf T -> nat_injective (list T).
 Proof.
 intros [x]; exists (repeat x); intros n; induction n; simpl;
   intros m Heq; destruct m; inversion Heq; [ reflexivity | subst ].

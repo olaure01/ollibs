@@ -2,13 +2,13 @@
 this requires a type with decidable equality
 this allows to solve the goal through the use of rewrite *)
 (* it is not possible directly because of Issue #7675 *)
+(* Issue#7675 is not a problem for PCPermutation_Type, see Issue#12240 *)
 
 (* similarly with CPermutation_Type and CPermutation *)
 (* and then  with PCEPermutation_Type and PCEPermutation *)
 (* and then  with PCPermutation_Type and PCPermutation *)
 (* and then  with PEPermutation_Type and PEPermutation *)
 
-(* TODO no known Issue#7675-style problem for PCPermutation_Type *)
 
 From Coq Require Import List PeanoNat Compare_dec.
 From Coq Require Export Permutation CPermutation.

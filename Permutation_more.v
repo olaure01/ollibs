@@ -1,7 +1,7 @@
-(** * Add-ons for Permutation library
+(** Add-ons for Permutation library
 Usefull properties apparently missing in the Permutation library. *)
 
-From Coq Require Export Permutation.
+From Coq Require Export Permutation List.
 From OLlibs Require Import List_more funtheory.
 
 Set Implicit Arguments.
@@ -48,7 +48,7 @@ induction l1 ; intros.
   + now constructor.
 Qed.
 
-Lemma Permutation_map_inv_inj {A B} : forall f : A -> B, injective f ->
+Lemma Permutation_map_inv_inj A B : forall f : A -> B, injective f ->
   forall l1 l2, Permutation (map f l1) (map f l2) -> Permutation l1 l2.
 Proof.
 intros f Hi l1; induction l1; intros l2 HP.
