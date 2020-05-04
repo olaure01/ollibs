@@ -7,6 +7,7 @@ Import EqNotations.
 
 Set Implicit Arguments.
 
+
 (** * Tactics *)
 
 (** ** Simplification in lists *)
@@ -611,13 +612,6 @@ Qed.
 
 (** *** Properties about [Forall2_inf] *)
 
-Lemma Forall2_inf_length A B : forall l1 l2 (R : A -> B -> Type),
-  Forall2_inf R l1 l2 -> length l1 = length l2.
-Proof.
-  intros l1 l2 R HF; induction HF; auto.
-  now simpl; rewrite IHHF.
-Qed.
-
 Lemma Forall2_inf_in_l A B : forall l1 l2 a (R : A -> B -> Type),
   Forall2_inf R l1 l2 -> In_inf a l1 -> { b & prod (In_inf b l2) (R a b) }.
 Proof.
@@ -719,3 +713,35 @@ Proof. intros Hassoc Hunit; apply fold_right_app_assoc2; [ assumption | apply Hu
 (* TODO PR #12237 submitted, remove once merged *)
 
 Section Filter.
+
+  Variable A : Type.
+  Variable f : A -> bool.
+  Implicit Type l : list A.
+
+  Lemma incl_filter l : incl (filter f l) l.
+  Proof. intros x Hin; now apply filter_In in Hin. Qed.
+
+  Lemma NoDup_filter l : NoDup l -> NoDup (filter f l).
+  Proof.
+  induction l; simpl; intros Hnd; auto.
+  apply NoDup_cons_iff in Hnd.
+  destruct (f a); [ | intuition ].
+  apply NoDup_cons_iff; split; intuition.
+  apply filter_In in H; intuition.
+  Qed.
+
+End Filter.
+
+Section Map.
+
+  Variable A B : Type.
+  Variable f : A -> B.
+
+  Lemma incl_map l1 l2 : incl l1 l2 -> incl (map f l1) (map f l2).
+  Proof.
+  intros Hincl x Hinx.
+  destruct (proj1 (in_map_iff _ _ _) Hinx) as [y [<- Hiny]].
+  apply in_map; intuition.
+  Qed.
+
+End Map.
