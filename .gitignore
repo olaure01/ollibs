@@ -17,6 +17,7 @@
 .coqdeps.d
 .Makefile.d
 Makefile.conf
+Makefile
 
 *.o
 *.v.crashcoqide
