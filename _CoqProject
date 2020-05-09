@@ -20,6 +20,7 @@ GPermutation.v
 infinite.v
 List_assoc.v
 List_more.v
+List_Type.v
 nattree.v
 Permutation_more.v
 PermutationPropify.v

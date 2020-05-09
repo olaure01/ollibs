@@ -1,7 +1,7 @@
 (** Infinite Types *)
 
 From Coq Require Import Bool PeanoNat Lia List.
-From OLlibs Require Import funtheory dectype.
+From OLlibs Require Import funtheory dectype List_Type.
 
 Set Implicit Arguments.
 

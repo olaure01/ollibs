@@ -3,6 +3,7 @@ Usefull tactics and properties apparently missing in the List library. *)
 
 From Coq Require Import PeanoNat.
 From Coq Require Export List.
+From OLlibs Require Export List_Type.
 Import EqNotations.
 
 Set Implicit Arguments.
@@ -745,3 +746,18 @@ Section Map.
   Qed.
 
 End Map.
+
+(** TODO included in PR #11966 submitted, remove once merged *)
+
+    Lemma rev_case A (l : list A) : l = nil \/ exists a tl, l = tl ++ a :: nil.
+    Proof.
+      induction l using rev_ind; [ left | right ]; auto.
+      now exists x, l.
+    Qed.
+
+  Lemma Forall2_length A B (R : A -> B -> Prop): forall l1 l2,
+    Forall2 R l1 l2 -> length l1 = length l2.
+  Proof.
+    intros l1 l2 HF; induction HF; auto.
+    now simpl; rewrite IHHF.
+  Qed.
