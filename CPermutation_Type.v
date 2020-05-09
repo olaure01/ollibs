@@ -143,11 +143,11 @@ apply CPermutation_Type_nil in HC.
 inversion HC.
 Qed.
 
-Lemma CPermutation_Type_one A : forall a b : A,
+Lemma CPermutation_Type_length_1 A : forall a b : A,
   CPermutation_Type (a :: nil) (b :: nil) -> a = b.
 Proof. now intros; apply Permutation_Type_length_1, CPermutation_Permutation_Type. Qed.
 
-Lemma CPermutation_Type_two A : forall a1 a2 b1 b2 : A,
+Lemma CPermutation_Type_length_2 A : forall a1 a2 b1 b2 : A,
   CPermutation_Type (a1 :: a2 :: nil) (b1 :: b2 :: nil) ->
     { a1 = b1 /\ a2 = b2 } + { a1 = b2 /\ a2 = b1 }.
 Proof. now intros; apply Permutation_Type_length_2, CPermutation_Permutation_Type. Qed.
