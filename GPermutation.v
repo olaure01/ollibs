@@ -423,14 +423,14 @@ Section MultiGPermutation.
   apply CPermutation_Permutation.
   Qed.
 
-  Lemma PCPermutation_monot : Bool.leb b b' ->
+  Lemma PCPermutation_monot : Bool.le b b' ->
     forall l1 l2 : list A, PCPermutation b l1 l2 -> PCPermutation b' l1 l2.
   Proof.
   intros Hle l1 l2; destruct b, b'; try (now inversion Hle).
   apply CPermutation_Permutation.
   Qed.
 
-  Lemma PEPermutation_monot : Bool.leb b b' ->
+  Lemma PEPermutation_monot : Bool.le b b' ->
     forall l1 l2 : list A, PEPermutation b l1 l2 -> PEPermutation b' l1 l2.
   Proof.
   intros Hle l1 l2; destruct b, b'; try (now inversion Hle).

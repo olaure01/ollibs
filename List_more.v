@@ -711,43 +711,7 @@ Lemma fold_right_app_assoc A f (e : A) l1 l2 :
 Proof. intros Hassoc Hunit; apply fold_right_app_assoc2; [ assumption | apply Hunit ]. Qed.
 
 
-(* TODO PR #12237 submitted, remove once merged *)
-
-Section Filter.
-
-  Variable A : Type.
-  Variable f : A -> bool.
-  Implicit Type l : list A.
-
-  Lemma incl_filter l : incl (filter f l) l.
-  Proof. intros x Hin; now apply filter_In in Hin. Qed.
-
-  Lemma NoDup_filter l : NoDup l -> NoDup (filter f l).
-  Proof.
-  induction l; simpl; intros Hnd; auto.
-  apply NoDup_cons_iff in Hnd.
-  destruct (f a); [ | intuition ].
-  apply NoDup_cons_iff; split; intuition.
-  apply filter_In in H; intuition.
-  Qed.
-
-End Filter.
-
-Section Map.
-
-  Variable A B : Type.
-  Variable f : A -> B.
-
-  Lemma incl_map l1 l2 : incl l1 l2 -> incl (map f l1) (map f l2).
-  Proof.
-  intros Hincl x Hinx.
-  destruct (proj1 (in_map_iff _ _ _) Hinx) as [y [<- Hiny]].
-  apply in_map; intuition.
-  Qed.
-
-End Map.
-
-(** TODO included in PR #11966 submitted, remove once merged *)
+(* TODO included in PR #11966 submitted, remove once merged *)
 
     Lemma rev_case A (l : list A) : l = nil \/ exists a tl, l = tl ++ a :: nil.
     Proof.

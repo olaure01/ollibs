@@ -6,7 +6,6 @@
 
 From Coq Require Import Bool.
 From Coq Require Export List.
-From OLlibs Require Import List_more. (* TODO ongoing PR #12237, to be removed when merged *)
 From OLlibs Require Export dectype.
 
 Set Implicit Arguments.

@@ -512,14 +512,14 @@ Section MultiGPermutation.
   apply CPermutation_Permutation_Type.
   Qed.
 
-  Lemma PCPermutation_Type_monot : Bool.leb b b' ->
+  Lemma PCPermutation_Type_monot : Bool.le b b' ->
     forall l1 l2 : list A, PCPermutation_Type b l1 l2 -> PCPermutation_Type b' l1 l2.
   Proof.
   intros Hle l1 l2; destruct b, b'; try (now inversion Hle).
   apply CPermutation_Permutation_Type.
   Qed.
 
-  Lemma PEPermutation_Type_monot : Bool.leb b b' ->
+  Lemma PEPermutation_Type_monot : Bool.le b b' ->
     forall l1 l2 : list A, PEPermutation_Type b l1 l2 -> PEPermutation_Type b' l1 l2.
   Proof.
   intros Hle l1 l2; destruct b, b'; try (now inversion Hle).
