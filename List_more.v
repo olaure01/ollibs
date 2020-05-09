@@ -16,32 +16,22 @@ Set Implicit Arguments.
 Ltac list_simpl :=
   repeat (
     repeat simpl ;
-    repeat rewrite <- app_assoc ;
-    repeat rewrite <- app_comm_cons ;
-    repeat rewrite app_nil_r ;
-    repeat rewrite <- map_rev ;
-    repeat rewrite rev_involutive ;
-    repeat rewrite rev_app_distr ;
-    repeat rewrite rev_unit ;
-    repeat rewrite map_app ).
+    rewrite <- ? app_assoc, <- ? app_comm_cons, ? app_nil_r;
+    rewrite <- ? map_rev, ? rev_involutive, ? rev_app_distr, ? rev_unit;
+    rewrite ? map_app, ? flat_map_app).
 Ltac list_simpl_hyp H :=
   repeat (
     repeat simpl in H ;
-    repeat rewrite <- app_assoc in H ;
-    repeat rewrite <- app_comm_cons in H ;
-    repeat rewrite app_nil_r in H ;
-    repeat rewrite <- map_rev in H ;
-    repeat rewrite rev_involutive in H ;
-    repeat rewrite rev_app_distr in H ;
-    repeat rewrite rev_unit in H ;
-    repeat rewrite map_app in H ).
+    rewrite <- ? app_assoc, <- ? app_comm_cons, ? app_nil_r in H;
+    rewrite <- ? map_rev, ? rev_involutive, ? rev_app_distr, ? rev_unit in H;
+    rewrite ? map_app, ? flat_map_app in H).
 Tactic Notation "list_simpl" "in" hyp(H) := list_simpl_hyp H.
 Ltac list_simpl_hyps :=
   match goal with
-  | H : _ |- _ => list_simpl in H ; revert H ; list_simpl_hyps ; intro H
+  | H : _ |- _ => list_simpl in H; revert H; list_simpl_hyps; intro H
   | _ => idtac
   end.
-Ltac list_simpl_all := list_simpl_hyps ; list_simpl.
+Ltac list_simpl_all := list_simpl_hyps; list_simpl.
 
 
 (** ** Removal of [cons] constructions *)
