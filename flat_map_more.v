@@ -226,26 +226,26 @@ Qed.
 Lemma Permutation_Type_f_app_flat_map T T1 T2 (g : T -> T2) : forall (f : T1 -> T2) lw0 L lw lw' l,
   Permutation_Type lw lw' -> map f lw' = l ++ flat_map (fun '(p1, p2) => g p1 :: p2) L ->
   {'(L', lw') & prod (L <> nil -> L' <> nil)
-      (prod (map f lw = lw' ++ flat_map (fun '(p1,p2) => g p1 :: p2) L')
-            (Permutation_Type (lw' ++ flat_map (fun '(p1,p2) => app (map f lw0) p2) L')
-                              (l ++ flat_map (fun '(p1,p2) => app (map f lw0) p2) L))) }.
+      (prod (map f lw = lw' ++ flat_map (fun '(p1, p2) => g p1 :: p2) L')
+            (Permutation_Type (lw' ++ flat_map (fun '(_, p2) => app (map f lw0) p2) L')
+                              (l ++ flat_map (fun '(_, p2) => app (map f lw0) p2) L))) }.
 Proof.
 intros f lw0 L lw lw' l HP Heq.
 apply (Permutation_Type_map f) in HP; rewrite Heq in HP.
 apply Permutation_Type_app_flat_map; assumption.
 Qed.
 
-Lemma Permutation_flat_map_cons_flat_map_app T T1 T2 (g : T -> T2) :
+Lemma Permutation_Type_flat_map_cons_flat_map_app T T1 T2 (g : T -> T2) :
 forall (f : T1 -> T2), injective f -> forall l0 l1 l2 lp1 lp2 l L,
   Permutation_Type lp1 lp2 ->
   l1 ++ map f lp2 ++ l2 = l ++ flat_map (fun '(p1, p2) => g p1 :: p2) L ->
   {'(l1', l2', l3', l4', l', L') & prod (l1 ++ map f lp1 ++ l2 = l'
-                                     ++ flat_map (fun '(p1,p2) => g p1 :: p2) L')
+                                     ++ flat_map (fun '(p1, p2) => g p1 :: p2) L')
             (prod (Permutation_Type l1' l2')
                   (prod (l3' ++ map f l1' ++ l4'
-                             = l' ++ flat_map (fun '(p1,p2) => (app (map f l0) p2)) L')
+                             = l' ++ flat_map (fun '(_, p2) => (app (map f l0) p2)) L')
                         (l3' ++ map f l2' ++ l4'
-                             = l ++ flat_map (fun '(p1,p2) => (app (map f l0) p2)) L))) }.
+                             = l ++ flat_map (fun '(_, p2) => (app (map f l0) p2)) L))) }.
 Proof.
 intros f Hinj l0 l1 l2 lp1 lp2 l L HP Heq.
 app_vs_app_flat_map_inv Heq.
@@ -626,13 +626,13 @@ split with (map snd L', lw'); repeat split.
   intros Heq1.
   apply Hneq.
   now apply map_eq_nil in Heq1.
-- replace (flat_map (cons A) (map snd L')) with (flat_map (fun '(p1,p2) => A :: p2) L'); auto.
+- replace (flat_map (cons A) (map snd L')) with (flat_map (fun '(_, p2) => A :: p2) L'); auto.
   clear; induction L'; auto.
   destruct a; simpl; rewrite IHL'; auto.
-- replace (flat_map (app lw0) (map snd L')) with (flat_map (fun '(p1,p2) => lw0 ++ p2) L')
+- replace (flat_map (app lw0) (map snd L')) with (flat_map (fun '(_, p2) => lw0 ++ p2) L')
     by (now clear; induction L'; try destruct a; simpl; try rewrite IHL').
   now replace (flat_map (app lw0) L)
-     with (flat_map (fun '(p1,p2) => lw0 ++ p2) (map (fun p => (1, p)) L))
+     with (flat_map (fun '(_, p2) => lw0 ++ p2) (map (fun p => (1, p)) L))
        by (now clear; induction L; simpl; try rewrite IHL).
 Qed.
 
@@ -660,7 +660,7 @@ forall (A : T1) (f : T -> T1), injective f -> forall l0 l1 l2 lp1 lp2 l L,
                              = l ++ flat_map (app (map f l0)) L))) }.
 Proof.
 intros A f Hinj l0 l1 l2 lp1 lp2 l L HP Heq.
-destruct (@Permutation_flat_map_cons_flat_map_app _ _ _ (fun _ => A)
+destruct (@Permutation_Type_flat_map_cons_flat_map_app _ _ _ (fun _ => A)
             f Hinj l0 l1 l2 lp1 lp2 l (map (fun p => (1 , p)) L)); auto.
 { rewrite Heq.
   replace (flat_map (fun '(p1, p2) => A :: p2) (map (fun p => (1, p)) L))
@@ -677,7 +677,7 @@ split with (l1', l2', l3', l4', l', map snd L'); repeat split; auto.
     with (flat_map (app (map f l0)) (map snd L'))
     by (now clear; induction L'; try destruct a; simpl; try rewrite IHL'); auto.
 - rewrite H4.
-  replace (flat_map (fun '(p1,p2) => map f l0 ++ p2) (map (fun p  => (1, p)) L))
+  replace (flat_map (fun '(p1, p2) => map f l0 ++ p2) (map (fun p  => (1, p)) L))
     with (flat_map (app (map f l0)) L)
     by (now clear; induction L; simpl; try rewrite IHL); auto.
 Qed.
@@ -707,9 +707,9 @@ split with (map snd L' , lw'); repeat split.
     with (flat_map (cons A) (map snd L'))
     by (clear; induction L'; try destruct a; simpl; try rewrite IHL'; reflexivity).
 - replace (flat_map (app lw0) (map snd L'))
-    with (flat_map (fun '(p1,p2) => lw0 ++ p2) L')
+    with (flat_map (fun '(_, p2) => lw0 ++ p2) L')
     by (clear; induction L'; try destruct a; simpl; try rewrite IHL'; reflexivity).
   now replace (flat_map (app lw0) L)
-    with (flat_map (fun '(p1,p2) => lw0 ++ p2) (map (fun x => (1, x)) L))
+    with (flat_map (fun '(_, p2) => lw0 ++ p2) (map (fun x => (1, x)) L))
     by (clear; induction L; simpl; try rewrite IHL; reflexivity).
 Qed.

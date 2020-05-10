@@ -9,7 +9,7 @@ From OLlibs Require GPermutation.
 Set Implicit Arguments.
 
 
-Section GPermutation.
+Section GPermutationType.
 
   Variable A : Type.
   Variable c : comparison.
@@ -132,7 +132,7 @@ Section GPermutation.
     [ apply CPermutation_Type_Forall | intros ? ? -> | apply Permutation_Type_Forall ].
   Qed.
 
-  Global Instance PCEPermutation_Exists_Type (P : A -> Prop) :
+  Global Instance PCEPermutation_Type_Exists (P : A -> Prop) :
     Proper (PCEPermutation_Type ==> Basics.impl) (Exists P).
   Proof.
   now case_perm_tri;
@@ -201,7 +201,7 @@ Section GPermutation.
   now case_perm; [ apply Permutation_Type_length_1_inv | apply CPermutation_Type_length_1_inv ].
   Qed.
 
-  Lemma PCPermutation_length_2_inv : forall a1 a2 l,
+  Lemma PCPermutation_Type_length_2_inv : forall a1 a2 l,
     PCPermutation_Type (a1 :: a2 :: nil) l -> {l = a1 :: a2 :: nil} + {l = a2 :: a1 :: nil}.
   Proof.
   now case_perm; [ apply Permutation_Type_length_2_inv | apply CPermutation_Type_length_2_inv ].
@@ -265,7 +265,7 @@ Section GPermutation.
     PEPermutation_Type tl tl' -> PEPermutation_Type (l ++ tl) (l ++ tl').
   Proof. now case_perm; simpl; intros l l' tl HP; [ apply Permutation_Type_app_head | subst ]. Qed.
 
-  Lemma PEPermtuation_add_inside : forall a l l' tl tl',
+  Lemma PEPermutation_Type_add_inside : forall a l l' tl tl',
     PEPermutation_Type l l' -> PEPermutation_Type tl tl' ->
     PEPermutation_Type (l ++ a :: tl) (l' ++ a :: tl').
   Proof.
@@ -306,7 +306,7 @@ Section GPermutation.
   now apply PEPermutation_Type_vs_elt_inv.
   Qed.
 
-  Global Instance PEPermtutation_in a : Proper (PEPermutation_Type ==> Basics.impl) (In a).
+  Global Instance PEPermtutation_Type_in a : Proper (PEPermutation_Type ==> Basics.impl) (In a).
   Proof.
   now case_perm; simpl; intros l l' HP HIn; subst; [ apply Permutation_Type_in with l | ].
   Qed.
@@ -408,9 +408,9 @@ Section GPermutation.
   now symmetry in HP; apply PEPermutation_Permutation_Type.
   Qed.
 
-End GPermutation.
+End GPermutationType.
 
-Section MultiGPermutation.
+Section MultiGPermutationType.
 
   Variable A B : Type.
   Variable c : comparison.
@@ -526,7 +526,7 @@ Section MultiGPermutation.
   now simpl; intros ->.
   Qed.
 
-End MultiGPermutation.
+End MultiGPermutationType.
 
 
 (** ** Solvinc tactics *)
