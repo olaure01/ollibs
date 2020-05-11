@@ -228,18 +228,18 @@ End FMSetNotations.
 
 Definition fmslist_empty B : SortedList B := exist _ (nil) eq_refl.
 
-Lemma fmslist_add B : @carrier B -> SortedList B -> SortedList B.
+Lemma fmslist_add B : @car B -> SortedList B -> SortedList B.
 Proof.
 intros a m.
 exists (insert a (proj1_sig m)).
-apply (insert_sorted (length (proj1_sig m)) a m); reflexivity.
+apply (insert_sorted a m); reflexivity.
 Defined.
 
-Lemma insert_add B : forall (a : @carrier B) l,
+Lemma insert_add B : forall (a : @car B) l,
   proj1_sig (fmslist_add a l) = insert a (proj1_sig l).
 Proof. reflexivity. Qed.
 
-Theorem FMConstr_slist : FMConstructor SortedList (@carrier).
+Theorem FMConstr_slist : FMConstructor SortedList (@car).
 Proof.
 intros A.
 split with (@fmslist_empty A) (@fmslist_add A) (fun m => proj1_sig m); intros; auto.

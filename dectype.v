@@ -1,7 +1,7 @@
 (** Types with decidable equality formalized as types with Boolean valued equality
 this is based on records rather than modules (as opposed to stdlib) *)
 
-From Coq Require Import Bool PeanoNat.
+From Coq Require Import Bool PeanoNat Equalities.
 From Coq Require Eqdep_dec.
 
 Set Implicit Arguments.
@@ -301,3 +301,35 @@ Definition list_inhdectype (D : DecType) := {|
   inhcar := list_dectype D;
   inh_dt := inhabited_inf_list D
 |}.
+
+
+(** Equivalence between [DecType] and [UsualOrderedTypeFull]. *)
+
+Module Type ModDecType.
+  Parameter DT : DecType.
+End ModDecType.
+
+Module ModDecType_as_UsualBoolEq (T : ModDecType) : UsualBoolEq.
+  Definition t := @car T.DT.
+  Definition eq := @eq T.DT.
+  Definition eqb := @eqb T.DT.
+  Definition eqb_eq := @eqb_eq T.DT.
+End ModDecType_as_UsualBoolEq.
+
+Module ModDecType_as_UsualDecidableTypeFull (T : ModDecType) : UsualDecidableTypeFull.
+  Module TMDT := ModDecType_as_UsualBoolEq T.
+  Include Make_UDTF TMDT.
+End ModDecType_as_UsualDecidableTypeFull.
+
+Module UsualBoolEq_as_DecType (T : UsualBoolEq).
+  Definition to_DecType := {|
+    car := T.t;
+    eqb := T.eqb;
+    eqb_eq := T.eqb_eq
+  |}.
+End UsualBoolEq_as_DecType.
+
+Module UsualBoolEq_as_ModDecType (T : UsualBoolEq).
+  Module DT := UsualBoolEq_as_DecType T.
+  Definition t := DT.to_DecType.
+End UsualBoolEq_as_ModDecType.

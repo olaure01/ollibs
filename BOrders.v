@@ -8,23 +8,25 @@ Set Implicit Arguments.
 Definition brelation A := A -> A -> bool.
 
 Class BOrder := {
-  carrier : Type ;
-  leb : brelation carrier ;
+  car : Type ;
+  leb : brelation car ;
   total : forall a b, leb a b = false -> leb b a = true ;
   asym :  forall a b, leb a b = true -> leb b a = true -> a = b ;
   trans : forall a b c, leb a b = true -> leb b c = true -> leb a c = true
 }.
 
-(** Equivalence with UsualOrderedTypeFull. *)
-Module BOrder_to_UsualOrderedTypeFull : UsualOrderedTypeFull.
+(** Equivalence with [UsualOrderedTypeFull]. *)
+Module Type ModBOrder.
+  Parameter t : BOrder.
+End ModBOrder.
 
-  Parameter B : BOrder.
+Module ModBOrder_as_UsualOrderedTypeFull (B : ModBOrder) : UsualOrderedTypeFull.
 
-  Definition t := @carrier B.
-  Definition eq := @eq (@carrier B).
+  Definition t := @car B.t.
+  Definition eq := @eq (@car B.t).
   Definition eq_equiv : Equivalence eq := eq_equivalence.
   Local Coercion is_true : bool >-> Sortclass.
-  Definition lt x y := @leb B x y /\ x <> y.
+  Definition lt x y := @leb B.t x y /\ x <> y.
 
   Lemma lt_strorder : StrictOrder lt.
   Proof.
@@ -50,7 +52,7 @@ Module BOrder_to_UsualOrderedTypeFull : UsualOrderedTypeFull.
   Qed.
 
   Definition compare x y :=
-    if @leb B x y then (if leb y x then Eq else Lt) else Gt.
+    if @leb B.t x y then (if leb y x then Eq else Lt) else Gt.
 
   Lemma compare_spec : forall x y, CompSpec eq lt x y (compare x y).
   Proof.
@@ -82,7 +84,7 @@ Module BOrder_to_UsualOrderedTypeFull : UsualOrderedTypeFull.
     rewrite Heq1 in Heq2; inversion Heq2.
   Qed.
 
-  Definition le x y := is_true (@leb B x y).
+  Definition le x y := is_true (@leb B.t x y).
 
   Lemma le_lteq : forall x y, le x y <-> lt x y \/ eq x y.
   Proof.
@@ -100,9 +102,9 @@ Module BOrder_to_UsualOrderedTypeFull : UsualOrderedTypeFull.
       rewrite Heq2 in Heq3; inversion Heq3.
   Qed.
 
-End BOrder_to_UsualOrderedTypeFull.
+End ModBOrder_as_UsualOrderedTypeFull.
 
-Module UsualOrderedTypeFull_to_BOrder (T : UsualOrderedTypeFull).
+Module UsualOrderedTypeFull_as_BOrder (T : UsualOrderedTypeFull).
 
   Definition leb x y :=
   match T.compare x y with
@@ -186,7 +188,13 @@ Module UsualOrderedTypeFull_to_BOrder (T : UsualOrderedTypeFull).
     + right ; reflexivity.
   Qed.
 
-End UsualOrderedTypeFull_to_BOrder.
+End UsualOrderedTypeFull_as_BOrder.
+
+Module UsualOrderedTypeFull_as_ModBOrder (T : UsualOrderedTypeFull) : ModBOrder.
+  Module TBOrder := UsualOrderedTypeFull_as_BOrder T.
+  Definition t := TBOrder.to_BOrder.
+End UsualOrderedTypeFull_as_ModBOrder.
+
 
 (** * [BOrder] structure over [nat]. *)
 Instance border_nat : BOrder.
@@ -203,7 +211,7 @@ split with nat Nat.leb; intros.
   apply Nat.leb_le; lia.
 Defined.
 
-Lemma border_inj A B (f : A -> @carrier B) (Hi : injective f) : BOrder.
+Lemma border_inj A B (f : A -> @car B) (Hi : injective f) : BOrder.
 Proof.
 split with A (fun x y => leb (f x) (f y)) ; intros.
 - now apply total.
@@ -217,7 +225,7 @@ Defined.
 
 (** ** Insertion sort *)
 
-Fixpoint insert B (a : @carrier B) (l : list (@carrier B)) :=
+Fixpoint insert B (a : @car B) l :=
 match l with
 | nil => a :: nil
 | b :: t => if (leb a b) then a :: b :: t
@@ -225,7 +233,7 @@ match l with
 end.
 Arguments insert [_] _ _.
 
-Lemma insert_insert B : forall (x y : @carrier B) l,
+Lemma insert_insert B : forall (x y : @car B) l,
   insert y (insert x l) = insert x (insert y l).
 Proof.
 induction l ; simpl.
@@ -253,7 +261,7 @@ Qed.
 
 (** ** Sorted lists *)
 
-Fixpoint is_sorted B (l : list (@carrier B)) :=
+Fixpoint is_sorted B (l : list (@car B)) :=
 match l with
 | nil => true
 | a :: nil => true
@@ -284,12 +292,17 @@ f_equal.
 apply (Eqdep_dec.UIP_dec bool_dec).
 Qed.
 
-Lemma insert_sorted B : forall s a (m : SortedList B),
-  length (proj1_sig m) = s ->
+Lemma insert_sorted B : forall a (m : SortedList B),
   let l := insert a (proj1_sig m) in
     is_sorted l = true /\ l <> nil
  /\ forall c, In c l -> In c (proj1_sig m) \/ c = a.
 Proof.
+enough (forall s a (m : SortedList B),
+  length (proj1_sig m) = s ->
+  let l := insert a (proj1_sig m) in
+    is_sorted l = true /\ l <> nil
+ /\ forall c, In c l -> In c (proj1_sig m) \/ c = a) as Hlen
+  by now intros; apply Hlen with (length (proj1_sig m)).
 induction s as [s IH] using (well_founded_induction lt_wf).
 intros a m Hlen l.
 destruct m as [l0 Hsort].
@@ -330,5 +343,3 @@ destruct l0 ; (split ; [ | split ]); auto.
       apply Hin' in Hin.
       now destruct Hin; [ left; apply in_cons | right ].
 Qed.
-
-Arguments insert_sorted [_] _ _ _.
