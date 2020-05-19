@@ -121,6 +121,8 @@ Section DecTypes.
 
 End DecTypes.
 
+Arguments eqb_refl {_} _.
+Arguments eqb_neq {_} _.
 Arguments eq_dt_dec {_} _ _.
 Arguments eq_dt_reflect {_} _ _.
 

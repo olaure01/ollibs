@@ -76,3 +76,5 @@ Section RemoveAssoc.
   Qed.
 
 End RemoveAssoc.
+
+Arguments remove_assoc {_} {_} _ _.

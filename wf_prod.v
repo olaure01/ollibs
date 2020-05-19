@@ -50,9 +50,9 @@ Ltac lt_nat_nat_solve :=
   | |- lt_nat_nat ?v1 ?v2 => try (left; simpl; lia);
                              try (right; split; simpl; lia);
                              fail
-  | |- lt_prod _ _ lt lt ?v1 ?v2 => try (left; simpl; lia);
-                                    try (right; split; simpl; lia);
-                                    fail
+  | |- lt_prod lt lt ?v1 ?v2 => try (left; simpl; lia);
+                                try (right; split; simpl; lia);
+                                fail
   end.
 
 (** * Well founded order on triples of [nat] *)
@@ -67,12 +67,12 @@ Ltac lt_nat_nat_nat_solve :=
      try (right; split; [ | left ]; simpl; lia);
      try (right; split; [ | right; split ]; simpl; lia);
      fail
-  | |- lt_prod _ _ lt lt_nat_nat ?v1 ?v2 =>
+  | |- lt_prod lt lt_nat_nat ?v1 ?v2 =>
      try (left; simpl; lia);
      try (right; split; [ | left ]; simpl; lia);
      try (right; split; [ | right; split ]; simpl; lia);
      fail
-  | |- lt_prod _ _ lt (lt_prod _ _ lt lt) ?v1 ?v2 =>
+  | |- lt_prod lt (lt_prod lt lt) ?v1 ?v2 =>
      try (left; simpl; lia);
      try (right; split; [ | left ]; simpl; lia);
      try (right; split; [ | right; split ]; simpl; lia);

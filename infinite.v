@@ -340,6 +340,7 @@ Section InfDecTypes.
 End InfDecTypes.
 
 Arguments infinite_nat_injective {_}.
+Arguments freshlist {_} _ _.
 Arguments Inh_of_InfDecType _ : clear implicits.
 
 
