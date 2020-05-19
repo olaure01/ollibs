@@ -432,46 +432,6 @@ end.
 
 (** * Additional statements *)
 
-(** ** [In] *)
-
-(* TODO in_concat from List is enough? (iff shape)
-Lemma in_concat A : forall (l : list A) (L : list (list A)) a, In a l -> In l L -> In a (concat L).
-Proof.
-intros l L a Hin1 Hin2.
-induction L; simpl; inversion_clear Hin2; subst.
-- clear IHL; induction l; inversion_clear Hin1; [left|right]; intuition.
-- apply in_or_app; intuition.
-Qed.
-*)
-
-(* TODO an iff shape exists with same name in stdlib
-Lemma in_flat_map A B : forall (f : A -> list B) x a l,
-  In x (f a) -> In a l -> In x (flat_map f l).
-Proof.
-intros f x a l Hinx Hina.
-rewrite flat_map_concat_map; apply in_concat with (f a); trivial.
-now apply in_map.
-Qed.
-*)
-
-(** ** [remove] *)
-
-(* TODO easy consequence of in_remove
-Lemma incl_remove A : forall Hdec l (x : A), incl (remove Hdec x l) l.
-Proof.
-intros.
-intros a Hin.
-now apply in_remove in Hin.
-Qed.
-Proof.
-induction l; simpl; intros x y Hy; intuition.
-destruct (Hdec x a); subst.
-- apply IHl in Hy; intuition.
-- destruct Hy as [Hy|Hy]; [left|right]; intuition.
-  now apply IHl in Hy.
-Qed.
-*)
-
 (** ** [concat] *)
 
 Lemma concat_vs_elt A : forall (a : A) L l1 l2,
@@ -541,22 +501,6 @@ induction l ; split ; intro H.
   + apply IHl.
     now exists l0.
 Qed.
-
-(* TODO easy consequence of Forall_impl
-Lemma inc_Forall A : forall (P : nat -> A -> Prop) l i j,
-  (forall i j a, P i a -> i <= j -> P j a) ->
-    Forall (P i) l -> i <= j -> Forall (P j) l.
-Proof.
-intros P l i j Hinc HP Hle; apply (@Forall_impl _ (P i)); intuition.
-now apply (Hinc i).
-Qed.
-Proof.
-intros P l i j Hinc.
-induction l; intros H Hl; constructor; inversion H.
-- now apply Hinc with i.
-- now apply IHl.
-Qed.
-*)
 
 (** *** Properties about [Forall_inf] *)
 
