@@ -6,7 +6,7 @@ From OLlibs Require Import funtheory Permutation_Type.
 Set Implicit Arguments.
 
 
-(* Transpose elements of index n and n+1 in l *)
+(** Transpose elements of index [n] and [n + 1] in [l] *)
 Fixpoint transp A n (l : list A) :=
 match n, l with
 | 0, x :: y :: r => y :: x :: r

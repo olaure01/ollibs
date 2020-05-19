@@ -1,4 +1,4 @@
-(** * Add-ons for [List] library
+(** Add-ons for [List] library:
 Properties of [flat_map]. *)
 
 From OLlibs Require Import funtheory List_more

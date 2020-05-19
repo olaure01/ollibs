@@ -502,7 +502,7 @@ induction l ; split ; intro H.
     now exists l0.
 Qed.
 
-(** *** Properties about [Forall_inf] *)
+(** ** [Forall_inf] *)
 
 (** Translation from [Forall_inf] to a list of dependent pairs *)
 
@@ -545,7 +545,7 @@ induction FL ; simpl.
   + rewrite IHFL ; reflexivity.
 Qed.
 
-(** *** Properties about [Forall2_inf] *)
+(** ** [Forall2_inf] *)
 
 Lemma Forall2_inf_in_l A B : forall l1 l2 a (R : A -> B -> Type),
   Forall2_inf R l1 l2 -> In_inf a l1 -> { b & prod (In_inf b l2) (R a b) }.
@@ -578,7 +578,7 @@ induction HF ; intro Hin; inversion Hin.
 Qed.
 
 
-(** ** Map for functions with two arguments : [map2] *)
+(** ** Map for functions with two arguments: [map2] *)
 
 Fixpoint map2 A B C (f : A -> B -> C) l1 l2 :=
   match l1 , l2 with
@@ -622,7 +622,7 @@ induction l1; intros.
     now apply Nat.succ_lt_mono.
 Qed.
 
-(** * [fold_right] *)
+(** ** [fold_right] *)
 
 Lemma fold_right_app_assoc2 A B f (g : B -> A) h (e : A) l1 l2 :
     (forall x y z, h (g x) (f y z) = f (h (g x) y) z) ->
@@ -644,6 +644,8 @@ Lemma fold_right_app_assoc A f (e : A) l1 l2 :
   fold_right f e (l1 ++ l2) = f (fold_right f e l1) (fold_right f e l2).
 Proof. intros Hassoc Hunit; apply fold_right_app_assoc2; [ assumption | apply Hunit ]. Qed.
 
+
+(** misc *)
 
 (* TODO included in PR #11966 submitted, remove once merged *)
 

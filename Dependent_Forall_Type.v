@@ -1,4 +1,4 @@
-(** * Generalization of [Forall_inf] to dependent product *)
+(** Generalization of [Forall_inf] to dependent product *)
 
 From Coq Require Export Eqdep_dec.
 From Coq Require Import PeanoNat List.
@@ -7,7 +7,7 @@ From OLlibs Require Import List_Type.
 Set Implicit Arguments.
 
 
-(** ** [In_Forall_inf] *)
+(** * [In_Forall_inf] *)
 
 Section In_Forall_inf.
   Variable A : Type.
@@ -91,7 +91,7 @@ Section In_Forall_inf.
 End In_Forall_inf.
 
 
-(** ** [Dependent_Forall_inf] *)
+(** * [Dependent_Forall_inf] *)
 
 Inductive Dependent_Forall_inf A (P : A -> Type) (Pred : forall a, P a -> Type) :
    forall l, Forall_inf P l -> Type :=

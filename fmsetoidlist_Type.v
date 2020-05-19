@@ -1,4 +1,5 @@
-(** * Finite Multiset over Lists
+(** Finite Multiset over Lists
+
 We define an axiomatization of finite multiset through their relation with lists.
 Equality is an equivalence relation.
 An implementation of the axioms is provided for every type

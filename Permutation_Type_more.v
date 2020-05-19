@@ -1,4 +1,4 @@
-(** * Add-ons for Permutation_Type library
+(** Add-ons for Permutation_Type library
 Usefull properties apparently missing in the Permutation_Type library. *)
 
 From Coq Require Import PeanoNat Permutation CMorphisms.
@@ -7,6 +7,8 @@ From OLlibs Require Export Permutation_Type.
 
 Set Implicit Arguments.
 
+
+(** * Additional Properties *)
 
 Instance Permutation_Type_refl' A : Proper (Logic.eq ==> @Permutation_Type A) id.
 Proof. now intros x y ->. Qed.
@@ -340,7 +342,7 @@ intros l1; induction l1; intros l2 HP.
 Qed.
 
 
-(** ** Permutation definition based on transpositions for induction with fixed length *)
+(** * Permutation definition based on transpositions for induction with fixed length *)
 Inductive Permutation_Type_transp A : list A -> list A -> Type :=
 | Permutation_Type_t_refl : forall l, Permutation_Type_transp l l
 | Permutation_Type_t_swap : forall x y l1 l2,

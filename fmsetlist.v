@@ -1,4 +1,5 @@
-(** * Finite Multiset over Lists
+(** Finite Multiset over Lists
+
 We define an axiomatization of finite multisets through their relation with lists.
 Equality is required to be Coq equality.
 An implementation of the axioms is provided by sorted lists

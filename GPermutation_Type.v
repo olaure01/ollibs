@@ -1,4 +1,4 @@
-(** * Factorized statements for different notions of permutation *)
+(** Factorized statements for different notions of permutation *)
 
 From Coq Require Import List CMorphisms.
 From OLlibs Require Import funtheory ComparisonOrder List_more
@@ -15,8 +15,8 @@ Section GPermutationType.
   Variable c : comparison.
   Variable b : bool.
 
-  (** ** Definitions
-   parametrized by a boolean. *)
+  (** * Definitions
+   parametrized by a trilean or a boolean. *)
 
   (** Permutation or cyclic permutation or equality *)
 
@@ -340,7 +340,7 @@ Section GPermutationType.
   Proof. now case_perm; intros l1 l2 HP; [ apply Permutation_Type_rev' | subst ].  Qed.
 
 
-  (** ** From [PEPermutation_Type] to [PCPermutation_Type] *)
+  (** * From [PEPermutation_Type] to [PCPermutation_Type] *)
 
   Global Instance PEPermutation_PCPermutation_Type_cons :
     Proper (eq ==> PEPermutation_Type ==> PCPermutation_Type) cons.
@@ -529,7 +529,7 @@ Section MultiGPermutationType.
 End MultiGPermutationType.
 
 
-(** ** Solvinc tactics *)
+(** * Solvinc tactics *)
 
 (** unfolding into [Permutation_Type], [CPermutation_Type] or [eq] *)
 Ltac hyps_GPermutation_Type_unfold :=

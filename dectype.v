@@ -52,7 +52,7 @@ Proof (inhabits_inf id).
 
 
 (** * Decidable Types *)
-(* types with a boolean binary predicate equivalent to equality *)
+(** types with a boolean binary predicate equivalent to equality *)
 
 Record DecType := {
   car :> Type;
@@ -100,7 +100,7 @@ Section DecTypes.
   Proof. intros x y Hneq u v; now destruct (eq_dt_dec x y). Qed.
 
 
-  (** Statements from [Module DecidableEqDep] in Eqdep_dec *)
+  (** Statements from [Module DecidableEqDep] in [Eqdep_dec] *)
   Lemma eq_rect_eq : forall x (P : X -> Type) p h, p = eq_rect x P p x h.
   Proof (Eqdep_dec.eq_rect_eq_dec eq_dt_dec).
 

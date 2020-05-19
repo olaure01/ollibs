@@ -1,10 +1,10 @@
-(** * Axiom(s) of Finite Choice *)
+(** Axiom(s) of Finite Choice *)
 
 From Coq Require Import PeanoNat Lia List.
 
 Set Implicit Arguments.
 
-(** ** Functional Axiom of Choice for finite functions *)
+(** * Functional Axiom of Choice for finite functions *)
 Lemma AFC A : forall (a : A) k (R : nat -> A -> Prop),
   (forall x, x < k -> exists y, R x y) ->
      exists f, forall x, x < k -> R x (f x).
@@ -29,7 +29,7 @@ induction k; intros R He.
          rewrite Ho in Heqb; inversion Heqb.
 Qed.
 
-(** ** Axiom of Finite Choices over lists *)
+(** * Axiom of Finite Choices over lists *)
 Lemma AFClist : forall A (R : nat -> A -> Prop) l,
   (forall a i j, In a l -> R i a -> i < j -> R j a) ->
     (Forall (fun x => exists k, R k x) l) -> exists k, Forall (R k) l.
@@ -69,7 +69,7 @@ intros R Hinc; induction m; intros HF.
 Qed.
 
 
-(** ** Axioms of Finite Choices over vectors *)
+(** * Axioms of Finite Choices over vectors *)
 Lemma AFCvec : forall A (R : nat -> A -> Prop) n (l : Vector.t _ n),
   (forall a i j, Vector.In a l -> R i a -> i < j -> R j a) ->
     (Vector.Forall (fun x => exists k, R k x) l) -> exists k, Vector.Forall (R k) l.

@@ -1,5 +1,5 @@
-(** * Cyclic Permutations
-Definition and basic properties of cyclic permutations in Type. *)
+(** Cyclic Permutations
+Definition and basic properties of cyclic permutations in [Type]. *)
 
 From Coq Require Import CMorphisms PeanoNat.
 From Coq Require CPermutation.
@@ -8,7 +8,7 @@ From OLlibs Require Import List_more Permutation_Type_more funtheory.
 Set Implicit Arguments.
 
 
-(** Definition *)
+(** * Definition *)
 Inductive CPermutation_Type A : list A -> list A -> Type :=
 | cperm_Type : forall l1 l2, CPermutation_Type (l1 ++ l2) (l2 ++ l1).
 
@@ -18,6 +18,13 @@ intros l1 l2 HC.
 inversion HC.
 apply Permutation_Type_app_comm.
 Qed.
+
+Lemma CPermutation_Type_CPermutation A : forall l1 l2 : list A,
+  CPermutation_Type l1 l2 -> CPermutation.CPermutation l1 l2.
+Proof. intros l1 l2 HP; inversion HP; constructor. Qed.
+
+
+(** * Properties *)
 
 Instance CPermutation_Type_refl A : Reflexive (@CPermutation_Type A).
 Proof.
@@ -356,8 +363,3 @@ apply map_injective_in in Heq6.
 2:{ intros x y Hin1 Hin2 Heq; apply Hi; auto; apply in_or_app; auto. }
 subst; constructor.
 Qed.
-
-
-Lemma CPermutation_Type_CPermutation A : forall l1 l2 : list A,
-  CPermutation_Type l1 l2 -> CPermutation.CPermutation l1 l2.
-Proof. intros l1 l2 HP; inversion HP; constructor. Qed.

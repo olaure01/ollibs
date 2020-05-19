@@ -1,9 +1,11 @@
-(** * Class of Boolean-valued total orders *)
+(** Boolean-valued total orders as a [Class] *)
 
 From Coq Require Import Bool PeanoNat Wf_nat Lia List Orders.
 From OLlibs Require Import funtheory.
 
 Set Implicit Arguments.
+
+(** * Class of Boolean-valued total orders *)
 
 Definition brelation A := A -> A -> bool.
 
@@ -15,7 +17,7 @@ Class BOrder := {
   trans : forall a b c, leb a b = true -> leb b c = true -> leb a c = true
 }.
 
-(** Equivalence with [UsualOrderedTypeFull]. *)
+(** ** Equivalence with [UsualOrderedTypeFull] *)
 Module Type ModBOrder.
   Parameter t : BOrder.
 End ModBOrder.

@@ -6,10 +6,12 @@ From OLlibs Require Import funtheory dectype List_Type.
 Set Implicit Arguments.
 
 
-(* a pigeonhole principle *)
+(** a pigeonhole principle *)
 Definition pigeon X := forall (l1 l2 : list X),
   NoDup l1 -> length l2 < length l1 -> { x | In x l1 & ~ In x l2 }.
 
+
+(** * Definitions and implications *)
 
 (* The following results are proved in the case of a DecType:
      bijection with nat => section with nat => non-surjective self injection => injection from nat
@@ -102,6 +104,7 @@ Section Infinite.
 
 End Infinite.
 
+(** [DecType] case *)
 
 (* Implications requiring a DecType
      section with nat => non-surjective self injection => injection from nat
@@ -242,8 +245,8 @@ revert Heq; induction x; simpl; intros Heq.
 Qed.
 
 
-(** * Infinite Decidable Types *)
-(* (infinite) decidable types with freshness function *)
+(** * Infinite Decidable Types
+  (infinite) decidable types with freshness function *)
 
 Record InfDecType := {
   infcar :> DecType;
@@ -344,7 +347,7 @@ Arguments freshlist {_} _ _.
 Arguments Inh_of_InfDecType _ : clear implicits.
 
 
-(* [nat] instance of [InfDecType] *)
+(** [nat] instance of [InfDecType] *)
 Definition nat_infdectype := {|
   infcar := nat_dectype;
   fresh := (proj1_sig (section_choice (nat_bijective_section (existT _ id (id_bijective)))));
@@ -371,7 +374,7 @@ Definition nat_infdectype := {|
 |}.
 *)
 
-(* [option] construction of [InfDecType] *)
+(** [option] construction of [InfDecType] *)
 Lemma nat_injective_option (T : Type) : nat_injective T -> nat_injective (option T).
 Proof.
 intros [i Hi].
@@ -391,7 +394,7 @@ Definition option_infdectype (D : InfDecType) := {|
                                                | None :: r => SomeDown r
                                                | Some x :: r => x :: SomeDown r *)
 
-(* [sum] constructions of [InfDecType] *)
+(** [sum] constructions of [InfDecType] *)
 Lemma nat_injective_suml (T1 T2 : Type) : nat_injective T1 -> nat_injective (sum T1 T2).
 Proof.
 intros [i Hi].
@@ -424,7 +427,7 @@ Definition sumr_infdectype (D1 : DecType) (D2 : InfDecType) := {|
 |}.
 (* alternative definition could use direct definition of fresh *)
 
-(* [prod] constructions of [InfDecType] *)
+(** [prod] constructions of [InfDecType] *)
 Section Prod.
 
   Variable (ID : InfDecType) (D : InhDecType).
@@ -466,7 +469,7 @@ End Prod.
 Definition prod_infdectype (ID1 ID2 : InfDecType) :=
   prodl_infdectype ID1 (Inh_of_InfDecType ID2).
 
-(* [list] construction of [InfDecType] *)
+(** [list] construction of [InfDecType] *)
 Lemma nat_injective_list (T : Type) : inhabited_inf T -> nat_injective (list T).
 Proof.
 intros [x]; exists (repeat x); intros n; induction n; simpl;

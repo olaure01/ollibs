@@ -39,7 +39,7 @@ Ltac perm_rot :=
     [ apply Permutation_app_rot
     | instantiate ].
 
-(** The parameter [20] below is an arbitrary
+(** The parameter [20] below is arbitrary:
  the higher, the longer, the more powerful *)
 Ltac Permutation_solve :=
   match goal with

@@ -14,7 +14,7 @@ Ltac cperm_rot :=
     [ apply CPermutation_app_rot
     | instantiate ].
 
-(** The parameter [20] below is an arbitrary
+(** The parameter [20] below is arbitrary:
  the higher, the longer, the more powerful *)
 Ltac CPermutation_solve :=
   match goal with
