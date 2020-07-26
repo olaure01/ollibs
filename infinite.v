@@ -1,7 +1,8 @@
 (** Infinite Types *)
 
 From Coq Require Import Bool PeanoNat Lia List.
-From OLlibs Require Import funtheory dectype List_Type.
+From OLlibs Require Import funtheory List_Type.
+From OLlibs Require Export dectype.
 
 Set Implicit Arguments.
 
@@ -251,8 +252,7 @@ Qed.
 Record InfDecType := {
   infcar :> DecType;
   fresh : list infcar -> infcar;
-  fresh_prop : forall l, ~ In (fresh l) l
-}.
+  fresh_prop : forall l, ~ In (fresh l) l }.
 Arguments fresh {_}.
 Arguments fresh_prop {_}.
 
@@ -337,8 +337,7 @@ Section InfDecTypes.
 
   Definition Inh_of_InfDecType := {|
     inhcar := X;
-    inh_dt := inhabits_inf (fresh nil)
-  |}.
+    inh_dt := inhabits_inf (fresh nil) |}.
 
 End InfDecTypes.
 
@@ -354,14 +353,14 @@ Definition nat_infdectype := {|
   fresh_prop := (proj2_sig (section_choice (nat_bijective_section (existT _ id (id_bijective)))));
 |}.
 (* alternative direct construction *)
-Definition nat_fresh l := S (fold_right max 0 l).
+Definition nat_fresh l := S (list_max l).
 Lemma nat_fresh_prop : forall l, ~ In (nat_fresh l) l.
 Proof.
 enough (forall l n h, ~ In (n + nat_fresh (h ++ l)) l) as Hh
   by (intros l; rewrite <- (app_nil_l l) at 1; apply (Hh _ 0)).
 induction l; unfold nat_fresh; simpl; intros n h Hin; auto.
 destruct Hin as [Hin|Hin].
-- enough (a < n + S (fold_right Init.Nat.max 0 (h ++ a :: l))) by lia.
+- enough (a < n + S (list_max (h ++ a :: l))) by lia.
   clear; induction h; simpl; lia.
 - apply IHl with n (h ++ a :: nil).
   now rewrite <- app_assoc.
@@ -387,8 +386,7 @@ Definition option_infdectype (D : InfDecType) := {|
   fresh := (proj1_sig (@nat_injective_choice (option_dectype D)
                       (nat_injective_option infinite_nat_injective)));
   fresh_prop := (proj2_sig (@nat_injective_choice (option_dectype D)
-                           (nat_injective_option infinite_nat_injective)));
-|}.
+                           (nat_injective_option infinite_nat_injective))); |}.
 (* alternative definition could use: fresh := fun L => Some (fresh (SomeDown L))
                                with: SomeDown := nil => nil
                                                | None :: r => SomeDown r
@@ -407,8 +405,7 @@ Definition suml_infdectype (D1 : InfDecType) (D2 : DecType) := {|
   fresh := (proj1_sig (@nat_injective_choice (sum_dectype D1 D2)
                       (nat_injective_suml _ infinite_nat_injective)));
   fresh_prop := (proj2_sig (@nat_injective_choice (sum_dectype D1 D2)
-                           (nat_injective_suml _ infinite_nat_injective)));
-|}.
+                           (nat_injective_suml _ infinite_nat_injective))); |}.
 (* alternative definition could use direct definition of fresh *)
 
 Lemma nat_injective_sumr (T1 T2 : Type) : nat_injective T2 -> nat_injective (sum T1 T2).
@@ -423,8 +420,7 @@ Definition sumr_infdectype (D1 : DecType) (D2 : InfDecType) := {|
   fresh := (proj1_sig (@nat_injective_choice (sum_dectype D1 D2)
                       (nat_injective_sumr _ infinite_nat_injective)));
   fresh_prop := (proj2_sig (@nat_injective_choice (sum_dectype D1 D2)
-                (nat_injective_sumr _ infinite_nat_injective)));
-|}.
+                (nat_injective_sumr _ infinite_nat_injective))); |}.
 (* alternative definition could use direct definition of fresh *)
 
 (** [prod] constructions of [InfDecType] *)
@@ -445,8 +441,7 @@ Section Prod.
   Definition prodl_infdectype := {|
     infcar := prod_dectype ID D;
     fresh := prodl_fresh;
-    fresh_prop := notin_prodl_fresh;
-  |}.
+    fresh_prop := notin_prodl_fresh; |}.
 
   Definition prodr_fresh : list (prod D ID) -> prod D ID :=
     fun l => (inhabitant_inf inh_dt, fresh (map snd l)).
@@ -461,8 +456,7 @@ Section Prod.
   Definition prodr_infdectype := {|
     infcar := prod_dectype D ID;
     fresh := prodr_fresh;
-    fresh_prop := notin_prodr_fresh;
-  |}.
+    fresh_prop := notin_prodr_fresh; |}.
 
 End Prod.
 
@@ -480,6 +474,5 @@ Qed.
 Definition list_infdectype (D : InhDecType) := {|
   infcar := list_dectype D;
   fresh := (proj1_sig (@nat_injective_choice (list_dectype D) (nat_injective_list inh_dt)));
-  fresh_prop := (proj2_sig (@nat_injective_choice (list_dectype D) (nat_injective_list inh_dt)));
-|}.
+  fresh_prop := (proj2_sig (@nat_injective_choice (list_dectype D) (nat_injective_list inh_dt))); |}.
 (* alternative definition could use: (x : D) : fresh := fun L => x :: concat L *)
