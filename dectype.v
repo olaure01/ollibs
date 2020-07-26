@@ -231,7 +231,7 @@ Section Minus.
 
 End Minus.
 
-Arguments minus [_] _.
+Arguments minus {_} _.
 
 
 (** * Tactics *)

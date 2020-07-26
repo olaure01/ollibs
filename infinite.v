@@ -201,7 +201,7 @@ Section InfiniteDec.
 
 End InfiniteDec.
 
-Arguments self_injective_minus [_] _.
+Arguments self_injective_minus {_} _.
 
 Definition nat_of_self (X : DecType) (pi : self_injective X) (n : nat) :
    { x | x = Nat.iter n (projT1 (sigT_of_sigT2 pi)) (proj1_sig (projT3 pi)) }
