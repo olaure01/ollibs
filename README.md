@@ -3,6 +3,11 @@
 
 Working with `Coq 8.12.0`
 
+[Opam](https://coq.inria.fr/opam-using.html)-based installation procedure:
+
+    $ opam repo add coq-released https://coq.inria.fr/opam/released
+    $ opam install coq-ollibs
+
 Manual installation procedure:
 
     $ ./configure
