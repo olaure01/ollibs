@@ -503,7 +503,7 @@ induction l ; split ; intro H.
 Qed.
 
 (** ** [repeat] *)
-(* TODO submit PR in List.v *)
+(* TODO included in PR #12799 submitted, remove once merged and released *)
 
 Lemma repeat_app A (a : A) n m :
   repeat a (n + m) = repeat a n ++ repeat a m.
@@ -690,7 +690,7 @@ Proof. intros Hassoc Hunit; apply fold_right_app_assoc2; [ assumption | apply Hu
 
 (** misc *)
 
-(* TODO included in PR #11966 submitted, remove once merged *)
+(* TODO included in PR #11966 submitted, remove once merged and released *)
 
     Lemma rev_case A (l : list A) : l = nil \/ exists a tl, l = tl ++ a :: nil.
     Proof.

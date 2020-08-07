@@ -99,7 +99,7 @@ Qed.
 
 
 (** ** [repeat] *)
-(* TODO submit PR in Permutation.v *)
+(* TODO included in PR #12799 submitted, remove once merged and released *)
 
 Lemma Permutation_repeat A (a : A) n l :
   Permutation l (repeat a n) -> l = repeat a n.
