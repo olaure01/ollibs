@@ -56,5 +56,11 @@ Manual installation procedure:
 ## Misc
 
 * `flat_map_more`           : decomposition properties for `flat_map`
-* `Dependent_Forall_Type`   : generalization of `Forall_Type` to dependent product
+* `Dependent_Forall_Type`   : generalization of `Forall_inf` to dependent product
 
+----
+
+## Main contributors
+
+* Olivier Laurent
+* Christophe Lucas
