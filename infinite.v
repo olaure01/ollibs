@@ -56,7 +56,7 @@ Section Infinite.
     end) as c; exists c.
   enough (forall l, Forall (fun x => s x < s (c l)) l) as Hlt.
   { intros l Hin; specialize Hlt with l.
-    apply Forall_forall with (x:= c l) in Hlt; [ lia | assumption ]. }
+    apply (proj1 (Forall_forall _ _) Hlt (c l)) in Hin; lia. }
   induction l; simpl; intuition; constructor.
   - rewrite Heqc, Hsec; lia.
   - apply Forall_forall; intros b Hb; apply Forall_forall with (x:= b) in IHl; [ | assumption ].

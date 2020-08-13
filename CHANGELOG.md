@@ -4,8 +4,10 @@
 
 Ongoing development.
 
+* proof scripts more robust with respect to automatically generated names
+
 ## Version 2.0.0
 
 First Opam-released version.
 
-It coïncides with incorporation of part of the content into the standard library of Coq v8.12.0.
+It coincides with incorporation of part of previous content into the standard library of Coq v8.12.0.
