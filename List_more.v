@@ -91,11 +91,11 @@ Qed.
 Ltac unit_vs_elt_inv H := 
   match type of H with
   | ?a :: nil = ?l1 ++ ?x :: ?l2 =>
-      let H1 := fresh H in
-      let H2 := fresh H in 
-        destruct l1 ; inversion H as [[H1 H2]] ;
-        [ (try subst x) ; (try subst l2)
-        | destruct l1 ; inversion H2 ]
+      let Hnil1 := fresh in
+      let Hnil2 := fresh in
+      symmetry in H; apply elt_eq_unit in H as [H [Hnil1 Hnil2]];
+      (try subst x); (try subst a); rewrite_all Hnil1; rewrite_all Hnil2;
+      clear Hnil1 Hnil2
   end.
 
 Lemma dichot_app A (l1 l2 l3 l4 : list A) :
@@ -108,7 +108,7 @@ revert l2 l3 l4;induction l1 as [|a l1 IHl1]; intros l2 l3; induction l3 as [|b 
 - now right; exists (@nil A).
 - now left; exists (b :: l3).
 - now right; exists (a :: l1).
-- destruct (IHl1 _ _ _ Heq') as [(l2' & <- & H2'2) | (l4' & -> & H4'2)].
+- destruct (IHl1 _ _ _ Heq') as [[l2' [<- H2'2]] | [l4' [-> H4'2]]].
   + now left; exists l2'.
   + now right; exists l4'.
 Qed.
@@ -120,7 +120,7 @@ Ltac dichot_app_exec H :=
                          let l4 := fresh "l" in
                          let H1 := fresh H in
                          let H2 := fresh H in
-                         destruct H as [(l2 & H1 & H2) | (l4 & H1 & H2)]
+                         destruct H as [[l2 [H1 H2]] | [l4 [H1 H2]]]
   end.
 
 Lemma dichot_elt_app A l1 (a : A) l2 l3 l4 :
@@ -133,7 +133,7 @@ revert l2 l3 l4; induction l1 as [|b l1 IHl1]; intros l2 l3; induction l3 as [|c
 - now right; exists (@nil A).
 - now left; exists l3.
 - now right; exists (b :: l1).
-- destruct (IHl1 _ _ _ Heq') as [(l2' & <- & H2'2) | (l4' & -> & H4'2)].
+- destruct (IHl1 _ _ _ Heq') as [[l2' [<- H2'2]] | [l4' [-> H4'2]]].
   + now left; exists l2'.
   + now right; exists l4'.
 Qed.
@@ -145,14 +145,14 @@ Ltac dichot_elt_app_exec H :=
                               let l4 := fresh "l" in
                               let H1 := fresh H in
                               let H2 := fresh H in
-                              destruct H as [(l2 & H1 & H2) | (l4 & H1 & H2)]
+                              destruct H as [[l2 [H1 H2]] | [l4 [H1 H2]]]
   | _ ++ _ = _ ++ _ :: _ => simple apply eq_sym in H ;
                             apply dichot_elt_app in H ;
                               let l2 := fresh "l" in
                               let l4 := fresh "l" in
                               let H1 := fresh H in
                               let H2 := fresh H in
-                              destruct H as [(l2 & H1 & H2) | (l4 & H1 & H2)]
+                              destruct H as [[l2 [H1 H2]] | [l4 [H1 H2]]]
   end.
 
 Lemma trichot_elt_app A l1 (a : A) l2 l3 l4 l5 :

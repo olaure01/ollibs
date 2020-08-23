@@ -52,14 +52,6 @@ Proof.
   apply Permutation_Type_trans with (l':=l'); assumption.
 Qed.
 
-(*
-Theorem Permutation_Type_trans : forall l l' l'' : list A,
- Permutation l l' -> Permutation l' l'' -> Permutation l l''.
-Proof.
-  exact perm_trans.
-Qed.
-*)
-
 End Permutation.
 
 Hint Resolve Permutation_Type_refl Permutation_Type_nil_nil Permutation_Type_skip : core.
