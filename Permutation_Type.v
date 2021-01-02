@@ -54,6 +54,7 @@ Qed.
 
 End Permutation.
 
+#[global]
 Hint Resolve Permutation_Type_refl Permutation_Type_nil_nil Permutation_Type_skip : core.
 
 (* These hints do not reduce the size of the problem to solve and they
