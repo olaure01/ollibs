@@ -95,7 +95,7 @@ Ltac unit_vs_elt_inv H :=
       let Hnil2 := fresh in
       symmetry in H; apply elt_eq_unit in H as [H [Hnil1 Hnil2]];
       (try subst x); (try subst a); rewrite_all Hnil1; rewrite_all Hnil2;
-      clear Hnil1 Hnil2
+      clear Hnil1 Hnil2; (try clear l1); (try clear l2)
   end.
 
 Lemma dichot_app A (l1 l2 l3 l4 : list A) :
