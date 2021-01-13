@@ -2,11 +2,11 @@
 
 ## Version 2.0.1
 
-Ongoing development.
-
 * proof scripts more robust with respect to automatically generated names
-* adapt to Coq v8.13
+* slightly more powerful `unit_vs_elt_inv` tactic
+* adapt to Coq v8.13.0
     * remove statements about `repeat` (moved into Coq standard library: [PR #12799](https://github.com/coq/coq/pull/12799))
+    * add locality attributes to `Hint` commands
 
 
 ## Version 2.0.0
