@@ -1,5 +1,9 @@
 # Versions 2.0.x
 
+## Version 2.0.2
+
+Ongoing development.
+
 ## Version 2.0.1
 
 * proof scripts more robust with respect to automatically generated names
