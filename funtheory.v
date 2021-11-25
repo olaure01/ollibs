@@ -5,6 +5,17 @@ From Coq Require Import Relation_Definitions RelationClasses List.
 
 Set Implicit Arguments.
 
+(** * Functions on constructors *)
+Definition Empty_fun {A} : Empty_set -> A := fun o => match o with end.
+
+Definition option_eval_default A B default (f : A -> B) o :=
+match o with
+| Some a => f a
+| None => default
+end.
+
+Definition option_map A B (f : A -> B) := option_eval_default None (fun x => Some (f x)).
+
 
 (** * Retraction pairs *)
 
@@ -38,6 +49,10 @@ Section Function.
 
   Lemma injective_NoDup : injective -> forall l, NoDup l -> NoDup (map f l).
   Proof.
+  (* from Logic.FinFun
+  intros Ij. induction 1 as [|x l X N IH]; simpl; constructor; trivial.
+  rewrite in_map_iff. intros (y & E & Y). apply Ij in E. now subst.
+  *)
   intros Hinj l; induction l as [|a l IHl]; simpl; intros Hnd.
   - constructor.
   - inversion Hnd as [|a' l' Hnin Hnd']; constructor; subst.

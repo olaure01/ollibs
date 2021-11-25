@@ -6,6 +6,7 @@ Set Implicit Arguments.
 
 
 (** * Non-Dependant Product of two [well_founded] relations *)
+(* TODO might be in stdlib after merging of PR #14809 *)
 
 Section Product.
 

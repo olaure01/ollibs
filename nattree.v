@@ -5,6 +5,8 @@ From OLlibs Require Import funtheory.
 
 Set Implicit Arguments.
 
+(* TODO use Cantor pairing from stdlib ?*)
+
 
 (** * Coding of pairs of [nat] *)
 
@@ -29,7 +31,7 @@ intros n; induction n as [|n IHn]; unfold cpair; simpl; intros m n' m' Hc.
 Qed.
 
 (* No easy non-deprecated way to do this found in Standard Library *)
-Lemma even_odd_decomp k : { n | k = 2 * n } + { n | k = 2 * n + 1}.
+Lemma even_odd_decomp k : { n | k = 2 * n } + { n | k = 2 * n + 1 }.
 Proof.
 induction k as [|k [[n ->] | [n ->]]].
 - left; exists 0; reflexivity.
