@@ -51,6 +51,7 @@ Proof. destr_comparison. Qed.
 Lemma Lt_le c : le Lt c.
 Proof. destr_comparison. Qed.
 
+#[global]
 Instance le_compat : Proper (eq ==> eq ==> iff) le.
 Proof. intuition. Qed.
 
@@ -77,6 +78,7 @@ Lemma lt_trans c1 c2 c3 :
   lt c1 c2 -> lt c2 c3 -> lt c1 c3.
 Proof. destr_comparison. Qed.
 
+#[global]
 Instance lt_compat : Proper (eq ==> eq ==> iff) lt.
 Proof. intuition. Qed.
 
@@ -114,6 +116,7 @@ Proof. destr_comparison; intuition. Qed.
 (** * Order structures *)
 
 (* Class structure *)
+#[global]
 Instance le_preorder : PreOrder le.
 Proof.
 split.
@@ -121,6 +124,7 @@ split.
 - intros c1 c2 c3; apply le_trans.
 Qed.
 
+#[global]
 Instance lt_strorder : StrictOrder lt.
 Proof.
 split.

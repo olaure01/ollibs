@@ -60,17 +60,21 @@ Hint Resolve Permutation_Type_refl Permutation_Type_nil_nil Permutation_Type_ski
 (* These hints do not reduce the size of the problem to solve and they
    must be used with care to avoid combinatoric explosions *)
 
-Local Hint Resolve Permutation_Type_swap Permutation_Type_trans : core.
-Local Hint Resolve Permutation_Type_sym : core.
+#[local]
+Hint Resolve Permutation_Type_swap Permutation_Type_trans : core.
+#[local]
+Hint Resolve Permutation_Type_sym : core.
 
 (* This provides reflexivity, symmetry and transitivity and rewriting
    on morphims to come *)
 
+#[global]
 Instance Permutation_Type_Equivalence A : Equivalence (@Permutation_Type A) | 10 := {
   Equivalence_Reflexive := @Permutation_Type_refl A ;
   Equivalence_Symmetric := @Permutation_Type_sym A ;
   Equivalence_Transitive := @Permutation_Type_trans A }.
 
+#[global]
 Instance Permutation_Type_cons A :
  Proper (Logic.eq ==> @Permutation_Type A ==> @Permutation_Type A) (@cons A) | 10.
 Proof.
@@ -93,7 +97,8 @@ Proof.
   intros l l' x Hperm; induction Hperm; simpl; tauto.
 Qed.
 
-Global Instance Permutation_Type_in' :
+#[global]
+Instance Permutation_Type_in' :
  Proper (Logic.eq ==> @Permutation_Type A ==> iff) (@In A) | 10.
 Proof.
   repeat red; intros; subst; eauto using Permutation_Type_in.
@@ -105,7 +110,8 @@ Proof.
   intros l l' x Hperm; induction Hperm; simpl; tauto.
 Qed.
 
-Global Instance Permutation_Type_in_inf' :
+#[global]
+Instance Permutation_Type_in_inf' :
  Proper (Logic.eq ==> @Permutation_Type A ==> Basics.arrow) (@In_inf A) | 10.
 Proof.
   intros l1 l2 Heq l1' l2' HP Hi ; subst.
@@ -138,7 +144,8 @@ Proof.
   apply Permutation_Type_app_tail; assumption.
 Qed.
 
-Global Instance Permutation_Type_app' :
+#[global]
+Instance Permutation_Type_app' :
  Proper (@Permutation_Type A ==> @Permutation_Type A ==> @Permutation_Type A) (@app A) | 10.
 Proof.
   repeat intro; now apply Permutation_Type_app.
@@ -204,7 +211,8 @@ Proof.
   apply Permutation_Type_app_tail. assumption.
 Qed.
 
-Global Instance Permutation_Type_rev' :
+#[global]
+Instance Permutation_Type_rev' :
  Proper (@Permutation_Type A ==> @Permutation_Type A) (@rev A) | 10.
 Proof.
   intros l1 l2 HP.
@@ -221,7 +229,8 @@ Proof.
   intros l l' Hperm; induction Hperm; simpl; auto. now transitivity (length l').
 Qed.
 
-Global Instance Permutation_Type_length' :
+#[global]
+Instance Permutation_Type_length' :
  Proper (@Permutation_Type A ==> Logic.eq) (@length A) | 10.
 Proof.
   exact Permutation_Type_length.
@@ -467,7 +476,8 @@ Proof.
    constructor. simpl; intuition. constructor; intuition.
 Qed.
 
-Global Instance Permutation_Type_NoDup_inf' :
+#[global]
+Instance Permutation_Type_NoDup_inf' :
  Proper (@Permutation_Type A ==> iffT) (@NoDup_inf A) | 10.
 Proof.
   repeat red; eauto using Permutation_Type_NoDup_inf.
@@ -486,7 +496,8 @@ Proof.
  induction 1; simpl; eauto.
 Qed.
 
-Global Instance Permutation_Type_map' :
+#[global]
+Instance Permutation_Type_map' :
   Proper (@Permutation_Type A ==> @Permutation_Type B) (map f) | 10.
 Proof.
   exact Permutation_Type_map.

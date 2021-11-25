@@ -27,7 +27,8 @@ Module ModBOrder_as_UsualOrderedTypeFull (B : ModBOrder) : UsualOrderedTypeFull.
   Definition t := @car B.t.
   Definition eq := @eq (@car B.t).
   Definition eq_equiv : Equivalence eq := eq_equivalence.
-  Local Coercion is_true : bool >-> Sortclass.
+  #[local]
+  Coercion is_true : bool >-> Sortclass.
   Definition lt x y := @leb B.t x y /\ x <> y.
 
   Lemma lt_strorder : StrictOrder lt.
@@ -195,6 +196,7 @@ End UsualOrderedTypeFull_as_ModBOrder.
 
 
 (** * [BOrder] structure over [nat]. *)
+#[global]
 Instance border_nat : BOrder.
 Proof.
 split with nat Nat.leb; intros a b.
