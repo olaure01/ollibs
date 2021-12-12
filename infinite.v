@@ -281,7 +281,7 @@ Section InfDecTypes.
   Proof.
   induction n; simpl; intros x [Hin1 | Hin2] Hinl; subst; intuition.
   - revert Hinl; subst; apply fresh_prop.
-  - apply fresh_prop with (l0 := freshlist_of_list l n ++ l).
+  - apply fresh_prop with (freshlist_of_list l n ++ l).
     apply in_or_app; intuition.
   - now apply IHn in Hinl.
   Qed.
@@ -302,7 +302,7 @@ Section InfDecTypes.
   Lemma freshlist_of_list_NoDup : forall l n, NoDup (freshlist_of_list l n).
   Proof. induction n; simpl; constructor; intuition.
   - constructor.
-  - apply fresh_prop with (l0 := freshlist_of_list l n ++ l).
+  - apply fresh_prop with (freshlist_of_list l n ++ l).
     apply in_or_app; intuition.
   Qed.
 

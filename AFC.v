@@ -43,7 +43,7 @@ induction l as [|b l IHl]; intros Hinc HF.
     exists (S (max k1 k2)); constructor.
     * apply (Hinc _ k1); intuition.
     * apply Forall_forall; intros x Hx.
-      apply (Forall_forall _) with (x0:=x) in Hk2; intuition.
+      apply (Forall_forall _ _) with x in Hk2; intuition.
       apply Hinc with k2; intuition.
   + intros ? i; intros; apply Hinc with i; intuition.
 Qed.

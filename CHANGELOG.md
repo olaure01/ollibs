@@ -2,7 +2,8 @@
 
 ## Version 2.0.2
 
-Ongoing development.
+* adapt to Coq v8.14 and v8.15
+    * add locality attributes to `Instance` commands
 
 ## Version 2.0.1
 
