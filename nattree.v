@@ -22,34 +22,21 @@ Qed.
 
 Lemma cpair_inj : injective2 cpair.
 Proof.
-intros n; induction n as [|n IHn]; unfold cpair; simpl; intros m n' m' Hc.
-- assert (0 = n') as <- by (destruct n'; simpl in Hc; lia).
-  simpl in Hc; split; lia.
-- destruct n'; simpl in Hc.
+intros n; induction n as [|n IHn]; unfold cpair; cbn; intros m n' m' Hc.
+- assert (0 = n') as <- by (destruct n'; cbn in Hc; lia).
+  cbn in Hc; split; lia.
+- destruct n'; cbn in Hc.
   + exfalso; lia.
   + assert (n = n' /\ m = m') as [-> ->] by (apply IHn; unfold cpair; lia); intuition.
-Qed.
-
-(* No easy non-deprecated way to do this found in Standard Library *)
-Lemma even_odd_decomp k : { n | k = 2 * n } + { n | k = 2 * n + 1 }.
-Proof.
-induction k as [|k [[n ->] | [n ->]]].
-- left; exists 0; reflexivity.
-- right; exists n; lia.
-- left; exists (S n); lia.
 Qed.
 
 Lemma cpair_surj k : 0 < k -> {'(n, m) | k = cpair n m }.
 Proof.
 induction k as [k IH] using (well_founded_induction Wf_nat.lt_wf); intros Hpos.
-destruct (even_odd_decomp k) as [[k' ->] | [k' ->]].
-- assert (0 < k') as Hpos2 by lia.
-  assert (k' < 2 * k') as Hdec by lia.
-  destruct (IH k' Hdec Hpos2) as [(n, m) ->].
-  exists (S n, m).
-  unfold cpair; simpl; lia.
-- exists (0, k').
-  unfold cpair; simpl; lia.
+rewrite (Nat.div2_odd k) in *; destruct (Nat.odd k); cbn in *.
+- exists (0, Nat.div2 k); cbn; lia.
+- destruct (IH (Nat.div2 k)) as [(n, m) ->]; [ lia | lia | ].
+  exists (S n, m); unfold cpair; cbn; lia.
 Qed.
 
 Definition dpair1 k (Hpos : k > 0) := fst (proj1_sig (cpair_surj Hpos)).
@@ -109,10 +96,10 @@ now apply Nat.pow_nonzero.
 Qed.
 
 Lemma cpair_lt_l n m : n < cpair n m.
-Proof. unfold cpair; induction n; simpl; lia. Qed.
+Proof. unfold cpair; induction n; cbn; lia. Qed.
 
 Lemma cpair_lt_r n m : m < cpair n m.
-Proof. unfold cpair; induction n; simpl; lia. Qed.
+Proof. unfold cpair; induction n; cbn; lia. Qed.
 
 Lemma pcpair_inc_l n n' m : n < n' -> pcpair n m < pcpair n' m.
 Proof.
@@ -157,15 +144,15 @@ end.
 
 Lemma nattree2nat_inj : injective nattree2nat.
 Proof.
-intro t1; induction t1 as [|n t1' IH' t1'' IH'']; simpl;
+intro t1; induction t1 as [|n t1' IH' t1'' IH'']; cbn;
   intros [|m t2' t2''] Heq; intuition.
 - exfalso.
   assert (Hpos := cpair_pos m (pcpair (nattree2nat t2') (nattree2nat t2''))).
-  simpl in Heq; lia.
+  cbn in Heq; lia.
 - exfalso.
   assert (Hpos := cpair_pos n (pcpair (nattree2nat t1') (nattree2nat t1''))).
-  simpl in Heq; lia.
-- simpl in Heq; apply cpair_inj in Heq as [-> Heq].
+  cbn in Heq; lia.
+- cbn in Heq; apply cpair_inj in Heq as [-> Heq].
   apply pcpair_inj in Heq as [Heq' Heq''].
   now apply IH' in Heq'; apply IH'' in Heq''; subst.
 Qed.

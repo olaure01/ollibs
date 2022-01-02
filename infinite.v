@@ -57,7 +57,7 @@ Section Infinite.
   enough (forall l, Forall (fun x => s x < s (c l)) l) as Hlt.
   { intros l Hin; specialize Hlt with l.
     apply (proj1 (Forall_forall _ _) Hlt (c l)) in Hin; lia. }
-  induction l; simpl; intuition; constructor.
+  induction l; cbn; intuition; constructor.
   - rewrite Heqc, Hsec; lia.
   - apply Forall_forall; intros b Hb; apply Forall_forall with (x:= b) in IHl; [ | assumption ].
     subst; rewrite Hsec; lia.
@@ -73,7 +73,7 @@ Section Infinite.
     end) as ih.
   exists (fun n => hd (c nil) (ih n)).
   assert(forall n x, In (hd (c nil) (ih x)) (ih (n + x))) as HC.
-  { induction n; simpl; intros x.
+  { induction n; cbn; intros x.
     - subst; destruct x; intuition.
     - subst; apply in_cons; intuition. }
   enough (forall x y, x < y -> hd (c nil) (ih x) = hd (c nil) (ih y) -> x = y) as Hlt.
@@ -142,7 +142,7 @@ Section InfiniteDec.
 
   Lemma pigeon_dectype : pigeon X.
   Proof.
-  intros l1; induction l1; simpl; intros l2 Hnd Hl; [ exfalso; lia | ].
+  intros l1; induction l1; cbn; intros l2 Hnd Hl; [ exfalso; lia | ].
   destruct (in_dec eq_dt_dec a l2).
   - apply NoDup_NoDup_inf in Hnd.
     inversion_clear Hnd as [ | ? ? Hnin Hnd2 ].
@@ -168,7 +168,7 @@ Section InfiniteDec.
   - rewrite map_length, seq_length; lia.
   - remember (S (length l)) as k; clear Heqk.
     remember 0 as s; clear Heqs.
-    revert s Hin Hnin; induction k; simpl; intros s Hin Hnin; [ easy | ].
+    revert s Hin Hnin; induction k; cbn; intros s Hin Hnin; [ easy | ].
     case (eq_dt_reflect (f s) x); intros Heq; subst.
     + now exists s.
     + apply IHk with (S s); [ | assumption ].
@@ -185,7 +185,7 @@ Section InfiniteDec.
   Lemma self_injective_minus : forall (pi : self_injective X),
     self_injective (minus (proj1_sig (projT3 pi))).
   Proof.
-  intros [f Hinj [i Hi]]; simpl.
+  intros [f Hinj [i Hi]]; cbn.
   assert (forall x, eqb i x = false -> eqb i (f x) = false) as Hif
     by (intros x _; now apply eqb_neq).
   split with (fun a => exist _ (f (proj1_sig a)) (Hif (proj1_sig a) (proj2_sig a))).
@@ -195,7 +195,7 @@ Section InfiniteDec.
     now rewrite ((Eqdep_dec.UIP_dec bool_dec) _ _ Hx Hy).
   - assert (eqb i (f i) = false) as Hj by now apply eqb_neq.
     split with (exist _ (f i) Hj).
-    intros [y Hy]; simpl; intros Heq.
+    intros [y Hy]; cbn; intros Heq.
     inversion Heq as [Heq2].
     now apply Hinj, eqb_neq in Heq2.
   Qed.
@@ -211,12 +211,12 @@ Proof.
 remember pi as HX; destruct pi as [f Hinj [i Hi]].
 induction n.
 - split.
-  + exists i; simpl; now subst.
+  + exists i; cbn; now subst.
   + exists (minus (proj1_sig (projT3 HX))).
     apply (self_injective_minus HX).
 - destruct IHn as [y Y]; split.
   + destruct y as [y Hy].
-    exists (f y); simpl; now subst.
+    exists (f y); cbn; now subst.
   + destruct Y as [Y HY].
     exists (minus (proj1_sig (projT3 HY))).
     apply (self_injective_minus HY).
@@ -228,8 +228,8 @@ intros HX.
 exists (fun n => proj1_sig (fst (nat_of_self X HX n))).
 intros x y Heq.
 destruct (fst (nat_of_self X HX x)) as [n Hn]; subst.
-destruct (fst (nat_of_self X HX y)) as [m Hm]; subst; simpl in Heq.
-destruct HX as [f Hinj [i Hi]]; simpl in Heq.
+destruct (fst (nat_of_self X HX y)) as [m Hm]; subst; cbn in Heq.
+destruct HX as [f Hinj [i Hi]]; cbn in Heq.
 revert x y Heq.
 enough (forall x y, x < y -> Nat.iter x f i = Nat.iter y f i -> x = y) as Hlt.
 { intros x y Heq.
@@ -239,7 +239,7 @@ enough (forall x y, x < y -> Nat.iter x f i = Nat.iter y f i -> x = y) as Hlt.
 intros x y Hlt Heq; exfalso.
 remember (pred (y - x)) as n.
 replace y with (S n + x) in Heq by lia; clear Heqn.
-revert Heq; induction x; simpl; intros Heq.
+revert Heq; induction x; cbn; intros Heq.
 - now apply Hi in Heq.
 - replace (S n + x) with (n + S x) in IHx by lia.
   now apply IHx, Hinj; [ lia | ].
@@ -279,7 +279,7 @@ Section InfDecTypes.
   Lemma freshlist_of_list_fresh : forall l n x,
     In x (freshlist_of_list l n) -> ~ In x l.
   Proof.
-  induction n; simpl; intros x [Hin1 | Hin2] Hinl; subst; intuition.
+  induction n; cbn; intros x [Hin1 | Hin2] Hinl; subst; intuition.
   - revert Hinl; subst; apply fresh_prop.
   - apply fresh_prop with (freshlist_of_list l n ++ l).
     apply in_or_app; intuition.
@@ -300,7 +300,7 @@ Section InfDecTypes.
   Qed.
 
   Lemma freshlist_of_list_NoDup : forall l n, NoDup (freshlist_of_list l n).
-  Proof. induction n; simpl; constructor; intuition.
+  Proof. induction n; cbn; constructor; intuition.
   - constructor.
   - apply fresh_prop with (freshlist_of_list l n ++ l).
     apply in_or_app; intuition.
@@ -325,8 +325,8 @@ Section InfDecTypes.
   intros n m Hlt Heq; exfalso.
   apply freshlist_of_list_prefix with (l:= l) in Hlt; destruct Hlt as [ l' [Hnil Hprf] ].
   unfold freshlist in Heq; rewrite Hprf in Heq.
-  destruct l'; [ now apply Hnil | ]; simpl in Heq.
-  destruct n; simpl in Heq, Hprf; rewrite Heq in Hprf.
+  destruct l'; [ now apply Hnil | ]; cbn in Heq.
+  destruct n; cbn in Heq, Hprf; rewrite Heq in Hprf.
   - assert (In c ((c :: l') ++ nil)) as Hin by intuition.
     revert Hin; apply NoDup_remove_2; rewrite <- app_comm_cons, <- Hprf.
     apply (freshlist_of_list_NoDup l m).
@@ -358,7 +358,7 @@ Lemma nat_fresh_prop : forall l, ~ In (nat_fresh l) l.
 Proof.
 enough (forall l n h, ~ In (n + nat_fresh (h ++ l)) l) as Hh
   by (intros l; rewrite <- (app_nil_l l) at 1; apply (Hh _ 0)).
-induction l; unfold nat_fresh; simpl; intros n h Hin; auto.
+induction l; unfold nat_fresh; cbn; intros n h Hin; auto.
 destruct Hin as [Hin|Hin].
 - enough (a < n + S (list_max (h ++ a :: l))) by lia.
   clear; induction h; simpl; lia.
@@ -466,7 +466,7 @@ Definition prod_infdectype (ID1 ID2 : InfDecType) :=
 (** [list] construction of [InfDecType] *)
 Lemma nat_injective_list (T : Type) : inhabited_inf T -> nat_injective (list T).
 Proof.
-intros [x]; exists (repeat x); intros n; induction n; simpl;
+intros [x]; exists (repeat x); intros n; induction n; cbn;
   intros m Heq; destruct m; inversion Heq; [ reflexivity | subst ].
 now f_equal; apply IHn.
 Qed.

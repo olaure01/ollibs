@@ -50,10 +50,10 @@ Section Function.
   Lemma injective_NoDup : injective -> forall l, NoDup l -> NoDup (map f l).
   Proof.
   (* from Logic.FinFun
-  intros Ij. induction 1 as [|x l X N IH]; simpl; constructor; trivial.
+  intros Ij. induction 1 as [|x l X N IH]; cbn; constructor; trivial.
   rewrite in_map_iff. intros (y & E & Y). apply Ij in E. now subst.
   *)
-  intros Hinj l; induction l as [|a l IHl]; simpl; intros Hnd.
+  intros Hinj l; induction l as [|a l IHl]; cbn; intros Hnd.
   - constructor.
   - inversion Hnd as [|a' l' Hnin Hnd']; constructor; subst.
     + intros Hin; apply Hnin.
@@ -86,8 +86,8 @@ Section Function.
   Proof.
   intros Hbij.
   exists (fun x => proj1_sig (sig_of_sig2 (Hbij x))).
-  - intros x; simpl; destruct (Hbij x) as [y Heq _]; auto.
-  - intros x; simpl; destruct (Hbij (f x)) as [y _ Heq]; auto.
+  - intros x; cbn; destruct (Hbij x) as [y Heq _]; auto.
+  - intros x; cbn; destruct (Hbij (f x)) as [y _ Heq]; auto.
   Qed.
 
   Lemma bijective_injective : bijective -> injective.
@@ -215,7 +215,7 @@ Qed.
 (** * More Properties of Bijective Functions *)
 
 Lemma id_bijective A : bijective (@id A).
-Proof. intros x; exists x; unfold id; simpl; intuition. Qed.
+Proof. intros x; exists x; unfold id; cbn; intuition. Qed.
 Arguments id_bijective {_}.
 
 Lemma compose_bijective A B C : forall (f : A -> B) (g : B -> C),
