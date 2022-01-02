@@ -10,8 +10,7 @@ Set Implicit Arguments.
 
 (** * Additional Properties *)
 
-#[global]
-Instance Permutation_Type_refl' A : Proper (Logic.eq ==> @Permutation_Type A) id.
+#[export] Instance Permutation_Type_refl' A : Proper (Logic.eq ==> @Permutation_Type A) id.
 Proof. now intros x y ->. Qed.
 
 Lemma Permutation_Type_morph_transp A (P : list A -> Type) :
@@ -157,8 +156,7 @@ revert l2 l3 l4; induction l1 as [|a l1 IHl1]; intros l2 l3 l4 HP.
     * now apply Permutation_Type_sym, Permutation_Type_cons_app, Permutation_Type_sym.
 Qed.
 
-#[global]
-Instance Permutation_Type_Forall A (P : A -> Prop) :
+#[export] Instance Permutation_Type_Forall A (P : A -> Prop) :
   Proper ((@Permutation_Type A) ==> Basics.impl) (Forall P).
 Proof.
 intros l1 l2 H.
@@ -166,8 +164,7 @@ apply Permutation_Type_Permutation in H.
 rewrite H; reflexivity.
 Qed.
 
-#[global]
-Instance Permutation_Type_Exists A (P : A -> Prop) :
+#[export] Instance Permutation_Type_Exists A (P : A -> Prop) :
   Proper ((@Permutation_Type A) ==> Basics.impl) (Exists P).
 Proof.
 intros l1 l2 H.
@@ -175,8 +172,7 @@ apply Permutation_Type_Permutation in H.
 rewrite H; reflexivity.
 Qed.
 
-#[global]
-Instance Permutation_Type_Forall_inf A (P : A -> Type) :
+#[export] Instance Permutation_Type_Forall_inf A (P : A -> Type) :
   Proper ((@Permutation_Type A) ==> Basics.arrow) (Forall_inf P).
 Proof.
 intros l1 l2 HP.
@@ -187,8 +183,7 @@ induction HP as [ | ? ? ? ? IHP | | ]; intro HF0; auto.
   now repeat constructor.
 Qed.
 
-#[global]
-Instance Permutation_Type_Exists_inf A (P : A -> Type) :
+#[export] Instance Permutation_Type_Exists_inf A (P : A -> Type) :
   Proper ((@Permutation_Type A) ==> Basics.arrow) (Exists_inf P).
 Proof.
 intros l1 l2 HP.
@@ -290,8 +285,7 @@ dichot_elt_app_inf_exec Heq; subst.
   apply Hf in Heq1; inversion Heq1.
 Qed.
 
-#[global]
-Instance Permutation_Type_flat_map A B f :
+#[export] Instance Permutation_Type_flat_map A B f :
   Proper ((@Permutation_Type A) ==> (@Permutation_Type B)) (flat_map f).
 Proof.
 intros l1; induction l1 as [|a l1 IHl1]; intros l2 HP.
@@ -315,8 +309,7 @@ intros l1; induction l1 as [|a l1 IHl1]; intros l2 HP.
     apply Permutation_Type_app_rot.
 Qed.
 
-#[global]
-Instance list_sum_perm_Type : Proper (@Permutation_Type nat ==> eq) list_sum.
+#[export] Instance list_sum_perm_Type : Proper (@Permutation_Type nat ==> eq) list_sum.
 Proof.
 intros l1; induction l1 as [|a l1 IHl1]; intros l2 HP.
 - now apply Permutation_Type_nil in HP; subst.
@@ -338,15 +331,13 @@ Inductive Permutation_Type_transp A : list A -> list A -> Type :=
 | Permutation_Type_t_trans l l' l'' :
     Permutation_Type_transp l l' -> Permutation_Type_transp l' l'' -> Permutation_Type_transp l l''.
 
-#[global]
-Instance Permutation_Type_transp_sym A : Symmetric (@Permutation_Type_transp A).
+#[export] Instance Permutation_Type_transp_sym A : Symmetric (@Permutation_Type_transp A).
 Proof.
 intros l1 l2 HC; induction HC; subst; try (now constructor).
 eapply Permutation_Type_t_trans ; eassumption.
 Qed.
 
-#[global]
-Instance Permutation_Type_transp_equiv A : Equivalence (@Permutation_Type_transp A).
+#[export] Instance Permutation_Type_transp_equiv A : Equivalence (@Permutation_Type_transp A).
 Proof. split.
 - intros l; apply Permutation_Type_t_refl.
 - apply Permutation_Type_transp_sym.

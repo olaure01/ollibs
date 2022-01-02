@@ -12,8 +12,8 @@ Set Implicit Arguments.
 Inductive CPermutation_Type A : list A -> list A -> Type :=
 | cperm_Type : forall l1 l2, CPermutation_Type (l1 ++ l2) (l2 ++ l1).
 
-#[global]
-Instance CPermutation_Permutation_Type A : Proper (@CPermutation_Type A ==> @Permutation_Type A) id.
+#[export] Instance CPermutation_Permutation_Type A :
+   Proper (@CPermutation_Type A ==> @Permutation_Type A) id.
 Proof.
 intros l1 l2 HC.
 inversion HC.
@@ -27,8 +27,7 @@ Proof. intros l1 l2 HP; inversion HP; constructor. Qed.
 
 (** * Properties *)
 
-#[global]
-Instance CPermutation_Type_refl A : Reflexive (@CPermutation_Type A).
+#[export] Instance CPermutation_Type_refl A : Reflexive (@CPermutation_Type A).
 Proof.
 intros l.
 assert (CPermutation_Type (nil ++ l) (l ++ nil))
@@ -37,16 +36,14 @@ simpl in HC.
 now rewrite app_nil_r in HC.
 Qed.
 
-#[global]
-Instance CPermutation_Type_sym A : Symmetric (@CPermutation_Type A).
+#[export] Instance CPermutation_Type_sym A : Symmetric (@CPermutation_Type A).
 Proof.
 intros l1 l2 HC.
 inversion HC.
 apply cperm_Type.
 Qed.
 
-#[global]
-Instance CPermutation_Type_trans A : Transitive (@CPermutation_Type A).
+#[export] Instance CPermutation_Type_trans A : Transitive (@CPermutation_Type A).
 Proof.
 intros l1 l2 l3 HC1 HC2.
 inversion HC1 ; inversion HC2 ; subst.
@@ -58,8 +55,7 @@ destruct H1 as [[l2' [Hl1 Hl2]] | [l4' [Hr1 Hr2]]] ; subst.
   apply cperm_Type.
 Qed.
 
-#[global]
-Instance CPermutation_Type_equiv A : Equivalence (@CPermutation_Type A).
+#[export] Instance CPermutation_Type_equiv A : Equivalence (@CPermutation_Type A).
 Proof.
 split.
 - apply CPermutation_Type_refl.
@@ -241,8 +237,8 @@ dichot_app_inf_exec Hx; dichot_app_inf_exec Hy; subst.
 Qed.
 
 (** [rev], [in], [map], [Forall], [Exists], etc. *)
-#[global]
-Instance CPermutation_Type_rev A : Proper (@CPermutation_Type A ==> @CPermutation_Type A) (@rev A).
+#[export] Instance CPermutation_Type_rev A :
+  Proper (@CPermutation_Type A ==> @CPermutation_Type A) (@rev A).
 Proof.
 intros l; induction l; intros l' HC.
 - apply CPermutation_Type_nil in HC; subst; apply CPermutation_Type_refl.
@@ -252,17 +248,16 @@ intros l; induction l; intros l' HC.
   now simpl; rewrite ? rev_app_distr; simpl; rewrite <- app_assoc.
 Qed.
 
-#[global]
-Instance CPermutation_Type_in A (a : A) : Proper (@CPermutation_Type A ==> Basics.impl) (In a).
+#[export] Instance CPermutation_Type_in A (a : A) :
+  Proper (@CPermutation_Type A ==> Basics.impl) (In a).
 Proof.
 intros l l' HC Hin.
 apply Permutation_Type_in with l; auto.
 now apply CPermutation_Permutation_Type.
 Qed.
 
-#[global]
-Instance CPermutation_Type_map A B (f : A -> B) :
-   Proper (@CPermutation_Type A ==> @CPermutation_Type B) (map f).
+#[export] Instance CPermutation_Type_map A B (f : A -> B) :
+  Proper (@CPermutation_Type A ==> @CPermutation_Type B) (map f).
 Proof.
 intros l l' HC.
 now inversion HC; subst; rewrite ? map_app.
@@ -286,8 +281,7 @@ induction l1; intros l2 HP.
   + constructor.
 Qed.
 
-#[global]
-Instance CPermutation_Type_Forall A (P : A -> Prop) :
+#[export] Instance CPermutation_Type_Forall A (P : A -> Prop) :
   Proper (@CPermutation_Type A ==> Basics.impl) (Forall P).
 Proof.
 intros l1 l2 HC HF.
@@ -295,8 +289,7 @@ apply Permutation_Type_Forall with l1; auto.
 now apply CPermutation_Permutation_Type.
 Qed.
 
-#[global]
-Instance CPermutation_Type_Exists A (P : A -> Prop) :
+#[export] Instance CPermutation_Type_Exists A (P : A -> Prop) :
   Proper (@CPermutation_Type A ==> Basics.impl) (Exists P).
 Proof.
 intros l1 l2 HC HE.
@@ -304,8 +297,7 @@ apply Permutation_Type_Exists with l1; auto.
 now apply CPermutation_Permutation_Type.
 Qed.
 
-#[global]
-Instance CPermutation_Type_Forall_inf A (P : A -> Type) :
+#[export] Instance CPermutation_Type_Forall_inf A (P : A -> Type) :
   Proper (@CPermutation_Type A ==> Basics.arrow) (Forall_inf P).
 Proof.
 intros l1 l2 HC HF.
@@ -313,8 +305,7 @@ apply Permutation_Type_Forall_inf with l1; auto.
 now apply CPermutation_Permutation_Type.
 Qed.
 
-#[global]
-Instance CPermutation_Type_Exists_inf A (P : A -> Type) :
+#[export] Instance CPermutation_Type_Exists_inf A (P : A -> Type) :
   Proper (@CPermutation_Type A ==> Basics.arrow) (Exists_inf P).
 Proof.
 intros l1 l2 HC HE.

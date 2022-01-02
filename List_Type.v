@@ -176,9 +176,8 @@ Section Facts.
 
 End Facts.
 
-#[global]
-Hint Resolve in_inf_eq in_inf_cons in_inf_inv in_inf_nil
-             in_inf_app_or in_inf_or_app: datatypes.
+#[export] Hint Resolve in_inf_eq in_inf_cons in_inf_inv in_inf_nil
+                       in_inf_app_or in_inf_or_app: datatypes.
 
 
 
@@ -750,9 +749,8 @@ Proof.
   apply in_inf_map; intuition.
 Qed.
 
-#[global]
-Hint Resolve incl_inf_refl incl_inf_tl incl_inf_tran
-  incl_inf_appl incl_inf_appr incl_inf_cons incl_inf_app: datatypes.
+#[export] Hint Resolve incl_inf_refl incl_inf_tl incl_inf_tran
+                       incl_inf_appl incl_inf_appr incl_inf_cons incl_inf_app: datatypes.
 
 
 Section Add.
@@ -1248,10 +1246,7 @@ Section Exists_Forall.
 
 End Exists_Forall.
 
-#[global]
-Hint Constructors Exists_inf : core.
-#[global]
-Hint Constructors Forall_inf : core.
+#[export] Hint Constructors Exists_inf Forall_inf : core.
 
 Lemma exists_Forall_inf A B : forall (P : A -> B -> Type) l,
   { k & Forall_inf (P k) l } -> Forall_inf (fun x => { k & P k x }) l.
@@ -1388,8 +1383,7 @@ Section Forall2_inf.
 
 End Forall2_inf.
 
-#[global]
-Hint Constructors Forall2_inf : core.
+#[export] Hint Constructors Forall2_inf : core.
 
 Lemma Forall2_inf_Forall2 {A B} (R : A -> B -> Prop) l1 l2 :
   Forall2_inf R l1 l2 -> Forall2 R l1 l2.

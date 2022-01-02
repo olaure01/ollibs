@@ -54,32 +54,26 @@ Qed.
 
 End Permutation.
 
-#[global]
-Hint Resolve Permutation_Type_refl Permutation_Type_nil_nil Permutation_Type_skip : core.
+#[export] Hint Resolve Permutation_Type_refl Permutation_Type_nil_nil
+                       Permutation_Type_skip : core.
 
 (* These hints do not reduce the size of the problem to solve and they
    must be used with care to avoid combinatoric explosions *)
 
-#[local]
-Hint Resolve Permutation_Type_swap Permutation_Type_trans : core.
-#[local]
-Hint Resolve Permutation_Type_sym : core.
+#[local] Hint Resolve Permutation_Type_swap Permutation_Type_trans : core.
+#[local] Hint Resolve Permutation_Type_sym : core.
 
 (* This provides reflexivity, symmetry and transitivity and rewriting
    on morphims to come *)
 
-#[global]
-Instance Permutation_Type_Equivalence A : Equivalence (@Permutation_Type A) | 10 := {
+#[export] Instance Permutation_Type_Equivalence A : Equivalence (@Permutation_Type A) | 10 := {
   Equivalence_Reflexive := @Permutation_Type_refl A ;
   Equivalence_Symmetric := @Permutation_Type_sym A ;
   Equivalence_Transitive := @Permutation_Type_trans A }.
 
-#[global]
-Instance Permutation_Type_cons A :
- Proper (Logic.eq ==> @Permutation_Type A ==> @Permutation_Type A) (@cons A) | 10.
-Proof.
-  repeat intro; subst; auto using Permutation_Type_skip.
-Qed.
+#[export] Instance Permutation_Type_cons A :
+  Proper (Logic.eq ==> @Permutation_Type A ==> @Permutation_Type A) (@cons A) | 10.
+Proof. repeat intro; subst; auto using Permutation_Type_skip. Qed.
 
 
 Section Permutation_properties.
@@ -92,17 +86,12 @@ Implicit Types l m : list A.
 (** Compatibility with others operations on lists *)
 
 Theorem Permutation_Type_in : forall (l l' : list A) (x : A),
- Permutation_Type l l' -> In x l -> In x l'.
-Proof.
-  intros l l' x Hperm; induction Hperm; simpl; tauto.
-Qed.
+  Permutation_Type l l' -> In x l -> In x l'.
+Proof. intros l l' x Hperm; induction Hperm; simpl; tauto. Qed.
 
-#[global]
-Instance Permutation_Type_in' :
- Proper (Logic.eq ==> @Permutation_Type A ==> iff) (@In A) | 10.
-Proof.
-  repeat red; intros; subst; eauto using Permutation_Type_in.
-Qed.
+#[export] Instance Permutation_Type_in' :
+  Proper (Logic.eq ==> @Permutation_Type A ==> iff) (@In A) | 10.
+Proof. repeat red; intros; subst; eauto using Permutation_Type_in. Qed.
 
 Theorem Permutation_Type_in_inf : forall (l l' : list A) (x : A),
  Permutation_Type l l' -> In_inf x l -> In_inf x l'.
@@ -110,9 +99,8 @@ Proof.
   intros l l' x Hperm; induction Hperm; simpl; tauto.
 Qed.
 
-#[global]
-Instance Permutation_Type_in_inf' :
- Proper (Logic.eq ==> @Permutation_Type A ==> Basics.arrow) (@In_inf A) | 10.
+#[export] Instance Permutation_Type_in_inf' :
+  Proper (Logic.eq ==> @Permutation_Type A ==> Basics.arrow) (@In_inf A) | 10.
 Proof.
   intros l1 l2 Heq l1' l2' HP Hi ; subst.
   eauto using Permutation_Type_in_inf.
@@ -144,19 +132,14 @@ Proof.
   apply Permutation_Type_app_tail; assumption.
 Qed.
 
-#[global]
-Instance Permutation_Type_app' :
+#[export] Instance Permutation_Type_app' :
  Proper (@Permutation_Type A ==> @Permutation_Type A ==> @Permutation_Type A) (@app A) | 10.
-Proof.
-  repeat intro; now apply Permutation_Type_app.
-Qed.
+Proof. repeat intro; now apply Permutation_Type_app. Qed.
 
 Lemma Permutation_Type_add_inside : forall a (l l' tl tl' : list A),
   Permutation_Type l l' -> Permutation_Type tl tl' ->
   Permutation_Type (l ++ a :: tl) (l' ++ a :: tl').
-Proof.
-  intros; apply Permutation_Type_app; auto.
-Qed.
+Proof. intros; apply Permutation_Type_app; auto. Qed.
 
 Lemma Permutation_Type_cons_append : forall (l : list A) x,
   Permutation_Type (x :: l) (l ++ x :: nil).
@@ -211,9 +194,8 @@ Proof.
   apply Permutation_Type_app_tail. assumption.
 Qed.
 
-#[global]
-Instance Permutation_Type_rev' :
- Proper (@Permutation_Type A ==> @Permutation_Type A) (@rev A) | 10.
+#[export] Instance Permutation_Type_rev' :
+  Proper (@Permutation_Type A ==> @Permutation_Type A) (@rev A) | 10.
 Proof.
   intros l1 l2 HP.
   eapply Permutation_Type_trans ; [ | eapply Permutation_Type_trans ].
@@ -229,12 +211,9 @@ Proof.
   intros l l' Hperm; induction Hperm; simpl; auto. now transitivity (length l').
 Qed.
 
-#[global]
-Instance Permutation_Type_length' :
- Proper (@Permutation_Type A ==> Logic.eq) (@length A) | 10.
-Proof.
-  exact Permutation_Type_length.
-Qed.
+#[export] Instance Permutation_Type_length' :
+  Proper (@Permutation_Type A ==> Logic.eq) (@length A) | 10.
+Proof Permutation_Type_length.
 
 Theorem Permutation_Type_ind_bis :
  forall P : list A -> list A -> Prop,
@@ -476,12 +455,9 @@ Proof.
    constructor. simpl; intuition. constructor; intuition.
 Qed.
 
-#[global]
-Instance Permutation_Type_NoDup_inf' :
+#[export] Instance Permutation_Type_NoDup_inf' :
  Proper (@Permutation_Type A ==> iffT) (@NoDup_inf A) | 10.
-Proof.
-  repeat red; eauto using Permutation_Type_NoDup_inf.
-Qed.
+Proof. repeat red; eauto using Permutation_Type_NoDup_inf. Qed.
 
 End Permutation_properties.
 
@@ -496,12 +472,9 @@ Proof.
  induction 1; simpl; eauto.
 Qed.
 
-#[global]
-Instance Permutation_Type_map' :
+#[export] Instance Permutation_Type_map' :
   Proper (@Permutation_Type A ==> @Permutation_Type B) (map f) | 10.
-Proof.
-  exact Permutation_Type_map.
-Qed.
+Proof Permutation_Type_map.
 
 End Permutation_map.
 
