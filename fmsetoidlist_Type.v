@@ -43,13 +43,13 @@ Section FMSet2List.
   Variable M A : Type.
   Variable fm : FinMultisetoid M A.
 
-  Global Instance mequivalence : Equivalence meq := mequiv.
+  #[export] Instance mequivalence : Equivalence meq := mequiv.
 
   Definition list2fm l := fold_right add empty l.
 
-  Global Instance list2fm_perm : Proper (@Permutation_Type A ==> meq) list2fm := perm_meq.
+  #[export] Instance list2fm_perm : Proper (@Permutation_Type A ==> meq) list2fm := perm_meq.
 
-  Global Instance elts_perm' : Proper (meq ==> @Permutation_Type A) elts := meq_perm.
+  #[export] Instance elts_perm' : Proper (meq ==> @Permutation_Type A) elts := meq_perm.
 
   Lemma list2fm_retract m : meq (list2fm (elts m)) m.
   Proof. apply retract_meq. Qed.
@@ -120,7 +120,7 @@ Section FMSet2List.
   - apply Permutation_Type_app_head, elts_perm.
   Qed.
 
-  Global Instance sum_meq : Proper (meq ==> meq ==> meq) sum.
+  #[export] Instance sum_meq : Proper (meq ==> meq ==> meq) sum.
   Proof.
   intros m1 m2 Heq m1' m2' Heq'; unfold sum.
   apply meq_perm in Heq.
@@ -144,7 +144,7 @@ Section Fmmap.
 
   Definition fmmap (m : M) := list2fm (map f (elts m)).
 
-  Global Instance fmmap_meq : Proper (meq ==> meq) fmmap.
+  #[export] Instance fmmap_meq : Proper (meq ==> meq) fmmap.
   Proof.
   intros l1 l2 Heq.
   now apply perm_meq, Permutation_Type_map, meq_perm.

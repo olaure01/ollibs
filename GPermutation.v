@@ -36,41 +36,41 @@ Section GPermutation.
   Ltac case_perm := unfold PCPermutation, PEPermutation; destruct b.
 
 
-  Global Instance PEPermutation_PCPermutation : Proper (PEPermutation ==> PCPermutation) id.
+  #[export] Instance PEPermutation_PCPermutation : Proper (PEPermutation ==> PCPermutation) id.
   Proof. now case_perm; simpl; intros l l' ->. Qed.
 
-  Global Instance PCEPermutation_Permutation : Proper (PCEPermutation ==> (@Permutation A)) id.
+  #[export] Instance PCEPermutation_Permutation : Proper (PCEPermutation ==> (@Permutation A)) id.
   Proof. case_perm_tri; intros l1 l2 HP; [ apply CPermutation_Permutation | subst | ]; auto. Qed.
 
-  Global Instance PCPermutation_Permutation : Proper (PCPermutation ==> (@Permutation A)) id.
+  #[export] Instance PCPermutation_Permutation : Proper (PCPermutation ==> (@Permutation A)) id.
   Proof. now case_perm; [ | apply CPermutation_Permutation ]. Qed.
 
-  Global Instance PEPermutation_Permutation : Proper (PEPermutation ==> (@Permutation A)) id.
+  #[export] Instance PEPermutation_Permutation : Proper (PEPermutation ==> (@Permutation A)) id.
   Proof. case_perm; simpl; intros l l' HP; now subst. Qed.
 
-  Global Instance CPermutation_PCPermutation :
+  #[export] Instance CPermutation_PCPermutation :
     Proper (@CPermutation A ==> PCPermutation) id.
   Proof. now case_perm; [ apply CPermutation_Permutation | ]. Qed.
 
-  Global Instance eq_PCEPermutation : Proper (eq ==> PCEPermutation) id.
+  #[export] Instance eq_PCEPermutation : Proper (eq ==> PCEPermutation) id.
   Proof. case_perm_tri; intuition. Qed.
 
-  Global Instance eq_PEPermutation : Proper (eq ==> PEPermutation) id.
+  #[export] Instance eq_PEPermutation : Proper (eq ==> PEPermutation) id.
   Proof. case_perm; intuition. Qed.
 
 
   (** ** Properties of [PCEPermutation] *)
 
-  Global Instance PCEPermutation_refl : Reflexive PCEPermutation.
+  #[export] Instance PCEPermutation_refl : Reflexive PCEPermutation.
   Proof. case_perm_tri; intros l; reflexivity. Qed.
 
-  Global Instance PCEPermutation_sym : Symmetric PCEPermutation.
+  #[export] Instance PCEPermutation_sym : Symmetric PCEPermutation.
   Proof. case_perm_tri; intros l l'; now symmetry. Qed.
 
-  Global Instance PCEPermutation_trans : Transitive PCEPermutation.
+  #[export] Instance PCEPermutation_trans : Transitive PCEPermutation.
   Proof. case_perm_tri; intros l l' l''; now transitivity l'. Qed.
 
-  Global Instance PCEPermutation_equiv : Equivalence PCEPermutation.
+  #[export] Instance PCEPermutation_equiv : Equivalence PCEPermutation.
   Proof.
   split; [ apply PCEPermutation_refl | apply PCEPermutation_sym | apply PCEPermutation_trans ].
   Qed.
@@ -92,19 +92,19 @@ Section GPermutation.
     [ apply CPermutation_length_1_inv | subst | apply Permutation_length_1_inv ].
   Qed.
 
-  Global Instance PCEPermutation_in a : Proper (PCEPermutation ==> Basics.impl) (In a).
+  #[export] Instance PCEPermutation_in a : Proper (PCEPermutation ==> Basics.impl) (In a).
   Proof.
   now case_perm_tri; intros l l' HP Hin;
     [ apply CPermutation_in with l | subst | apply Permutation_in with l ].
   Qed.
 
-  Global Instance PCEPermutation_Forall (P : A -> Prop) :
+  #[export] Instance PCEPermutation_Forall (P : A -> Prop) :
     Proper (PCEPermutation ==> Basics.impl) (Forall P).
   Proof.
   now case_perm_tri; [ apply CPermutation_Forall | intros ? ? -> | apply Permutation_Forall ].
   Qed.
 
-  Global Instance PCEPermutation_Exists (P : A -> Prop) :
+  #[export] Instance PCEPermutation_Exists (P : A -> Prop) :
     Proper (PCEPermutation ==> Basics.impl) (Exists P).
   Proof.
   now case_perm_tri; [ apply CPermutation_Exists | intros ? ? -> | apply Permutation_Exists ].
@@ -113,16 +113,16 @@ Section GPermutation.
 
   (** ** Properties of [PCPermutation] *)
 
-  Global Instance PCPermutation_refl : Reflexive PCPermutation.
+  #[export] Instance PCPermutation_refl : Reflexive PCPermutation.
   Proof. case_perm; intros l; reflexivity. Qed.
 
-  Global Instance PCPermutation_sym : Symmetric PCPermutation.
+  #[export] Instance PCPermutation_sym : Symmetric PCPermutation.
   Proof. case_perm; intros l l'; now symmetry. Qed.
 
-  Global Instance PCPermutation_trans : Transitive PCPermutation.
+  #[export] Instance PCPermutation_trans : Transitive PCPermutation.
   Proof. case_perm; intros l l' l''; now transitivity l'. Qed.
 
-  Global Instance PCPermutation_equiv : Equivalence PCPermutation.
+  #[export] Instance PCPermutation_equiv : Equivalence PCPermutation.
   Proof.
   split; [ apply PCPermutation_refl | apply PCPermutation_sym | apply PCPermutation_trans ].
   Qed.
@@ -159,40 +159,40 @@ Section GPermutation.
   now case_perm; [ apply Permutation_length_2_inv | apply CPermutation_length_2_inv ].
   Qed.
 
-  Global Instance PCPermutation_in a : Proper (PCPermutation ==> Basics.impl) (In a).
+  #[export] Instance PCPermutation_in a : Proper (PCPermutation ==> Basics.impl) (In a).
   Proof.
   now case_perm; intros l l' HP Hin; [ apply Permutation_in with l | apply CPermutation_in with l ].
   Qed.
 
-  Global Instance PCPermutation_Forall (P : A -> Prop) :
+  #[export] Instance PCPermutation_Forall (P : A -> Prop) :
     Proper (PCPermutation ==> Basics.impl) (Forall P).
   Proof. case_perm; [ apply Permutation_Forall | apply CPermutation_Forall ]. Qed.
 
-  Global Instance PCPermutation_Exists (P : A -> Prop) :
+  #[export] Instance PCPermutation_Exists (P : A -> Prop) :
     Proper (PCPermutation ==> Basics.impl) (Exists P).
   Proof. now case_perm; [ apply Permutation_Exists | apply CPermutation_Exists ]. Qed.
 
 
   (** ** Properties of [PEPermutation] *)
 
-  Global Instance PEPermutation_refl : Reflexive PEPermutation.
+  #[export] Instance PEPermutation_refl : Reflexive PEPermutation.
   Proof. now case_perm. Qed.
 
-  Global Instance PEPermutation_sym : Symmetric PEPermutation.
+  #[export] Instance PEPermutation_sym : Symmetric PEPermutation.
   Proof. now case_perm. Qed.
 
-  Global Instance PEPermutation_trans : Transitive PEPermutation.
+  #[export] Instance PEPermutation_trans : Transitive PEPermutation.
   Proof. now case_perm; intros l l' l''; transitivity l'. Qed.
 
-  Global Instance PEPermutation_equiv : Equivalence PEPermutation.
+  #[export] Instance PEPermutation_equiv : Equivalence PEPermutation.
   Proof.
   split; [ apply PEPermutation_refl | apply PEPermutation_sym | apply PEPermutation_trans ].
   Qed.
 
-  Global Instance PEPermutation_cons : Proper (eq ==> PEPermutation ==> PEPermutation) cons.
+  #[export] Instance PEPermutation_cons : Proper (eq ==> PEPermutation ==> PEPermutation) cons.
   Proof. now case_perm; intros x y -> l1 l2 HP; [ apply Permutation_cons | rewrite HP ]. Qed.
 
-  Global Instance PEPermutation_app :
+  #[export] Instance PEPermutation_app :
     Proper (PEPermutation ==> PEPermutation ==> PEPermutation) (@app A).
   Proof. now case_perm; simpl; intros l m HP1 l' m' HP2; [ apply Permutation_app | subst ]. Qed.
 
@@ -236,28 +236,28 @@ Section GPermutation.
     PEPermutation l (a :: l1) -> exists l2 l3, PEPermutation l1 (l2 ++ l3) /\ l = l2 ++ a :: l3.
   Proof. now intro HP; rewrite <- (app_nil_l l1); apply PEPermutation_vs_elt_inv. Qed.
 
-  Global Instance PEPermtutation_in a : Proper (PEPermutation ==> Basics.impl) (In a).
+  #[export] Instance PEPermtutation_in a : Proper (PEPermutation ==> Basics.impl) (In a).
   Proof. now case_perm; simpl; intros l l' HP HIn; subst; [ apply Permutation_in with l | ]. Qed.
 
-  Global Instance PEPermutation_Forall (P : A -> Prop) :
+  #[export] Instance PEPermutation_Forall (P : A -> Prop) :
     Proper (PEPermutation ==> Basics.impl) (Forall P).
   Proof.
   now case_perm; simpl; intros l1 l2 HP HF; subst; [ apply Permutation_Forall with l1 | ].
   Qed.
 
-  Global Instance PEPermutation_Exists (P : A -> Prop) :
+  #[export] Instance PEPermutation_Exists (P : A -> Prop) :
     Proper (PEPermutation ==> Basics.impl) (Exists P).
   Proof.
   now case_perm; simpl; intros l1 l2 HP HF; subst; [ apply Permutation_Exists with l1 | ].
   Qed.
 
-  Global Instance PEPermutation_rev : Proper (PEPermutation ==> PEPermutation) (@rev A).
+  #[export] Instance PEPermutation_rev : Proper (PEPermutation ==> PEPermutation) (@rev A).
   Proof. now case_perm; intros l1 l2 ->. Qed.
 
 
   (** * From [PEPermutation] to [PCPermutation] *)
 
-  Global Instance PEPermutation_PCPermutation_cons :
+  #[export] Instance PEPermutation_PCPermutation_cons :
     Proper (eq ==> PEPermutation ==> PCPermutation) cons.
   Proof.
   intros x y -> l1 l2 HP.
@@ -265,7 +265,7 @@ Section GPermutation.
   now rewrite HP.
   Qed.
 
-  Global Instance PEPermutation_PCPermutation_app :
+  #[export] Instance PEPermutation_PCPermutation_app :
     Proper (PEPermutation ==> PEPermutation ==> PCPermutation) (@app A).
   Proof.
   intros l1 l1' HPhd l2 l2' HPtl.
@@ -349,13 +349,13 @@ Section MultiGPermutation.
 
   Variable f : A -> B.
 
-  Global Instance PCEPermutation_map : Proper (PCEPermutation c ==> PCEPermutation c) (map f).
+  #[export] Instance PCEPermutation_map : Proper (PCEPermutation c ==> PCEPermutation c) (map f).
   Proof. now destruct c; intros l1 l2 ->. Qed.
 
-  Global Instance PCPermutation_map : Proper (PCPermutation b ==> PCPermutation b) (map f).
+  #[export] Instance PCPermutation_map : Proper (PCPermutation b ==> PCPermutation b) (map f).
   Proof. now destruct b; intros l1 l2 ->. Qed.
 
-  Global Instance PEPermutation_map : Proper (PEPermutation b ==> PEPermutation b) (map f).
+  #[export] Instance PEPermutation_map : Proper (PEPermutation b ==> PEPermutation b) (map f).
   Proof. now destruct b; simpl; intros l1 l2 ->. Qed.
 
   Lemma PCEPermutation_map_inv l1 l2 :

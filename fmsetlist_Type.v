@@ -41,7 +41,7 @@ Section FMSet2List.
 
   Definition list2fm l := fold_right add empty l.
 
-  Global Instance list2fm_perm : Proper (@Permutation_Type A ==> eq) list2fm
+  #[export] Instance list2fm_perm : Proper (@Permutation_Type A ==> eq) list2fm
     := perm_eq.
 
   Lemma list2fm_retract m : list2fm (elts m) = m.
@@ -71,7 +71,7 @@ Section FMSet2List.
     + now apply Permutation_Type_cons.
   Qed.
 
-  Global Instance elts_perm' : Proper (eq ==> @Permutation_Type A) elts.
+  #[export] Instance elts_perm' : Proper (eq ==> @Permutation_Type A) elts.
   Proof. now intros m1 m2 Heq ; subst. Qed.
 
   Lemma elts_eq_nil m : elts m = nil -> m = empty.

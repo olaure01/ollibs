@@ -7,6 +7,7 @@ Ongoing development.
 * `arrow`
     * do not export `Program.Basics` in `funtheory` anymore
     * rely on `Classes.CRelationClasses.arrow` rather than `Program.Basics.arrow` for `Proper` instances in `Type`
+* turn `#[global]` instances into `#[export]` ones
 
 ## Version 2.0.2
 

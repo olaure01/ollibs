@@ -52,47 +52,47 @@ Section GPermutationType.
     PEPermutation_Type l1 l2 -> GPermutation.PEPermutation b l1 l2.
   Proof. now case_perm; [ apply Permutation_Type_Permutation | ]. Qed.
 
-  Global Instance PEPermutation_PCPermutation_Type :
+  #[export] Instance PEPermutation_PCPermutation_Type :
     Proper (PEPermutation_Type ==> PCPermutation_Type) id.
   Proof.  now case_perm; simpl; intros l l' HP; [ | subst ]. Qed.
 
-  Global Instance PCEPermutation_Permutation_Type :
+  #[export] Instance PCEPermutation_Permutation_Type :
     Proper (PCEPermutation_Type ==> (@Permutation_Type A)) id.
   Proof.
   case_perm_tri; intros l1 l2 HP; [ apply CPermutation_Permutation_Type | subst | ]; auto.
   Qed.
 
-  Global Instance PCPermutation_Permutation_Type :
+  #[export] Instance PCPermutation_Permutation_Type :
     Proper (PCPermutation_Type ==> (@Permutation_Type A)) id.
   Proof. now case_perm; [ | apply CPermutation_Permutation_Type ]. Qed.
 
-  Global Instance PEPermutation_Permutation_Type :
+  #[export] Instance PEPermutation_Permutation_Type :
     Proper (PEPermutation_Type ==> (@Permutation_Type A)) id.
   Proof. case_perm; simpl; intros l l' HP; now subst. Qed.
 
-  Global Instance CPermutation_Type_PCPermutation_Type :
+  #[export] Instance CPermutation_Type_PCPermutation_Type :
     Proper (@CPermutation_Type A ==> PCPermutation_Type) id.
   Proof. now case_perm; [ apply CPermutation_Permutation_Type | ]. Qed.
 
-  Global Instance eq_PCEPermutation_Type : Proper (eq ==> PCEPermutation_Type) id.
+  #[export] Instance eq_PCEPermutation_Type : Proper (eq ==> PCEPermutation_Type) id.
   Proof. case_perm_tri; intuition. Qed.
 
-  Global Instance eq_PEPermutation_Type : Proper (eq ==> PEPermutation_Type) id.
+  #[export] Instance eq_PEPermutation_Type : Proper (eq ==> PEPermutation_Type) id.
   Proof. case_perm; intuition. Qed.
 
 
   (** ** Properties of [PCEPermutation_Type] *)
 
-  Global Instance PCEPermutation_Type_refl : Reflexive PCEPermutation_Type.
+  #[export] Instance PCEPermutation_Type_refl : Reflexive PCEPermutation_Type.
   Proof. case_perm_tri; intros l; reflexivity. Qed.
 
-  Global Instance PCEPermutation_Type_sym : Symmetric PCEPermutation_Type.
+  #[export] Instance PCEPermutation_Type_sym : Symmetric PCEPermutation_Type.
   Proof. case_perm_tri; intros l l'; now symmetry. Qed.
 
-  Global Instance PCEPermutation_Type_trans : Transitive PCEPermutation_Type.
+  #[export] Instance PCEPermutation_Type_trans : Transitive PCEPermutation_Type.
   Proof. case_perm_tri; intros l l' l''; now transitivity l'. Qed.
 
-  Global Instance PCEPermutation_Type_equiv : Equivalence PCEPermutation_Type.
+  #[export] Instance PCEPermutation_Type_equiv : Equivalence PCEPermutation_Type.
   Proof.
   split;
   [ apply PCEPermutation_Type_refl
@@ -118,34 +118,34 @@ Section GPermutationType.
     [ apply CPermutation_Type_length_1_inv | subst | apply Permutation_Type_length_1_inv ].
   Qed.
 
-  Global Instance PCEPermutation_Type_in a : Proper (PCEPermutation_Type ==> Basics.impl) (In a).
+  #[export] Instance PCEPermutation_Type_in a : Proper (PCEPermutation_Type ==> Basics.impl) (In a).
   Proof.
   now case_perm_tri; intros l l' HP Hin;
     [ apply CPermutation_Type_in with l | subst | apply Permutation_Type_in with l ].
   Qed.
 
-  Global Instance PCEPermutation_Type_Forall (P : A -> Prop) :
+  #[export] Instance PCEPermutation_Type_Forall (P : A -> Prop) :
     Proper (PCEPermutation_Type ==> Basics.impl) (Forall P).
   Proof.
   now case_perm_tri;
     [ apply CPermutation_Type_Forall | intros ? ? -> | apply Permutation_Type_Forall ].
   Qed.
 
-  Global Instance PCEPermutation_Type_Exists (P : A -> Prop) :
+  #[export] Instance PCEPermutation_Type_Exists (P : A -> Prop) :
     Proper (PCEPermutation_Type ==> Basics.impl) (Exists P).
   Proof.
   now case_perm_tri;
     [ apply CPermutation_Type_Exists | intros ? ? -> | apply Permutation_Type_Exists ].
   Qed.
 
-  Global Instance PCEPermutation_Type_Forall_inf (P : A -> Type) :
+  #[export] Instance PCEPermutation_Type_Forall_inf (P : A -> Type) :
     Proper (PCEPermutation_Type ==> arrow) (Forall_inf P).
   Proof.
   now case_perm_tri;
     [ apply CPermutation_Type_Forall_inf | intros ? ? -> | apply Permutation_Type_Forall_inf ].
   Qed.
 
-  Global Instance PCEPermutation_Type_Exists_inf (P : A -> Type) :
+  #[export] Instance PCEPermutation_Type_Exists_inf (P : A -> Type) :
     Proper (PCEPermutation_Type ==> arrow) (Exists_inf P).
   Proof.
   now case_perm_tri;
@@ -155,16 +155,16 @@ Section GPermutationType.
 
   (** ** Properties of [PCPermutation_Type] *)
 
-  Global Instance PCPermutation_Type_refl : Reflexive PCPermutation_Type.
+  #[export] Instance PCPermutation_Type_refl : Reflexive PCPermutation_Type.
   Proof. case_perm; intros l; reflexivity. Qed.
 
-  Global Instance PCPermutation_Type_sym : Symmetric PCPermutation_Type.
+  #[export] Instance PCPermutation_Type_sym : Symmetric PCPermutation_Type.
   Proof. case_perm; intros l l'; now symmetry. Qed.
 
-  Global Instance PCPermutation_Type_trans : Transitive PCPermutation_Type.
+  #[export] Instance PCPermutation_Type_trans : Transitive PCPermutation_Type.
   Proof. case_perm; intros l l' l''; now transitivity l'. Qed.
 
-  Global Instance PCPermutation_Type_equiv : Equivalence PCPermutation_Type.
+  #[export] Instance PCPermutation_Type_equiv : Equivalence PCPermutation_Type.
   Proof.
   split;
   [ apply PCPermutation_Type_refl | apply PCPermutation_Type_sym | apply PCPermutation_Type_trans ].
@@ -204,25 +204,25 @@ Section GPermutationType.
   now case_perm; [ apply Permutation_Type_length_2_inv | apply CPermutation_Type_length_2_inv ].
   Qed.
 
-  Global Instance PCPermutation_Type_in a : Proper (PCPermutation_Type ==> Basics.impl) (In a).
+  #[export] Instance PCPermutation_Type_in a : Proper (PCPermutation_Type ==> Basics.impl) (In a).
   Proof.
   now case_perm; intros l l' HP Hin;
     [ apply Permutation_Type_in with l | apply CPermutation_Type_in with l ].
   Qed.
 
-  Global Instance PCPermutation_Type_Forall (P : A -> Prop) :
+  #[export] Instance PCPermutation_Type_Forall (P : A -> Prop) :
     Proper (PCPermutation_Type ==> Basics.impl) (Forall P).
   Proof. case_perm; [ apply Permutation_Type_Forall | apply CPermutation_Type_Forall ]. Qed.
 
-  Global Instance PCPermutation_Type_Exists (P : A -> Prop) :
+  #[export] Instance PCPermutation_Type_Exists (P : A -> Prop) :
     Proper (PCPermutation_Type ==> Basics.impl) (Exists P).
   Proof. now case_perm; [ apply Permutation_Type_Exists | apply CPermutation_Type_Exists ]. Qed.
 
-  Global Instance PCPermutation_Type_Forall_inf (P : A -> Type) :
+  #[export] Instance PCPermutation_Type_Forall_inf (P : A -> Type) :
     Proper (PCPermutation_Type ==> arrow) (Forall_inf P).
   Proof. case_perm; [ apply Permutation_Type_Forall_inf | apply CPermutation_Type_Forall_inf ]. Qed.
 
-  Global Instance PCPermutation_Type_Exists_inf (P : A -> Type) :
+  #[export] Instance PCPermutation_Type_Exists_inf (P : A -> Type) :
     Proper (PCPermutation_Type ==> arrow) (Exists_inf P).
   Proof.
   now case_perm; [ apply Permutation_Type_Exists_inf | apply CPermutation_Type_Exists_inf ].
@@ -231,26 +231,26 @@ Section GPermutationType.
 
   (** ** Properties of [PEPermutation] *)
 
-  Global Instance PEPermutation_Type_refl : Reflexive PEPermutation_Type.
+  #[export] Instance PEPermutation_Type_refl : Reflexive PEPermutation_Type.
   Proof. now case_perm. Qed.
 
-  Global Instance PEPermutation_Type_sym : Symmetric PEPermutation_Type.
+  #[export] Instance PEPermutation_Type_sym : Symmetric PEPermutation_Type.
   Proof. now case_perm. Qed.
 
-  Global Instance PEPermutation_Type_trans : Transitive PEPermutation_Type.
+  #[export] Instance PEPermutation_Type_trans : Transitive PEPermutation_Type.
   Proof. now case_perm; intros l l' l''; transitivity l'. Qed.
 
-  Global Instance PEPermutation_Type_equiv : Equivalence PEPermutation_Type.
+  #[export] Instance PEPermutation_Type_equiv : Equivalence PEPermutation_Type.
   Proof.
   split;
   [ apply PEPermutation_Type_refl | apply PEPermutation_Type_sym | apply PEPermutation_Type_trans ].
   Qed.
 
-  Global Instance PEPermutation_Type_cons :
+  #[export] Instance PEPermutation_Type_cons :
     Proper (eq ==> PEPermutation_Type ==> PEPermutation_Type) cons.
   Proof. now case_perm; intros x y -> l1 l2 HP; [ apply Permutation_Type_cons | rewrite HP ]. Qed.
 
-  Global Instance PEPermutation_Type_app :
+  #[export] Instance PEPermutation_Type_app :
     Proper (PEPermutation_Type ==> PEPermutation_Type ==> PEPermutation_Type) (@app A).
   Proof. now case_perm; simpl; intros l m HP1 l' m' HP2; [ apply Permutation_Type_app | subst ]. Qed.
 
@@ -299,43 +299,43 @@ Section GPermutationType.
   now apply PEPermutation_Type_vs_elt_inv.
   Qed.
 
-  Global Instance PEPermtutation_Type_in a : Proper (PEPermutation_Type ==> Basics.impl) (In a).
+  #[export] Instance PEPermtutation_Type_in a : Proper (PEPermutation_Type ==> Basics.impl) (In a).
   Proof.
   now case_perm; simpl; intros l l' HP HIn; subst; [ apply Permutation_Type_in with l | ].
   Qed.
 
-  Global Instance PEPermutation_Type_Forall (P : A -> Prop) :
+  #[export] Instance PEPermutation_Type_Forall (P : A -> Prop) :
     Proper (PEPermutation_Type ==> Basics.impl) (Forall P).
   Proof.
   now case_perm; simpl; intros l1 l2 HP HF; subst; [ apply Permutation_Type_Forall with l1 | ].
   Qed.
 
-  Global Instance PEPermutation_Type_Exists (P : A -> Prop) :
+  #[export] Instance PEPermutation_Type_Exists (P : A -> Prop) :
     Proper (PEPermutation_Type ==> Basics.impl) (Exists P).
   Proof.
   now case_perm; simpl; intros l1 l2 HP HF; subst; [ apply Permutation_Type_Exists with l1 | ].
   Qed.
 
-  Global Instance PEPermutation_Type_Forall_inf (P : A -> Type) :
+  #[export] Instance PEPermutation_Type_Forall_inf (P : A -> Type) :
     Proper (PEPermutation_Type ==> arrow) (Forall_inf P).
   Proof.
   now case_perm; simpl; intros l1 l2 HP HF; subst; [ apply Permutation_Type_Forall_inf with l1 | ].
   Qed.
 
-  Global Instance PEPermutation_Type_Exists_inf (P : A -> Type) :
+  #[export] Instance PEPermutation_Type_Exists_inf (P : A -> Type) :
     Proper (PEPermutation_Type ==> arrow) (Exists_inf P).
   Proof.
   now case_perm; simpl; intros l1 l2 HP HF; subst; [ apply Permutation_Type_Exists_inf with l1 | ].
   Qed.
 
-  Global Instance PEPermutation_Type_rev :
+  #[export] Instance PEPermutation_Type_rev :
     Proper (PEPermutation_Type ==> PEPermutation_Type) (@rev A).
   Proof. now case_perm; intros l1 l2 HP; [ apply Permutation_Type_rev' | subst ].  Qed.
 
 
   (** * From [PEPermutation_Type] to [PCPermutation_Type] *)
 
-  Global Instance PEPermutation_PCPermutation_Type_cons :
+  #[export] Instance PEPermutation_PCPermutation_Type_cons :
     Proper (eq ==> PEPermutation_Type ==> PCPermutation_Type) cons.
   Proof.
   intros x y -> l1 l2 HP.
@@ -343,7 +343,7 @@ Section GPermutationType.
   now rewrite HP.
   Qed.
 
-  Global Instance PEPermutation_PCPermutation_Type_app :
+  #[export] Instance PEPermutation_PCPermutation_Type_app :
   Proper (PEPermutation_Type ==> PEPermutation_Type ==> PCPermutation_Type) (@app A).
   Proof.
   intros l1 l1' HPhd l2 l2' HPtl.
@@ -432,15 +432,15 @@ Section MultiGPermutationType.
 
   Variable f : A -> B.
 
-  Global Instance PCEPermutation_Type_map :
+  #[export] Instance PCEPermutation_Type_map :
     Proper (PCEPermutation_Type c ==> PCEPermutation_Type c) (map f).
   Proof. now destruct c; intros l1 l2 ->. Qed.
 
-  Global Instance PCPermutation_Type_map :
+  #[export] Instance PCPermutation_Type_map :
     Proper (PCPermutation_Type b ==> PCPermutation_Type b) (map f).
   Proof. now destruct b; intros l1 l2 ->. Qed.
 
-  Global Instance PEPermutation_Type_map :
+  #[export] Instance PEPermutation_Type_map :
     Proper (PEPermutation_Type b ==> PEPermutation_Type b) (map f).
   Proof. now destruct b; simpl; intros l1 l2 HP; [ apply Permutation_Type_map | subst ]. Qed.
 
