@@ -100,7 +100,7 @@ Proof.
 Qed.
 
 #[export] Instance Permutation_Type_in_inf' :
-  Proper (Logic.eq ==> @Permutation_Type A ==> Basics.arrow) (@In_inf A) | 10.
+  Proper (Logic.eq ==> @Permutation_Type A ==> arrow) (@In_inf A) | 10.
 Proof.
   intros l1 l2 Heq l1' l2' HP Hi ; subst.
   eauto using Permutation_Type_in_inf.

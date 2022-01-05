@@ -1,7 +1,16 @@
 # Versions 2.0.x
 
+## Version 2.0.3
+
+Ongoing development.
+
+* `arrow`
+    * do not export `Program.Basics` in `funtheory` anymore
+    * rely on `Classes.CRelationClasses.arrow` rather than `Program.Basics.arrow` for `Proper` instances in `Type`
+
 ## Version 2.0.2
 
+* add function constructions for `Empty_set` and `option` in `funtheory`
 * adapt to Coq v8.14 and v8.15
     * add locality attributes to `Instance` commands
 

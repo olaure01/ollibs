@@ -173,7 +173,7 @@ rewrite H; reflexivity.
 Qed.
 
 #[export] Instance Permutation_Type_Forall_inf A (P : A -> Type) :
-  Proper ((@Permutation_Type A) ==> Basics.arrow) (Forall_inf P).
+  Proper ((@Permutation_Type A) ==> arrow) (Forall_inf P).
 Proof.
 intros l1 l2 HP.
 induction HP as [ | ? ? ? ? IHP | | ]; intro HF0; auto.
@@ -184,7 +184,7 @@ induction HP as [ | ? ? ? ? IHP | | ]; intro HF0; auto.
 Qed.
 
 #[export] Instance Permutation_Type_Exists_inf A (P : A -> Type) :
-  Proper ((@Permutation_Type A) ==> Basics.arrow) (Exists_inf P).
+  Proper ((@Permutation_Type A) ==> arrow) (Exists_inf P).
 Proof.
 intros l1 l2 HP.
 induction HP as [ | ? ? ? ? IHP | | ]; intro HE0; auto.

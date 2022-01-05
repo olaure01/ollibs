@@ -139,14 +139,14 @@ Section GPermutationType.
   Qed.
 
   Global Instance PCEPermutation_Type_Forall_inf (P : A -> Type) :
-    Proper (PCEPermutation_Type ==> Basics.arrow) (Forall_inf P).
+    Proper (PCEPermutation_Type ==> arrow) (Forall_inf P).
   Proof.
   now case_perm_tri;
     [ apply CPermutation_Type_Forall_inf | intros ? ? -> | apply Permutation_Type_Forall_inf ].
   Qed.
 
   Global Instance PCEPermutation_Type_Exists_inf (P : A -> Type) :
-    Proper (PCEPermutation_Type ==> Basics.arrow) (Exists_inf P).
+    Proper (PCEPermutation_Type ==> arrow) (Exists_inf P).
   Proof.
   now case_perm_tri;
     [ apply CPermutation_Type_Exists_inf | intros ? ? -> | apply Permutation_Type_Exists_inf ].
@@ -219,11 +219,11 @@ Section GPermutationType.
   Proof. now case_perm; [ apply Permutation_Type_Exists | apply CPermutation_Type_Exists ]. Qed.
 
   Global Instance PCPermutation_Type_Forall_inf (P : A -> Type) :
-    Proper (PCPermutation_Type ==> Basics.arrow) (Forall_inf P).
+    Proper (PCPermutation_Type ==> arrow) (Forall_inf P).
   Proof. case_perm; [ apply Permutation_Type_Forall_inf | apply CPermutation_Type_Forall_inf ]. Qed.
 
   Global Instance PCPermutation_Type_Exists_inf (P : A -> Type) :
-    Proper (PCPermutation_Type ==> Basics.arrow) (Exists_inf P).
+    Proper (PCPermutation_Type ==> arrow) (Exists_inf P).
   Proof.
   now case_perm; [ apply Permutation_Type_Exists_inf | apply CPermutation_Type_Exists_inf ].
   Qed.
@@ -317,13 +317,13 @@ Section GPermutationType.
   Qed.
 
   Global Instance PEPermutation_Type_Forall_inf (P : A -> Type) :
-    Proper (PEPermutation_Type ==> Basics.arrow) (Forall_inf P).
+    Proper (PEPermutation_Type ==> arrow) (Forall_inf P).
   Proof.
   now case_perm; simpl; intros l1 l2 HP HF; subst; [ apply Permutation_Type_Forall_inf with l1 | ].
   Qed.
 
   Global Instance PEPermutation_Type_Exists_inf (P : A -> Type) :
-    Proper (PEPermutation_Type ==> Basics.arrow) (Exists_inf P).
+    Proper (PEPermutation_Type ==> arrow) (Exists_inf P).
   Proof.
   now case_perm; simpl; intros l1 l2 HP HF; subst; [ apply Permutation_Type_Exists_inf with l1 | ].
   Qed.

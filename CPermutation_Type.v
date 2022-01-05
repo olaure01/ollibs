@@ -298,7 +298,7 @@ now apply CPermutation_Permutation_Type.
 Qed.
 
 #[export] Instance CPermutation_Type_Forall_inf A (P : A -> Type) :
-  Proper (@CPermutation_Type A ==> Basics.arrow) (Forall_inf P).
+  Proper (@CPermutation_Type A ==> arrow) (Forall_inf P).
 Proof.
 intros l1 l2 HC HF.
 apply Permutation_Type_Forall_inf with l1; auto.
@@ -306,7 +306,7 @@ now apply CPermutation_Permutation_Type.
 Qed.
 
 #[export] Instance CPermutation_Type_Exists_inf A (P : A -> Type) :
-  Proper (@CPermutation_Type A ==> Basics.arrow) (Exists_inf P).
+  Proper (@CPermutation_Type A ==> arrow) (Exists_inf P).
 Proof.
 intros l1 l2 HC HE.
 apply Permutation_Type_Exists_inf with l1; auto.
