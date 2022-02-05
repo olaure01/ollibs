@@ -35,8 +35,7 @@ Ltac perm_Type_rot :=
   cons2app ;
   rewrite <- ? app_assoc ;
   eapply Permutation_Type_trans ;
-    [ apply Permutation_Type_app_rot
-    | instantiate ].
+    [ apply Permutation_Type_app_rot | ].
 
 (** The parameter [20] below is arbitrary:
  the higher, the longer, the more powerful *)
@@ -75,25 +74,20 @@ with perm_Type_run :=
   | H:Permutation_Type _ _ |- Permutation_Type _ _ => apply H
   | H:Permutation_Type ?l1 _ |- Permutation_Type (?l1 ++ _) _
        => eapply Permutation_Type_trans ; 
-          [ apply Permutation_Type_app_tail ; apply H
-          | instantiate ]
+          [ apply Permutation_Type_app_tail ; apply H | ]
   | H:Permutation_Type _ ?l1 |- Permutation_Type (?l1 ++ _) _
        => apply Permutation_Type_sym in H ;
           eapply Permutation_Type_trans ; 
-          [ apply Permutation_Type_app_tail ; apply H
-          | instantiate ]
+          [ apply Permutation_Type_app_tail ; apply H | ]
   | |- Permutation_Type (_ ++ _ ++ _) _ => perm_Type_rot
   | |- Permutation_Type (_ ++ _ ) _ => eapply Permutation_Type_trans ;
-                                  [ apply Permutation_Type_app_comm
-                                  | instantiate ]
+                                  [ apply Permutation_Type_app_comm | ]
   | H:Permutation_Type ?l1 _ |- Permutation_Type ?l1 _
-       => eapply Permutation_Type_trans ; 
-          [ apply H
-          | instantiate ]
+       => eapply Permutation_Type_trans ;
+          [ apply H | ]
   | H:Permutation_Type _ ?l1 |- Permutation_Type ?l1 _
        => apply Permutation_Type_sym in H ;
-          eapply Permutation_Type_trans ; 
-          [ apply H
-          | instantiate ]
+          eapply Permutation_Type_trans ;
+          [ apply H | ]
   | _ => idtac
   end ).

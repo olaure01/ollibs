@@ -889,7 +889,7 @@ Section NatSeq.
    revert start. induction len; simpl; intros start H.
    - inversion_clear H.
      rewrite <- plus_n_O in H1.
-     apply (Lt.lt_irrefl _ (Lt.le_lt_trans _ _ _ H0 H1)).
+     apply (Nat.lt_irrefl _ (Nat.le_lt_trans _ _ _ H0 H1)).
    - destruct H as [H1 H2].
      destruct (le_lt_eq_dec _ _ H1); intuition.
      right; apply IHlen.

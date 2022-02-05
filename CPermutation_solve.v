@@ -11,8 +11,7 @@ Ltac cperm_rot :=
   cons2app ;
   rewrite <- ? app_assoc ;
   eapply CPermutation_trans ;
-    [ apply CPermutation_app_rot
-    | instantiate ].
+    [ apply CPermutation_app_rot | ].
 
 (** The parameter [20] below is arbitrary:
  the higher, the longer, the more powerful *)
@@ -47,18 +46,15 @@ with cperm_run :=
   | H:CPermutation _ _ |- CPermutation _ _ => list_simpl in H ; apply H
   | |- CPermutation (_ ++ _ ++ _) _ => cperm_rot
   | |- CPermutation (_ ++ _ ) _ => eapply CPermutation_trans ;
-                                  [ apply cperm
-                                  | instantiate ]
+                                  [ apply cperm | ]
   | H:CPermutation ?l1 _ |- CPermutation ?l1 _
        => list_simpl in H ;
           eapply CPermutation_trans ;
-          [ apply H
-          | instantiate ]
+          [ apply H | ]
   | H:CPermutation _ ?l1 |- CPermutation ?l1 _
        => list_simpl in H ;
           apply CPermutation_sym in H ;
           eapply CPermutation_trans ;
-          [ apply H
-          | instantiate ]
+          [ apply H | ]
   | _ => idtac
   end ).

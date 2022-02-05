@@ -15,7 +15,7 @@ induction k as [| k IHk]; intros He.
 - destruct IHk as [g Hg].
   + intros x Hk.
     apply He; lia.
-  + destruct (He k (Lt.lt_n_Sn _)) as [y Hy].
+  + destruct (He k (Nat.lt_succ_diag_r _)) as [y Hy].
     exists (fun x => if S x <=? k then g x else y).
     intros x Hl.
     case_eq (S x <=? k); intros Heqb.
@@ -102,11 +102,11 @@ Lemma AFCvec_incdep m (R : nat -> forall n, n < m -> Prop) :
 Proof.
 induction m as [|m IHm]; intros Hext Hinc HI.
 - exists 0; intros n Hn; inversion Hn.
-- assert (forall n H, exists k, R k n (Lt.lt_S _ _ H)) as Hm
+- assert (forall n H, exists k, R k n (Nat.lt_lt_succ_r _ _ H)) as Hm
     by (intros; apply HI).
   apply IHm in Hm.
   + destruct Hm as [k Hk].
-    assert (exists k, R k m (Lt.lt_n_Sn _)) as [k' Hk'] by (apply HI).
+    assert (exists k, R k m (Nat.lt_succ_diag_r _)) as [k' Hk'] by (apply HI).
     exists (S (max k k')).
     intros n Hn; inversion Hn; subst.
     * apply (Hinc _ _ k'); [ | lia ].
