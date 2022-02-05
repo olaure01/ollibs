@@ -278,40 +278,11 @@ Proof.
    inversion_clear 1.
  - (* skip *)
    intros x l1 l2 PE IH. intros. InvAdd_Type; try finish_basic_perms_Type PE.
-   + eapply Permutation_Type_trans ; [ | apply PE ].
-     apply Permutation_Type_Add_inf.
-     assumption.
-   + eapply Permutation_Type_trans ; [ apply PE | ].
-     apply Permutation_Type_sym.
-     apply Permutation_Type_Add_inf.
-     assumption.
-   + constructor. now apply IH.
+   constructor. now apply IH.
  - (* swap *)
    intros x y l1 l2 PE IH. intros. InvAdd_Type; try finish_basic_perms_Type PE.
-   + apply Permutation_Type_skip.
-     eapply Permutation_Type_trans ; [ | apply PE ].
-     apply Permutation_Type_Add_inf.
-     assumption.
-   + apply Permutation_Type_sym.
-     change (y :: x :: l0) with ((y :: nil) ++ x :: l0).
-     apply Permutation_Type_cons_app.
-     apply Permutation_Type_sym.
-     eapply Permutation_Type_trans ; [ | apply PE ].
-     apply Permutation_Type_Add_inf.
-     assumption.
-   + apply Permutation_Type_skip.
-     eapply Permutation_Type_trans ; [ apply PE | ].
-     apply Permutation_Type_sym.
-     apply Permutation_Type_Add_inf.
-     assumption.
-   + change (x :: y :: l0) with ((x :: nil) ++ y :: l0).
-     apply Permutation_Type_cons_app.
-     eapply Permutation_Type_trans ; [ apply PE | ].
-     apply Permutation_Type_sym.
-     apply Permutation_Type_Add_inf.
-     assumption.
-   + eapply Permutation_Type_trans ; [ apply Permutation_Type_swap | ].
-     do 2 constructor. now apply IH.
+   eapply Permutation_Type_trans ; [ apply Permutation_Type_swap | ].
+   do 2 constructor. now apply IH.
  - (* trans *)
    intros l1 l l2 PE IH PE' IH' l1' l2' AD1 AD2.
    assert {l' : list A & Add_inf a l' l } as [l' AD].

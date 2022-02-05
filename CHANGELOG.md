@@ -11,6 +11,8 @@
 * create separated file `inhabited_Type.v`
 * add `option_test`, `Permutation_vs_elt_subst`, `decidable_image` (and associated properties), `in_inf_prod_inv` and `eqb_sym`
 * simplify `cpair_surj` hypothesis in `nattree.v`
+* adapt to Coq v8.16
+    * setoid_rewriting is more powerful (not backward compatible)
 
 ## Version 2.0.2
 
