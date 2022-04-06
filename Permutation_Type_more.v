@@ -128,6 +128,18 @@ apply Permutation_Type_trans with (l3 ++ l ++ l4); [ assumption | ].
 apply Permutation_Type_app_swap_app.
 Qed.
 
+Lemma Permutation_Type_vs_elt_subst A (a : A) l l1 l2 :
+  Permutation_Type l (l1 ++ a :: l2) ->
+  {'(l3, l4) & forall l0, Permutation_Type (l1 ++ l0 ++ l2) (l3 ++ l0 ++ l4) & l = l3 ++ a :: l4 }.
+Proof.
+intros HP.
+destruct (Permutation_Type_vs_elt_inv _ _ _ HP) as [(l', l'') ->].
+exists (l', l''); [ | reflexivity ].
+intros l0.
+apply Permutation_Type_app_inv, (Permutation_Type_app_middle l0) in HP.
+symmetry; assumption.
+Qed.
+
 Lemma Permutation_Type_app_app_inv A (l1 l2 l3 l4 : list A) :
   Permutation_Type (l1 ++ l2) (l3 ++ l4) -> {'(l1', l2', l3', l4') & prod (prod
     (Permutation_Type l1 (l1' ++ l3'))

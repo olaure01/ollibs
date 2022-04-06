@@ -47,6 +47,18 @@ revert l2 l3 l4; induction l1 as [|a l1 IHl1]; intros l2 l3 l4 HP.
   + now constructor.
 Qed.
 
+Lemma Permutation_vs_elt_subst A (a : A) l l1 l2 :
+  Permutation l (l1 ++ a :: l2) -> exists l3 l4,
+    (forall l0, Permutation (l1 ++ l0 ++ l2) (l3 ++ l0 ++ l4)) /\ l = l3 ++ a :: l4.
+Proof.
+intros HP.
+destruct (Permutation_vs_elt_inv _ _ _ HP) as [l' [l'' ->]].
+exists l', l''; split; [ | reflexivity ].
+intros l0.
+apply Permutation_app_inv, (Permutation_app_middle l0) in HP.
+symmetry; assumption.
+Qed.
+
 Lemma Permutation_map_inv_inj A B (f : A -> B) (Hinj : injective f) l1 l2 :
   Permutation (map f l1) (map f l2) -> Permutation l1 l2.
 Proof.

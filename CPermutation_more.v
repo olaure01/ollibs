@@ -41,10 +41,23 @@ dichot_app_exec Hx; dichot_app_exec Hy; subst.
   repeat split; rewrite <- ? app_assoc; apply CPermutation_app_rot.
 Qed.
 
-Lemma CPermutation_map_inv_inj A B : forall f : A -> B, injective f ->
+Lemma CPermutation_vs_elt_subst A (a : A) l l1 l2 :
+  CPermutation l (l1 ++ a :: l2) -> exists l3 l4,
+    (forall l0, CPermutation (l1 ++ l0 ++ l2) (l3 ++ l0 ++ l4)) /\ l = l3 ++ a :: l4.
+Proof.
+intros HP.
+destruct (CPermutation_vs_elt_inv _ _ _ HP) as [l' [l'' [Heq ->]]].
+exists l', l''; split; [ | reflexivity ].
+intros l0.
+etransitivity; [ apply CPermutation_app_comm | ].
+list_simpl; rewrite Heq, app_assoc.
+constructor.
+Qed.
+
+Lemma CPermutation_map_inv_inj A B (f : A -> B) : injective f ->
   forall l1 l2, CPermutation (map f l1) (map f l2) -> CPermutation l1 l2.
 Proof.
-intros f Hi l1 l2 HP; inversion HP as [l3 l4 Heq1 Heq2].
+intros Hi l1 l2 HP; inversion HP as [l3 l4 Heq1 Heq2].
 symmetry in Heq1; symmetry in Heq2.
 decomp_map Heq1; decomp_map Heq2; subst.
 apply map_injective in Heq5; auto.
@@ -52,11 +65,11 @@ apply map_injective in Heq6; auto.
 subst; constructor.
 Qed.
 
-Lemma CPermutation_map_inv_inj_local A B : forall (f : A -> B) l1 l2,
+Lemma CPermutation_map_inv_inj_local A B (f : A -> B) l1 l2 :
   (forall x y, In x l1 -> In y l2 -> f x = f y -> x = y) ->
     CPermutation (map f l1) (map f l2) -> CPermutation l1 l2.
 Proof.
-intros f l1 l2 Hi HP; inversion HP as [l3 l4 Heq1 Heq2].
+intros Hi HP; inversion HP as [l3 l4 Heq1 Heq2].
 symmetry in Heq1; symmetry in Heq2.
 decomp_map Heq1; decomp_map Heq2; subst.
 symmetry in Heq5; symmetry in Heq6.

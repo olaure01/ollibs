@@ -92,6 +92,16 @@ Section GPermutation.
     [ apply CPermutation_length_1_inv | subst | apply Permutation_length_1_inv ].
   Qed.
 
+  Lemma PCEPermutation_vs_elt_subst a l l1 l2 :
+    PCEPermutation l (l1 ++ a :: l2) -> exists l3 l4,
+      (forall l0, PCEPermutation (l1 ++ l0 ++ l2) (l3 ++ l0 ++ l4)) /\ l = l3 ++ a :: l4.
+  Proof.
+  case_perm_tri; intros HP.
+  - apply CPermutation_vs_elt_subst; assumption.
+  - exists l1, l2; split; [ reflexivity | assumption ].
+  - apply Permutation_vs_elt_subst; assumption.
+  Qed.
+
   #[export] Instance PCEPermutation_in a : Proper (PCEPermutation ==> Basics.impl) (In a).
   Proof.
   now case_perm_tri; intros l l' HP Hin;
@@ -159,6 +169,14 @@ Section GPermutation.
   now case_perm; [ apply Permutation_length_2_inv | apply CPermutation_length_2_inv ].
   Qed.
 
+  Lemma PCPermutation_vs_elt_subst a l l1 l2 :
+    PCPermutation l (l1 ++ a :: l2) -> exists l3 l4,
+      (forall l0, PCPermutation (l1 ++ l0 ++ l2) (l3 ++ l0 ++ l4)) /\ l = l3 ++ a :: l4.
+  Proof.
+  case_perm; intros HP;
+    [ apply Permutation_vs_elt_subst | apply CPermutation_vs_elt_subst ]; assumption.
+  Qed.
+
   #[export] Instance PCPermutation_in a : Proper (PCPermutation ==> Basics.impl) (In a).
   Proof.
   now case_perm; intros l l' HP Hin; [ apply Permutation_in with l | apply CPermutation_in with l ].
@@ -221,15 +239,21 @@ Section GPermutation.
     PEPermutation (a1 :: a2 :: nil) l -> l = a1 :: a2 :: nil \/ l = a2 :: a1 :: nil.
   Proof. now case_perm; [ apply Permutation_length_2_inv | left; symmetry ]. Qed.
 
+  Lemma PEPermutation_vs_elt_subst a l l1 l2 :
+    PEPermutation l (l1 ++ a :: l2) -> exists l3 l4,
+      (forall l0, PEPermutation (l1 ++ l0 ++ l2) (l3 ++ l0 ++ l4)) /\ l = l3 ++ a :: l4.
+  Proof.
+  case_perm; intros HP.
+  - apply Permutation_vs_elt_subst; assumption.
+  - exists l1, l2; split; [ reflexivity | assumption ].
+  Qed.
+
   Lemma PEPermutation_vs_elt_inv a l l1 l2 :
     PEPermutation l (l1 ++ a :: l2) -> exists l3 l4,
       PEPermutation (l1 ++ l2) (l3 ++ l4) /\ l = l3 ++ a :: l4.
   Proof.
-  case_perm; intro HP.
-  - destruct (Permutation_vs_elt_inv _ _ _ HP) as (l' & l'' & ->).
-    apply Permutation_app_inv in HP; symmetry in HP.
-    exists l', l''; auto.
-  - exists l1, l2; intuition.
+  intros HP; apply PEPermutation_vs_elt_subst in HP as [l3 [l4 [HP ->]]].
+  exists l3, l4; split; [ apply (HP nil) | reflexivity ].
   Qed.
 
   Lemma PEPermutation_vs_cons_inv a l l1 :
@@ -282,8 +306,8 @@ Section GPermutation.
     exists l', l''; split; auto.
     apply Permutation_app_inv in HP.
     symmetry in HP.
-    etransitivity ; [ eapply Permutation_app_comm | ].
-    etransitivity ; [ eassumption | apply Permutation_app_comm ].
+    etransitivity; [ eapply Permutation_app_comm | ].
+    etransitivity; [ eassumption | apply Permutation_app_comm ].
   - destruct (CPermutation_vs_elt_inv _ _ _ HP) as (l' & l'' & Heq & ->).
     exists l', l''; auto.
   Qed.

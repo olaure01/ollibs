@@ -118,6 +118,17 @@ Section GPermutationType.
     [ apply CPermutation_Type_length_1_inv | subst | apply Permutation_Type_length_1_inv ].
   Qed.
 
+  Lemma PCEPermutation_Type_vs_elt_subst a l l1 l2 :
+    PCEPermutation_Type l (l1 ++ a :: l2) ->
+      {'(l3, l4) & forall l0, PCEPermutation_Type (l1 ++ l0 ++ l2) (l3 ++ l0 ++ l4)
+                 & l = l3 ++ a :: l4 }.
+  Proof.
+  case_perm_tri; intros HP.
+  - apply CPermutation_Type_vs_elt_subst; assumption.
+  - exists (l1, l2); [ reflexivity | assumption ].
+  - apply Permutation_Type_vs_elt_subst; assumption.
+  Qed.
+
   #[export] Instance PCEPermutation_Type_in a : Proper (PCEPermutation_Type ==> Basics.impl) (In a).
   Proof.
   now case_perm_tri; intros l l' HP Hin;
@@ -204,6 +215,15 @@ Section GPermutationType.
   now case_perm; [ apply Permutation_Type_length_2_inv | apply CPermutation_Type_length_2_inv ].
   Qed.
 
+  Lemma PCPermutation_Type_vs_elt_subst a l l1 l2 :
+    PCPermutation_Type l (l1 ++ a :: l2) ->
+      {'(l3, l4) & forall l0, PCPermutation_Type (l1 ++ l0 ++ l2) (l3 ++ l0 ++ l4)
+                 & l = l3 ++ a :: l4 }.
+  Proof.
+  case_perm; intros HP;
+    [ apply Permutation_Type_vs_elt_subst | apply CPermutation_Type_vs_elt_subst ]; assumption.
+  Qed.
+
   #[export] Instance PCPermutation_Type_in a : Proper (PCPermutation_Type ==> Basics.impl) (In a).
   Proof.
   now case_perm; intros l l' HP Hin;
@@ -280,15 +300,22 @@ Section GPermutationType.
     PEPermutation_Type (a1 :: a2 :: nil) l -> {l = a1 :: a2 :: nil} + {l = a2 :: a1 :: nil}.
   Proof. now case_perm; [ apply Permutation_Type_length_2_inv | left; symmetry ]. Qed.
 
+  Lemma PEPermutation_Type_vs_elt_subst a l l1 l2 :
+    PEPermutation_Type l (l1 ++ a :: l2) ->
+      {'(l3, l4) & forall l0, PEPermutation_Type (l1 ++ l0 ++ l2) (l3 ++ l0 ++ l4)
+                 & l = l3 ++ a :: l4 }.
+  Proof.
+  case_perm; intros HP.
+  - apply Permutation_Type_vs_elt_subst; assumption.
+  - exists (l1, l2); [ reflexivity | assumption ].
+  Qed.
+
   Lemma PEPermutation_Type_vs_elt_inv a l l1 l2 :
     PEPermutation_Type l (l1 ++ a :: l2) ->
       {'(l3, l4) & PEPermutation_Type (l1 ++ l2) (l3 ++ l4) & l = l3 ++ a :: l4 }.
   Proof.
-  case_perm; intros HP.
-  - destruct (Permutation_Type_vs_elt_inv _ _ _ HP) as ((l', l'') & ->).
-    apply Permutation_Type_app_inv in HP; symmetry in HP.
-    exists (l', l''); auto.
-  - exists (l1, l2); intuition.
+  intros HP; apply PEPermutation_Type_vs_elt_subst in HP as [(l3, l4) HP ->].
+  exists (l3, l4); [ apply (HP nil) | reflexivity ].
   Qed.
 
   Lemma PEPermutation_Type_vs_cons_inv a l l1 :

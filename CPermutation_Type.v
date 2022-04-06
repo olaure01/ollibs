@@ -88,6 +88,10 @@ refine (CPermutation_Type_trans _ HC).
 apply cperm_Type.
 Qed.
 
+Theorem CPermutation_Type_app_comm A : forall l1 l2 : list A,
+  CPermutation_Type (l1 ++ l2) (l2 ++ l1).
+Proof. apply cperm_Type. Qed.
+
 Lemma CPermutation_Type_app_rot A : forall (l1 : list A) l2 l3,
    CPermutation_Type (l1 ++ l2 ++ l3) (l2 ++ l3 ++ l1).
 Proof.
@@ -191,6 +195,19 @@ apply CPermutation_Type_vs_elt_inv in HC.
 destruct HC as [(l1',l2') H1 H2].
 rewrite app_nil_r in H1 ; subst.
 now exists (l1', l2').
+Qed.
+
+Lemma CPermutation_Type_vs_elt_subst A (a : A) l l1 l2 :
+  CPermutation_Type l (l1 ++ a :: l2) ->
+  {'(l3, l4) & forall l0, CPermutation_Type (l1 ++ l0 ++ l2) (l3 ++ l0 ++ l4) & l = l3 ++ a :: l4 }.
+Proof.
+intros HP.
+destruct (CPermutation_Type_vs_elt_inv _ _ _ HP) as [(l', l'') Heq ->].
+exists (l', l''); [ | reflexivity ].
+intros l0.
+etransitivity; [ apply CPermutation_Type_app_comm | ].
+list_simpl; rewrite Heq, app_assoc.
+constructor.
 Qed.
 
 Lemma CPermutation_Type_app_app_inv A : forall l1 l2 l3 l4 : list A,
