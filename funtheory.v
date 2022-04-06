@@ -15,6 +15,10 @@ end.
 
 Definition option_map A B (f : A -> B) := option_eval_default None (fun x => Some (f x)).
 
+Definition option_test A := @option_eval_default A Prop True.
+
+Definition option_testT A := @option_eval_default A Type unit.
+
 
 (** * Retraction pairs *)
 
