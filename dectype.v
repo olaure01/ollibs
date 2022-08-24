@@ -3,7 +3,8 @@ this is based on records rather than modules (as opposed to stdlib) *)
 
 From Coq Require Import Bool PeanoNat Equalities.
 From Coq Require Eqdep_dec.
-From OLlibs Require Import inhabited_Type.
+From OLlibs Require Export inhabited_Type.
+From OLlibs Require Import funtheory.
 
 Set Implicit Arguments.
 
@@ -14,8 +15,7 @@ Set Implicit Arguments.
 Record DecType := {
   car :> Type;
   eqb : car -> car -> bool;
-  eqb_eq : forall x y, eqb x y = true <-> x = y
-}.
+  eqb_eq : forall x y, eqb x y = true <-> x = y }.
 Arguments eqb [_].
 Arguments eqb_eq [_].
 
@@ -90,8 +90,7 @@ Arguments eq_dt_reflect {_} _ _.
 Definition Empty_set_dectype := {|
   car := Empty_set;
   eqb := fun _ _ => true;
-  eqb_eq := fun a b => match a with end
-|}.
+  eqb_eq := fun a b => match a with end |}.
 
 (** the [unit] instance *)
 Definition unit_dectype := {|
@@ -245,7 +244,7 @@ Definition list_inhdectype (D : DecType) := {|
   inh_dt := inhabited_inf_list D |}.
 
 
-(** Equivalence between [DecType] and [UsualOrderedTypeFull]. *)
+(** Equivalence between [DecType] and [UsualBoolEq]. *)
 
 Module Type ModDecType.
   Parameter DT : DecType.
@@ -274,3 +273,16 @@ Module UsualBoolEq_as_ModDecType (T : UsualBoolEq).
   Module DT := UsualBoolEq_as_DecType T.
   Definition t := DT.to_DecType.
 End UsualBoolEq_as_ModDecType.
+
+
+(** Functions *)
+
+Lemma section_decidable_image A (B : DecType) (f : A -> B) g : retract g f -> decidable_image f.
+Proof.
+intros Hsec y.
+destruct (eq_dt_dec y (f (g y))) as [-> | Hneq].
+- left; exists (g y); reflexivity.
+- right; intros x ->.
+  apply Hneq.
+  rewrite Hsec; reflexivity.
+Qed.

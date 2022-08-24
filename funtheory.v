@@ -1,6 +1,7 @@
 (** Properties of functions *)
 
 From Coq Require Import Program.Basics Relation_Definitions RelationClasses List.
+From OLlibs Require Import inhabited_Type.
 
 Set Implicit Arguments.
 
@@ -47,8 +48,8 @@ Section Function.
   (** Same definition as in standard library [Coq.Sets.Image] *)
   Definition injective := forall x y, f x = f y -> x = y.
 
-  Lemma section_injective : forall g, retract g f -> injective.
-  Proof. intros g Hsec x y Hf; rewrite <- Hsec, Hf; intuition. Qed.
+  Lemma section_injective g : retract g f -> injective.
+  Proof. intros Hsec x y Hf; rewrite <- Hsec, Hf; trivial. Qed.
 
   Lemma injective_NoDup : injective -> forall l, NoDup l -> NoDup (map f l).
   Proof.
@@ -68,7 +69,26 @@ Section Function.
 
   (** ** Surjective functions *)
 
+  Definition decidable_image := forall y, { x | y = f x } + forall x, y <> f x.
+
+  Lemma injective_decidable_image_section : inhabited_inf A -> injective -> decidable_image ->
+    { g & retract g f }.
+  Proof.
+  intros [a] Hi Hd.
+  exists (fun y => match (Hd y) with
+                   | inl (exist _ x _) => x
+                   | _ => a
+                   end).
+  intros x.
+  destruct (Hd (f x)) as [[x' ->%Hi]|Hneq].
+  - reflexivity.
+  - contradiction (Hneq x); reflexivity.
+  Qed.
+
   Definition surjective := forall y, { x | y = f x }.
+
+  Lemma surjective_decidable_image : surjective -> decidable_image.
+  Proof. intros Hs y. left; apply (Hs y). Qed.
 
   Lemma retract_surjective : forall g, retract f g -> surjective.
   Proof. intros g Hr y; exists (g y); rewrite Hr; reflexivity. Qed.
@@ -85,7 +105,7 @@ Section Function.
   Definition bijective :=
     forall y, { x | y = f x & forall x', y = f x' -> x = x' }.
 
-  Lemma bijective_inverse : bijective -> { g : B -> A | retract f g & retract g f }.
+  Lemma bijective_inverse : bijective -> { g | retract f g & retract g f }.
   Proof.
   intros Hbij.
   exists (fun x => proj1_sig (sig_of_sig2 (Hbij x))).
