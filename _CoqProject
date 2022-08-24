@@ -18,6 +18,7 @@ funtheory.v
 GPermutation_Type.v
 GPermutation.v
 infinite.v
+inhabited_Type.v
 List_assoc.v
 List_more.v
 List_Type.v

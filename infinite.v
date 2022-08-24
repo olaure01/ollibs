@@ -2,7 +2,7 @@
 
 From Coq Require Import Bool PeanoNat Lia List.
 From OLlibs Require Import funtheory List_Type.
-From OLlibs Require Export dectype.
+From OLlibs Require Export inhabited_Type dectype.
 
 Set Implicit Arguments.
 
