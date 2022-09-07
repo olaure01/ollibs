@@ -8,6 +8,8 @@ Ongoing development.
     * do not export `Program.Basics` in `funtheory` anymore
     * rely on `Classes.CRelationClasses.arrow` rather than `Program.Basics.arrow` for `Proper` instances in `Type`
 * turn `#[global]` instances into `#[export]` ones
+* rename `wf_prod.v` into `Wf_nat_more.v`
+    * use the non-dependent product order from Coq stdlib (introduced in [PR #14809](https://github.com/coq/coq/pull/14809))
 
 ## Version 2.0.2
 
@@ -20,7 +22,7 @@ Ongoing development.
 * proof scripts more robust with respect to automatically generated names
 * slightly more powerful `unit_vs_elt_inv` tactic
 * adapt to Coq v8.13.0
-    * remove statements about `repeat` (moved into Coq standard library: [PR #12799](https://github.com/coq/coq/pull/12799))
+    * remove statements about `repeat` (moved into Coq stdlib: [PR #12799](https://github.com/coq/coq/pull/12799))
     * add locality attributes to `Hint` commands
 
 

@@ -30,4 +30,4 @@ Permutation_Type_more.v
 Permutation_Type_solve.v
 Permutation_Type.v
 transp_perm.v
-wf_prod.v
+Wf_nat_more.v

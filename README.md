@@ -1,7 +1,7 @@
 # OLlibs
 **Add-ons for the Coq Standard Library**
 
-Working with `Coq 8.14.1`
+Working with `Coq 8.15.2`
 
 [Opam](https://coq.inria.fr/opam-using.html)-based installation procedure:
 
@@ -26,7 +26,7 @@ Manual installation procedure:
 * `List_assoc`      : some operations on association lists
 * `AFC`             : finite versions of the axiom of choice
 * `nattree`         : nat-labelled trees and coding into nat
-* `wf_prod`         : well-founded order on product (application to `nat`)
+* `Wf_nat_more`    : well-founded order on products of `nat`
 
 ## Around Finite Multisets
 
