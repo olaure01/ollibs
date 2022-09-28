@@ -625,6 +625,15 @@ Qed.
           [ left; rewrite e; apply in_inf_prod_aux; assumption | right; auto ] ].
     Qed.
 
+    Lemma in_inf_prod_inv :
+      forall (l:list A)(l':list B)(x:A)(y:B),
+        In_inf (x,y) (list_prod l l') -> In_inf x l * In_inf y l'.
+    Proof.
+      intros l l' x y.
+      induction l as [|a l IHl]; cbn; [easy|].
+      intros [[? [= -> ->]] %in_inf_map_inv|] %in_inf_app_or; tauto.
+    Qed.
+
   End ListPairs.
 
 
