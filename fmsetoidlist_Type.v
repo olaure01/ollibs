@@ -9,6 +9,7 @@ From Coq Require Import CMorphisms List.
 From OLlibs Require Import Permutation_Type.
 
 Set Implicit Arguments.
+Set Default Proof Using "Type".
 
 
 (** * Axiomatization *)

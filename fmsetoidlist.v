@@ -8,6 +8,7 @@ by lists up to permutation. *)
 From Coq Require Import Relation_Definitions Morphisms List Permutation.
 
 Set Implicit Arguments.
+Set Default Proof Using "Type".
 
 
 (** * Axiomatization *)

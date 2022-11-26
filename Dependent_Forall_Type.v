@@ -5,6 +5,7 @@ From Coq Require Import PeanoNat List.
 From OLlibs Require Import List_Type.
 
 Set Implicit Arguments.
+Set Default Proof Using "Type".
 
 
 (** * [In_Forall_inf] *)
@@ -94,7 +95,7 @@ Section Eq_Dec.
 
   Lemma Dependent_Forall_inf_forall (P : A -> Type) Pred l a Pa : forall (Fl : Forall_inf P l),
     Dependent_Forall_inf Pred Fl -> In_Forall_inf a Pa Fl -> Pred a Pa.
-  Proof.
+  Proof using eq_dec.
   intros Fl DFl; revert a Pa;
     induction DFl as [|? ? ? ? ? ? IH]; intros a' Pa' Hin;
     [ inversion Hin | inversion Hin as [He|Heq] ].
@@ -118,7 +119,7 @@ Section Eq_Dec.
 
   Lemma Dependent_Forall_inf_inv (P : A -> Type) Pred a l Pa : forall (Pl : Forall_inf P l),
     Dependent_Forall_inf Pred (Forall_inf_cons a Pa Pl) -> Pred a Pa.
-  Proof.
+  Proof using eq_dec.
   intros Pl DPl; inversion DPl as [| ? ? Pb] ; subst.
   replace Pa with Pb; auto.
   now apply inj_pair2_eq_dec.
@@ -128,7 +129,7 @@ Section Eq_Dec.
     (forall a Pa, Pred a Pa + (Pred a Pa -> False)) ->
     forall l (Fl : Forall_inf P l),
     Dependent_Forall_inf Pred Fl + (Dependent_Forall_inf Pred Fl -> False).
-  Proof.
+  Proof using eq_dec.
   intros dec_Pred l Fl; induction Fl as [|x l p ? [HFl|HFl]].
   - left.
     apply Dependent_Forall_inf_nil.

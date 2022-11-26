@@ -9,6 +9,7 @@ From Coq Require Export List.
 From OLlibs Require Export dectype.
 
 Set Implicit Arguments.
+Set Default Proof Using "Type".
 
 
 (** [remove_assoc] *)

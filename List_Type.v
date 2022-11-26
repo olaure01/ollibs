@@ -30,18 +30,15 @@ Section Facts.
     forall (x y:list A) (a:A),
       x ++ y = [a] -> ((x = []) * (y = [a])) + ((x = [a]) * (y = [])).
   Proof.
-    destruct x as [| a l]; [ destruct y as [| a l] | destruct y as [| a0 l0] ];
-      simpl.
-    intros a H; discriminate H.
-    left; split; auto.
-    right; split; auto.
-    generalize H.
-    generalize (app_nil_r l); intros E.
-    rewrite -> E; auto.
-    intros.
-    injection H as [= H H0].
-    assert ([] = l ++ a0 :: l0) by auto.
-    apply app_cons_not_nil in H1 as [].
+    destruct x as [| a l]; [ destruct y as [| a l] | destruct y as [| a0 l0] ]; cbn.
+    - intros a [=].
+    - left; split; auto.
+    - right; split; [ | reflexivity ].
+      rewrite app_nil_r in H. assumption.
+    - intros.
+      injection H as [= H H0].
+      symmetry in H0.
+      apply app_cons_not_nil in H0 as [].
   Qed.
 
   (** Properties of [In_inf] *)

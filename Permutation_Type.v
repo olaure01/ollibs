@@ -213,7 +213,7 @@ Qed.
 
 #[export] Instance Permutation_Type_length' :
   Proper (@Permutation_Type A ==> Logic.eq) (@length A) | 10.
-Proof Permutation_Type_length.
+Proof. exact Permutation_Type_length. Qed.
 
 Theorem Permutation_Type_ind_bis :
  forall P : list A -> list A -> Prop,
@@ -445,7 +445,7 @@ Qed.
 
 #[export] Instance Permutation_Type_map' :
   Proper (@Permutation_Type A ==> @Permutation_Type B) (map f) | 10.
-Proof Permutation_Type_map.
+Proof. exact Permutation_Type_map. Qed.
 
 End Permutation_map.
 

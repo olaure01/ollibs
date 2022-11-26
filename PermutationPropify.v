@@ -1,8 +1,10 @@
 (** Turn goals involving [Permutation_Type] into similar ones with [Permutation]
 this requires a type with decidable equality
 this allows to solve the goal through the use of rewrite *)
-(* it is not possible directly because of Issue #7675 *)
+(* this is not possible directly with rewrite in Type because of Issue #7675 *)
 (* Issue#7675 is not a problem for PCPermutation_Type, see Issue#12240 *)
+(* TODO more testing should be done in Coq >=8.16 to see how much is solved by #14137 *)
+(* possible remaining troubles being Issue#15436 *)
 
 (* similarly with CPermutation_Type and CPermutation *)
 (* and then  with PCEPermutation_Type and PCEPermutation *)
@@ -16,6 +18,7 @@ From OLlibs Require Import List_Type.
 From OLlibs Require Export Permutation_Type CPermutation_Type GPermutation GPermutation_Type.
 
 Set Implicit Arguments.
+Set Default Proof Using "Type".
 
 
 (** * [Permutation] case *)
@@ -27,7 +30,7 @@ Section Permutation.
   Lemma notF_Permutation_Type_notF_Permutation (l1 l2 : list A) (F : Prop):
     (Permutation_Type l1 l2 -> F) -> Permutation l1 l2 -> F.
   Proof.
-  intros HnP HP; revert HnP; induction HP as [ | | | ? ? ? ? IHP1 ? IHP2]; intros HnP; intuition.
+  intros HnP HP; revert HnP; induction HP as [ | | | ? ? ? ? IHP1 ? IHP2]; intros HnP; [ auto | auto | | ].
   - apply HnP; constructor.
   - apply IHP1; intros IHP1'.
     apply IHP2; intros IHP2'.
@@ -38,18 +41,18 @@ Section Permutation.
     (Permutation_Type l1 l2 -> False) -> ~ Permutation l1 l2.
   Proof. intros HnP HP; now apply (notF_Permutation_Type_notF_Permutation HnP). Qed.
 
-  Section Dec.
+  Section EqDec.
 
-    Hypothesis EqDec : forall x y : A, {x = y} + {x <> y}.
+    Hypothesis eq_dec : forall x y : A, {x = y} + {x <> y}.
 
     Lemma Permutation_Type_dec (l1 l2 : list A):
       Permutation_Type l1 l2 + (Permutation_Type l1 l2 -> False).
-    Proof.
+    Proof using eq_dec.
     revert l2; induction l1 as [|a l1 IHl1]; intros l2.
     - destruct l2.
       + left; constructor.
       + right; apply Permutation_Type_nil_cons.
-    - destruct (in_inf_dec EqDec a l2) as [Hin | Hnin].
+    - destruct (in_inf_dec eq_dec a l2) as [Hin | Hnin].
       + destruct (in_inf_split _ _ Hin) as [(l2', l2'') ->].
         destruct (IHl1 (l2' ++ l2'')) as [HP | HnP]; [left|right].
         * now apply Permutation_Type_cons_app.
@@ -62,12 +65,12 @@ Section Permutation.
 
     Lemma Permutation_Permutation_Type (l1 l2 : list A):
       Permutation l1 l2 -> Permutation_Type l1 l2.
-    Proof.
+    Proof using eq_dec.
     intros HP; destruct (Permutation_Type_dec l1 l2); [ assumption | ].
     exfalso; revert HP; now apply not_Permutation_Type_not_Permutation.
     Qed.
 
-  End Dec.
+  End EqDec.
 
 End Permutation.
 
@@ -86,30 +89,30 @@ Section CPermutation.
     (CPermutation_Type l1 l2 -> False) -> ~ CPermutation l1 l2.
   Proof. intros HnP HP; now apply (notF_CPermutation_Type_notF_CPermutation HnP). Qed.
 
-  Section Dec.
+  Section EqDec.
 
-    Hypothesis EqDec : forall x y : A, {x = y} + {x <> y}.
+    Hypothesis eq_dec : forall x y : A, {x = y} + {x <> y}.
 
     Lemma CPermutation_Type_dec (l1 l2 : list A):
       CPermutation_Type l1 l2 + (CPermutation_Type l1 l2 -> False).
-    Proof.
+    Proof using eq_dec.
     assert (forall k, { n | l2 = skipn n l1 ++ firstn n l1 }
                     + (forall n, n < k -> l2 <> skipn n l1 ++ firstn n l1)) as Hk.
     { intros k; induction k as [|k IHk].
       - right; intros n Hn; inversion Hn.
       - destruct IHk as [[n Hn]|Hnn].
         + left; now exists n.
-        + destruct (list_eq_dec EqDec l2 (skipn k l1 ++ firstn k l1)) as [Hk|Hnk]; [left|right].
+        + destruct (list_eq_dec eq_dec l2 (skipn k l1 ++ firstn k l1)) as [Hk|Hnk]; [left|right].
           * now exists k.
           * intros n Hn; inversion Hn; auto. }
     assert ({ n | l2 = skipn n l1 ++ firstn n l1 }
          + ({ n | l2 = skipn n l1 ++ firstn n l1 } -> False)) as [[n ->] | Hns].
-    { destruct (Hk (S (length l1))) as [Hn|Hnn]; [left|right]; auto.
+    { destruct (Hk (S (length l1))) as [Hn|Hnn]; [now left|right].
       intros [n ->].
       destruct (lt_dec n (length l1)) as [Hlt|Hle].
       - apply (Hnn n); auto.
       - apply Nat.nlt_ge in Hle.
-        apply (Hnn (length l1)); auto.
+        apply (Hnn (length l1)); [ auto | ].
         now rewrite skipn_all, skipn_all2, firstn_all, firstn_all2. }
     - left; apply CPermutation_Type_skipn_firstn.
     - right; intros HP; now apply Hns, CPermutation_Type_split.
@@ -117,12 +120,12 @@ Section CPermutation.
 
     Lemma CPermutation_CPermutation_Type (l1 l2 : list A):
       CPermutation l1 l2 -> CPermutation_Type l1 l2.
-    Proof.
+    Proof using eq_dec.
     intros HP; destruct (CPermutation_Type_dec l1 l2); [ assumption | ].
     exfalso; revert HP; now apply not_CPermutation_Type_not_CPermutation.
     Qed.
 
-  End Dec.
+  End EqDec.
 
 End CPermutation.
 
@@ -140,24 +143,24 @@ Section PCEPermutation.
                   | apply not_Permutation_Type_not_Permutation ].
   Qed.
 
-  Section Dec.
+  Section EqDec.
 
-    Hypothesis EqDec : forall x y : A, {x = y} + {x <> y}.
+    Hypothesis eq_dec : forall x y : A, {x = y} + {x <> y}.
 
     Lemma PCEPermutation_Type_dec c (l1 l2 : list A):
       PCEPermutation_Type c l1 l2 + (PCEPermutation_Type c l1 l2 -> False).
-    Proof.
-    destruct c; [ apply CPermutation_Type_dec | | apply Permutation_Type_dec ]; auto.
-    destruct (list_eq_dec EqDec l1 l2); intuition.
+    Proof using eq_dec.
+    destruct c; [ now apply CPermutation_Type_dec | | now apply Permutation_Type_dec ].
+    destruct (list_eq_dec eq_dec l1 l2); auto.
     Qed.
 
     Lemma PCEPermutation_PCEPermutation_Type c (l1 l2 : list A):
       PCEPermutation c l1 l2 -> PCEPermutation_Type c l1 l2.
-    Proof.
+    Proof using eq_dec.
     now destruct c; [ apply CPermutation_CPermutation_Type | | apply Permutation_Permutation_Type ].
     Qed.
 
-  End Dec.
+  End EqDec.
 
 End PCEPermutation.
 
@@ -175,21 +178,21 @@ Section PCPermutation.
               | apply not_CPermutation_Type_not_CPermutation ].
   Qed.
 
-  Section Dec.
+  Section EqDec.
 
-    Hypothesis EqDec : forall x y : A, {x = y} + {x <> y}.
+    Hypothesis eq_dec : forall x y : A, {x = y} + {x <> y}.
 
     Lemma PCPermutation_Type_dec b (l1 l2 : list A):
       PCPermutation_Type b l1 l2 + (PCPermutation_Type b l1 l2 -> False).
-    Proof. now destruct b; [ apply Permutation_Type_dec | apply CPermutation_Type_dec ]. Qed.
+    Proof using eq_dec. now destruct b; [ apply Permutation_Type_dec | apply CPermutation_Type_dec ]. Qed.
 
     Lemma PCPermutation_PCPermutation_Type b (l1 l2 : list A):
       PCPermutation b l1 l2 -> PCPermutation_Type b l1 l2.
-    Proof.
+    Proof using eq_dec.
     now destruct b; [ apply Permutation_Permutation_Type | apply CPermutation_CPermutation_Type ].
     Qed.
 
-  End Dec.
+  End EqDec.
 
 End PCPermutation.
 
@@ -202,24 +205,24 @@ Section PEPermutation.
 
   Lemma not_PEPermutation_Type_not_PEPermutation b (l1 l2 : list A):
     (PEPermutation_Type b l1 l2 -> False) -> ~ PEPermutation b l1 l2.
-  Proof. destruct b; [ apply not_Permutation_Type_not_Permutation | intuition ]. Qed.
+  Proof. now destruct b; [ apply not_Permutation_Type_not_Permutation | ]. Qed.
 
-  Section Dec.
+  Section EqDec.
 
-    Hypothesis EqDec : forall x y : A, {x = y} + {x <> y}.
+    Hypothesis eq_dec : forall x y : A, {x = y} + {x <> y}.
 
     Lemma PEPermutation_Type_dec b (l1 l2 : list A):
       PEPermutation_Type b l1 l2 + (PEPermutation_Type b l1 l2 -> False).
-    Proof.
-    destruct b; [ apply Permutation_Type_dec | ]; auto.
-    destruct (list_eq_dec EqDec l1 l2); intuition.
+    Proof using eq_dec.
+    destruct b; [ now apply Permutation_Type_dec | ].
+    destruct (list_eq_dec eq_dec l1 l2); auto.
     Qed.
 
     Lemma PEPermutation_PEPermutation_Type b (l1 l2 : list A):
       PEPermutation b l1 l2 -> PEPermutation_Type b l1 l2.
-    Proof. now destruct b; [ apply Permutation_Permutation_Type | ]. Qed.
+    Proof using eq_dec. now destruct b; [ apply Permutation_Permutation_Type | ]. Qed.
 
-  End Dec.
+  End EqDec.
 
 End PEPermutation.
 

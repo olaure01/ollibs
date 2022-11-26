@@ -44,9 +44,7 @@ Section GPermutationType.
 
   Lemma PCPermutation_Type_PCPermutation l1 l2 :
     PCPermutation_Type l1 l2 -> GPermutation.PCPermutation b l1 l2.
-  Proof.
-  case_perm; [ apply Permutation_Type_Permutation | apply CPermutation_Type_CPermutation ].
-  Qed.
+  Proof. case_perm; [ apply Permutation_Type_Permutation | apply CPermutation_Type_CPermutation ]. Qed.
 
   Lemma PEPermutation_Type_PEPermutation l1 l2 :
     PEPermutation_Type l1 l2 -> GPermutation.PEPermutation b l1 l2.

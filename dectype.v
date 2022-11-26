@@ -7,7 +7,7 @@ From OLlibs Require Export inhabited_Type.
 From OLlibs Require Import funtheory.
 
 Set Implicit Arguments.
-
+Set Default Proof Using "Type".
 
 (** * Decidable Types *)
 (** types with a boolean binary predicate equivalent to equality *)
@@ -27,26 +27,25 @@ Section DecTypes.
   Lemma eqb_refl x : eqb x x = true.
   Proof. apply (proj2 (eqb_eq x x) eq_refl). Qed.
 
-  Lemma eqb_sym x y : eqb x y = eqb y x.
-  Proof.
-  case_eq (eqb x y); case_eq (eqb y x); intros Hyx Hxy; trivial.
-  - apply eqb_eq in Hxy; subst; rewrite eqb_refl in Hyx; assumption.
-  - apply eqb_eq in Hyx; subst; rewrite eqb_refl in Hxy; symmetry; assumption.
-  Qed.
-
   Lemma eqb_neq x y : eqb x y = false <-> x <> y.
   Proof.
-  destruct (eqb x y) eqn:Heq; split; intros Hb; [ | | | reflexivity ].
-  - discriminate Hb.
-  - apply eqb_eq in Heq as ->. contradiction Hb; reflexivity.
+  destruct (eqb x y) eqn:Heq; split; intros Hb; [ discriminate Hb | | | reflexivity ].
+  - apply eqb_eq in Heq as ->. contradiction Hb. reflexivity.
   - intros ->. rewrite eqb_refl in Heq. discriminate Heq.
   Qed.
 
+  Lemma eqb_sym x y : eqb x y = eqb y x.
+  Proof.
+  destruct (eqb x y) eqn:Hxy; destruct (eqb y x) eqn:Hyx; [ reflexivity | | | reflexivity ]; exfalso.
+  - apply eqb_eq in Hxy as ->. rewrite eqb_refl in Hyx. discriminate Hyx.
+  - apply eqb_eq in Hyx as ->. rewrite eqb_refl in Hxy. discriminate Hxy.
+  Qed.
+
   Lemma eq_dt_dec x y : {x = y} + {x <> y}.
-  Proof. now case_eq (eqb x y); intros Heq; [ left; apply eqb_eq in Heq | right; apply eqb_neq in Heq ]. Qed.
+  Proof. destruct (eqb x y) eqn:Heq; [ left; apply eqb_eq in Heq | right; apply eqb_neq in Heq ]; assumption. Qed.
 
   Lemma eq_dt_reflect x y : reflect (x = y) (eqb x y).
-  Proof. now case_eq (eqb x y); intros Heq; [ apply ReflectT, eqb_eq | apply ReflectF, eqb_neq ]. Qed.
+  Proof. destruct (eqb x y) eqn:Heq; [ apply ReflectT, eqb_eq | apply ReflectF, eqb_neq ]; assumption. Qed.
 
   Lemma if_eq_dt_dec_refl A x (u v : A) : (if eq_dt_dec x x then u else v) = u.
   Proof. now destruct (eq_dt_dec x x). Qed.
@@ -57,22 +56,22 @@ Section DecTypes.
 
   (** Statements from [Module DecidableEqDep] in [Eqdep_dec] *)
   Lemma eq_rect_eq : forall x (P : X -> Type) p h, p = eq_rect x P p x h.
-  Proof (Eqdep_dec.eq_rect_eq_dec eq_dt_dec).
+  Proof. exact (Eqdep_dec.eq_rect_eq_dec eq_dt_dec). Qed.
 
   Theorem eq_dep_eq : forall (P : X -> Type) x p q, EqdepFacts.eq_dep X P x p x q -> p = q.
-  Proof (EqdepFacts.eq_rect_eq__eq_dep_eq X eq_rect_eq).
+  Proof. exact (EqdepFacts.eq_rect_eq__eq_dep_eq X eq_rect_eq). Qed.
 
   Lemma UIP : forall x y (p q : x = y), p = q.
-  Proof (Eqdep_dec.UIP_dec eq_dt_dec).
+  Proof. exact (Eqdep_dec.UIP_dec eq_dt_dec). Qed.
 
   Lemma UIP_refl : forall x p, p = eq_refl x.
-  Proof (EqdepFacts.UIP__UIP_refl _ UIP).
+  Proof. exact (EqdepFacts.UIP__UIP_refl _ UIP). Qed.
 
   Lemma Streicher_K : forall x (P : x = x -> Prop), P (eq_refl x) -> forall p, P p.
-  Proof (Eqdep_dec.K_dec_type eq_dt_dec).
+  Proof. exact (Eqdep_dec.K_dec_type eq_dt_dec). Qed.
 
   Lemma inj_pairT2 : forall (P : X -> Type) x p q, existT P x p = existT P x q -> p = q.
-  Proof (EqdepFacts.eq_dep_eq__inj_pairT2 X eq_dep_eq).
+  Proof. exact (EqdepFacts.eq_dep_eq__inj_pairT2 X eq_dep_eq). Qed.
 
 End DecTypes.
 
@@ -161,13 +160,12 @@ Section Minus.
   Variable D : DecType.
   Variable d : D.
 
-  Lemma minus_eqb_eq : forall (a b : { z | eqb d z = false }),
-    eqb (proj1_sig a) (proj1_sig b) = true <-> a = b.
+  Lemma minus_eqb_eq (a b : { z | eqb d z = false }) : eqb (proj1_sig a) (proj1_sig b) = true <-> a = b.
   Proof.
-  intros [a Ha] [b Hb]; simpl; split; intros Heq.
-  - apply eqb_eq in Heq; subst.
-    f_equal; apply (@UIP bool_dectype _ _ Ha Hb).
-  - inversion_clear Heq; apply eqb_refl.
+  destruct a as [a Ha], b as [b Hb]. cbn. split; intros Heq.
+  - apply eqb_eq in Heq as ->.
+    f_equal. apply (@UIP bool_dectype _ _ Ha Hb).
+  - inversion_clear Heq. apply eqb_refl.
   Qed.
 
   Definition minus := {|
@@ -185,18 +183,17 @@ Arguments minus {_} _.
 (** a tactic for automatic case analysis on equalities on a [DecType] *)
 Ltac case_analysis :=
 let Heq := fresh "Heq" in
-let Heqeq := fresh "Heqeq" in
 match goal with
-| |- context f [?x =? ?y] => case_eq (x =? y); intros Heq
-| |- context f [?x <? ?y] => case_eq (x <? y); intros Heq
-| |- context f [?x ?= ?y] => case_eq (x ?= y); intros Heq
+| |- context f [?x =? ?y] => destruct (x =? y) eqn:Heq
+| |- context f [?x <? ?y] => destruct (x <? y) eqn:Heq
+| |- context f [?x ?= ?y] => destruct (x ?= y) eqn:Heq
 | |- context f [eqb ?x ?x] => rewrite (eqb_refl x)
 | |- context f [eqb ?x ?y] => case eq_dt_reflect; intros Heq; [ try subst x | ]
 | |- context f [eq_dt_dec ?x ?x] => rewrite (if_eq_dt_dec_refl x)
 | H : ?x <> ?y |- context f [eq_dt_dec ?x ?y] => rewrite (if_eq_dt_dec_neq x y H)
 | H : ?y <> ?x |- context f [eq_dt_dec ?x ?y] => rewrite (if_eq_dt_dec_neq x y (not_eq_sym H))
-| |- context f [eq_dt_dec ?x ?y] => case_eq (eq_dt_dec x y); intros Heq Heqeq; [ try subst x | ]
-end; simpl.
+| |- context f [eq_dt_dec ?x ?y] => destruct (eq_dt_dec x y) eqn:Heq; [ try subst x | ]
+end; cbn.
 
 
 (** * Inhabited Decidable Types *)
@@ -279,8 +276,8 @@ Lemma section_decidable_image A (B : DecType) (f : A -> B) g : retract g f -> de
 Proof.
 intros Hsec y.
 destruct (eq_dt_dec y (f (g y))) as [-> | Hneq].
-- left; exists (g y); reflexivity.
-- right; intros x ->.
+- left. exists (g y). reflexivity.
+- right. intros x ->.
   apply Hneq.
-  rewrite Hsec; reflexivity.
+  rewrite Hsec. reflexivity.
 Qed.

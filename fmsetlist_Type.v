@@ -10,6 +10,7 @@ From Coq Require Import Bool List CMorphisms.
 From OLlibs Require Import BOrders Permutation_Type_more.
 
 Set Implicit Arguments.
+Set Default Proof Using "Type".
 
 
 (** * Axiomatization *)
@@ -24,8 +25,7 @@ Class FinMultiset M A := {
   elts_add : forall a m, Permutation_Type (elts (add a m)) (a :: elts m);
   elts_retract : forall m, fold_right add empty (elts m) = m;
   perm_eq : forall l1 l2, Permutation_Type l1 l2 ->
-                  fold_right add empty l1 = fold_right add empty l2
-}.
+                  fold_right add empty l1 = fold_right add empty l2 }.
 
 (** [Mst] and [Elt] define a finite multiset construction over a type [K]
     if for any [A] in [K], [Mst A] is a finite multiset with elements [Elt A]. *)
