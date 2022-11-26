@@ -631,8 +631,8 @@ Proof. intros Hassoc Hunit; apply fold_right_app_assoc2; [ assumption | apply Hu
 
     Lemma rev_case A (l : list A) : l = nil \/ exists a tl, l = tl ++ a :: nil.
     Proof.
-      induction l using rev_ind; [ left | right ]; auto.
-      now exists x, l.
+      induction l as [|a l] using rev_ind; [ left | right ]; auto.
+      now exists a, l.
     Qed.
 
   Lemma Forall2_length A B (R : A -> B -> Prop) l1 l2 :

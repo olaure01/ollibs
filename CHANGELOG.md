@@ -10,6 +10,7 @@ Ongoing development.
 * turn `#[global]` instances into `#[export]` ones
 * rename `wf_prod.v` into `Wf_nat_more.v`
     * use the non-dependent product order from Coq stdlib (introduced in [PR #14809](https://github.com/coq/coq/pull/14809))
+* simplify `cpair_surj` hypothesis in `nattree.v`
 
 ## Version 2.0.2
 

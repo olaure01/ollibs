@@ -5,7 +5,7 @@ From OLlibs Require Import funtheory.
 
 Set Implicit Arguments.
 
-(* TODO use Cantor pairing from stdlib ?*)
+(* TODO use Cantor pairing from stdlib? *)
 
 
 (** * Coding of pairs of [nat] *)
@@ -30,21 +30,23 @@ intros n; induction n as [|n IHn]; unfold cpair; cbn; intros m n' m' Hc.
   + assert (n = n' /\ m = m') as [-> ->] by (apply IHn; unfold cpair; lia); intuition.
 Qed.
 
-Lemma cpair_surj k : 0 < k -> {'(n, m) | k = cpair n m }.
+Lemma cpair_surj k : {'(n, m) | S k = cpair n m }.
 Proof.
-induction k as [k IH] using (well_founded_induction Wf_nat.lt_wf); intros Hpos.
-rewrite (Nat.div2_odd k) in *; destruct (Nat.odd k); cbn in *.
-- exists (0, Nat.div2 k); cbn; lia.
-- destruct (IH (Nat.div2 k)) as [(n, m) ->]; [ lia | lia | ].
-  exists (S n, m); unfold cpair; cbn; lia.
+induction k as [k IH] using (well_founded_induction Wf_nat.lt_wf).
+rewrite (Nat.div2_odd (S k)) in *; remember (Nat.odd (S k)) as b eqn:Hodd; destruct b; cbn in *.
+- exists (0, Nat.div2 (S k)); cbn; lia.
+- destruct k as [|k]; [inversion Hodd|].
+  destruct (IH (Nat.div2 k)) as [(n, m) ->].
+  + apply Nat.lt_succ_r, Nat.div2_decr; lia.
+  + exists (S n, m); unfold cpair; cbn; lia.
 Qed.
 
-Definition dpair1 k (Hpos : k > 0) := fst (proj1_sig (cpair_surj Hpos)).
-Definition dpair2 k (Hpos : k > 0) := snd (proj1_sig (cpair_surj Hpos)).
+Definition dpair1 k := fst (proj1_sig (cpair_surj k)).
+Definition dpair2 k := snd (proj1_sig (cpair_surj k)).
 
-Lemma cpair_dpair k (Hpos : 0 < k) : k = cpair (dpair1 Hpos) (dpair2 Hpos).
+Lemma cpair_dpair k : S k = cpair (dpair1 k) (dpair2 k).
 Proof.
-assert (Heq := proj2_sig (cpair_surj Hpos)).
+assert (Heq := proj2_sig (cpair_surj k)).
 now rewrite surjective_pairing in Heq.
 Qed.
 
@@ -63,21 +65,18 @@ Qed.
 Lemma pcpair_surj : surjective2 pcpair.
 Proof.
 intros k.
-destruct (cpair_surj (Nat.lt_0_succ k)) as [(n, m) Heq].
+destruct (cpair_surj k) as [(n, m) Heq].
 exists (n, m); unfold pcpair; lia.
 Qed.
 
-Definition pdpair1 k := dpair1 (Nat.lt_0_succ k).
-Definition pdpair2 k := dpair2 (Nat.lt_0_succ k).
+Lemma pcpair_dpair k : k = pcpair (dpair1 k) (dpair2 k).
+Proof. now unfold pcpair; rewrite <- cpair_dpair. Qed.
 
-Lemma pcpair_pdpair k : k = pcpair (pdpair1 k) (pdpair2 k).
-Proof. unfold pcpair, pdpair1, pdpair2; rewrite <- cpair_dpair; lia. Qed.
+Lemma dpair1_pcpair n m : dpair1 (pcpair n m) = n.
+Proof. symmetry; apply (pcpair_inj _ _ _ _ (pcpair_dpair (pcpair n m))). Qed.
 
-Lemma pdpair1_pcpair n m : pdpair1 (pcpair n m) = n.
-Proof. symmetry; apply (pcpair_inj _ _ _ _ (pcpair_pdpair (pcpair n m))). Qed.
-
-Lemma pdpair2_pcpair n m : pdpair2 (pcpair n m) = m.
-Proof. symmetry; apply (pcpair_inj _ _ _ _ (pcpair_pdpair (pcpair n m))). Qed.
+Lemma dpair2_pcpair n m : dpair2 (pcpair n m) = m.
+Proof. symmetry; apply (pcpair_inj _ _ _ _ (pcpair_dpair (pcpair n m))). Qed.
 
 
 (** ** Properties of coding functions *)
@@ -161,8 +160,7 @@ Lemma nattree2nat_surj : surjective nattree2nat.
 Proof.
 intro y; induction y as [[|y] IH] using (well_founded_induction Wf_nat.lt_wf).
 - exists Lnt; reflexivity.
-- assert (0 < S y) as Hlt by lia.
-  destruct (cpair_surj Hlt) as [(n, m) Heq].
+- destruct (cpair_surj y) as [(n, m) Heq].
   destruct (pcpair_surj m) as [(n', m') Heq'].
   assert (m < S y) as Hm by (rewrite Heq; apply cpair_lt_r).
   assert (n' <= pcpair n' m') as Hl by apply pcpair_le_l.
