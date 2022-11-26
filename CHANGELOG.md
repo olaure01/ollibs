@@ -2,14 +2,14 @@
 
 ## Version 2.0.3
 
-Ongoing development.
-
 * `arrow`
     * do not export `Program.Basics` in `funtheory` anymore
     * rely on `Classes.CRelationClasses.arrow` rather than `Program.Basics.arrow` for `Proper` instances in `Type`
 * turn `#[global]` instances into `#[export]` ones
 * rename `wf_prod.v` into `Wf_nat_more.v`
     * use the non-dependent product order from Coq stdlib (introduced in [PR #14809](https://github.com/coq/coq/pull/14809))
+* create separated file `inhabited_Type.v`
+* add `option_test`, `Permutation_vs_elt_subst`, `decidable_image` (and associated properties), `in_inf_prod_inv` and `eqb_sym`
 * simplify `cpair_surj` hypothesis in `nattree.v`
 
 ## Version 2.0.2

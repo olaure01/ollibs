@@ -24,37 +24,34 @@ Section DecTypes.
   Variable X : DecType.
   Implicit Type x y : X.
 
-  Lemma eqb_refl : forall x, eqb x x = true.
-  Proof. intros x; apply (proj2 (eqb_eq x x) eq_refl). Qed.
+  Lemma eqb_refl x : eqb x x = true.
+  Proof. apply (proj2 (eqb_eq x x) eq_refl). Qed.
 
-  Lemma eqb_neq : forall x y, eqb x y = false <-> x <> y.
+  Lemma eqb_sym x y : eqb x y = eqb y x.
   Proof.
-  intros x y; case_eq (eqb x y); intros Heq; split; intros; intuition.
+  case_eq (eqb x y); case_eq (eqb y x); intros Hyx Hxy; trivial.
+  - apply eqb_eq in Hxy; subst; rewrite eqb_refl in Hyx; assumption.
+  - apply eqb_eq in Hyx; subst; rewrite eqb_refl in Hxy; symmetry; assumption.
+  Qed.
+
+  Lemma eqb_neq x y : eqb x y = false <-> x <> y.
+  Proof.
+  case_eq (eqb x y); intros Heq; split; intros; intuition.
   - apply eqb_eq in Heq; subst; intuition.
   - subst; rewrite eqb_refl in Heq; inversion Heq.
   Qed.
 
-  Lemma eq_dt_dec : forall x y, {x = y} + {x <> y}.
-  Proof.
-  intros x y; case_eq (eqb x y); intros Heq; [ left | right ].
-  - now apply eqb_eq in Heq.
-  - now apply eqb_neq in Heq.
-  Qed.
+  Lemma eq_dt_dec x y : {x = y} + {x <> y}.
+  Proof. now case_eq (eqb x y); intros Heq; [ left; apply eqb_eq in Heq | right; apply eqb_neq in Heq ]. Qed.
 
-  Lemma eq_dt_reflect : forall x y, reflect (x = y) (eqb x y).
-  Proof.
-  intros x y; case_eq (eqb x y); intros Heq.
-  - now apply ReflectT, eqb_eq.
-  - now apply ReflectF, eqb_neq.
-  Qed.
+  Lemma eq_dt_reflect x y : reflect (x = y) (eqb x y).
+  Proof. now case_eq (eqb x y); intros Heq; [ apply ReflectT, eqb_eq | apply ReflectF, eqb_neq ]. Qed.
 
-  Lemma if_eq_dt_dec_refl A : forall x (u v : A),
-    (if eq_dt_dec x x then u else v) = u.
-  Proof. intros x u v; now destruct (eq_dt_dec x x). Qed.
+  Lemma if_eq_dt_dec_refl A x (u v : A) : (if eq_dt_dec x x then u else v) = u.
+  Proof. now destruct (eq_dt_dec x x). Qed.
 
-  Lemma if_eq_dt_dec_neq A : forall x y, x <> y -> forall (u v : A),
-    (if eq_dt_dec x y then u else v) = v.
-  Proof. intros x y Hneq u v; now destruct (eq_dt_dec x y). Qed.
+  Lemma if_eq_dt_dec_neq A x y : x <> y -> forall (u v : A), (if eq_dt_dec x y then u else v) = v.
+  Proof. now intros Hneq u v; destruct (eq_dt_dec x y). Qed.
 
 
   (** Statements from [Module DecidableEqDep] in [Eqdep_dec] *)
