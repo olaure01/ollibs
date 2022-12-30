@@ -21,7 +21,7 @@ induction k as [| k IHk]; intros He.
     case_eq (S x <=? k); intros Heqb.
     * apply Nat.leb_le in Heqb.
       now apply Hg; lia.
-    * enough (x = k) by (subst; intuition).
+    * enough (x = k) as -> by assumption.
       case (Nat.compare_spec (S x) k); intros Ho; try lia.
       -- exfalso.
          rewrite <- Ho, Nat.leb_refl in Heqb; inversion Heqb.
@@ -35,17 +35,17 @@ Lemma AFClist A (R : nat -> A -> Prop) l :
     (Forall (fun x => exists k, R k x) l) -> exists k, Forall (R k) l.
 Proof.
 induction l as [|b l IHl]; intros Hinc HF.
-- exists 0; constructor.
+- now exists 0.
 - inversion_clear HF as [ | ? ? HF1 HF2 ].
   apply IHl in HF2.
   + destruct HF1 as [k1 Hk1].
     destruct HF2 as [k2 Hk2].
-    exists (S (max k1 k2)); constructor.
-    * apply (Hinc _ k1); intuition.
+    exists (S (max k1 k2)). apply Forall_cons.
+    * now apply (Hinc _ k1); [ left | | lia ].
     * apply Forall_forall; intros x Hx.
-      apply (Forall_forall _ _) with x in Hk2; intuition.
-      apply Hinc with k2; intuition.
-  + intros ? i; intros; apply Hinc with i; intuition.
+      apply (Forall_forall _ _) with x in Hk2; [ | assumption ].
+      apply Hinc with k2; [ right | | lia ]; assumption.
+  + intros ? i. intros. apply Hinc with i; [ right | | ]; assumption.
 Qed.
 
 Lemma AFCinc (R : nat -> nat -> Prop) :
@@ -54,18 +54,14 @@ Lemma AFCinc (R : nat -> nat -> Prop) :
     exists k, forall n, n < m -> R k n.
 Proof.
 intros Hinc; induction m as [|m IHm]; intros HF.
-- exists 0; intros n Hn; inversion Hn.
-- assert (exists k, R k m) as HS by (apply HF; lia).
-  assert (forall n, n < m -> exists k, R k n) as Hm
-    by (intros; apply HF; lia).
-  apply IHm in Hm.
-  destruct Hm as [k Hk].
-  destruct HS as [k' Hk'].
+- exists 0. intros n Hn. inversion Hn.
+- assert (exists k, R k m) as [k' Hk'] by (apply HF; lia).
+  assert (forall n, n < m -> exists k, R k n) as Hm by (intros; apply HF; lia).
+  apply IHm in Hm as [k Hk].
   exists (S (S (max k k'))).
-  intros n Hlt.
-  inversion_clear Hlt; intuition.
-  + apply Hinc with k'; intuition.
-  + apply Hinc with k; intuition.
+  intros n Hlt. inversion_clear Hlt.
+  + apply (Hinc _ k'); [ assumption | lia ].
+  + apply (Hinc _ k); [ apply Hk | ]; lia.
 Qed.
 
 
@@ -75,24 +71,26 @@ Lemma AFCvec A (R : nat -> A -> Prop) n (l : Vector.t _ n) :
     (Vector.Forall (fun x => exists k, R k x) l) -> exists k, Vector.Forall (R k) l.
 Proof.
 induction l as [| b n l IHl]; intros Hinc HF.
-- exists 0; constructor.
+- exists 0. constructor.
 - inversion HF as [ | ? ? v HF1 HF2 Heq0 [Heq1 Heq] ]; subst.
   apply Eqdep_dec.inj_pair2_eq_dec in Heq; [ | exact Nat.eq_dec ]; subst.
   apply IHl in HF2.
   + destruct HF1 as [k1 Hk1].
     destruct HF2 as [k2 Hk2].
-    exists (S (max k1 k2)); constructor.
-    * apply (Hinc b k1); intuition; constructor.
+    exists (S (max k1 k2)). constructor.
+    * apply (Hinc b k1); [ apply Vector.In_cons_hd | assumption | lia ].
     * revert Hk2; clear - Hinc; induction l; intros HF;
         inversion HF as [ | ? ? v HF1 HF2 Heq0 [Heq1 Heq] ]; 
         try (apply Eqdep_dec.inj_pair2_eq_dec in Heq; [ | exact Nat.eq_dec ]);
         subst; constructor.
-      -- apply Hinc with k2; intuition; constructor; constructor.
-      -- apply IHl; intuition.
+      -- apply Hinc with k2; [ apply Vector.In_cons_tl, Vector.In_cons_hd | assumption | lia ].
+      -- apply IHl; [ intros a i j H ? ? | assumption ].
          inversion H as [ ? v Heq0 [Heq1 Heq] | ? ? v Hin Heq0 [t Heq]]; subst;
            apply Eqdep_dec.inj_pair2_eq_dec in Heq; subst; try exact Nat.eq_dec;
-           apply Hinc with i; intuition; constructor; constructor; assumption.
-  + intros ? i; intros; apply Hinc with i; intuition; now constructor.
+           apply Hinc with i; [ | assumption | lia | | assumption | lia ].
+         ++ apply Vector.In_cons_hd.
+         ++ do 2 apply Vector.In_cons_tl; assumption.
+  + intros ? i; intros; apply Hinc with i; [ apply Vector.In_cons_tl | | lia ]; assumption.
 Qed.
 
 Lemma AFCvec_incdep m (R : nat -> forall n, n < m -> Prop) :

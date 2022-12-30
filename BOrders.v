@@ -74,14 +74,15 @@ Module ModBOrder_as_UsualOrderedTypeFull (B : ModBOrder) : UsualOrderedTypeFull.
 
   Lemma eq_dec x y : {eq x y} + {eq x y -> False}.
   Proof.
-  case_eq (leb x y); case_eq (leb y x); intros Heq1 Heq2.
-  - apply asym in Heq1; subst; intuition.
-  - right; intros Heq; unfold eq in Heq; subst.
-    rewrite Heq1 in Heq2; inversion Heq2.
-  - right; intros Heq; unfold eq in Heq; subst.
-    rewrite Heq1 in Heq2; inversion Heq2.
+  destruct (leb x y) eqn:Heq1; destruct (leb y x) eqn:Heq2.
+  - destruct (asym _ _ Heq1 Heq2).
+    left. reflexivity.
+  - right. intros Heq. unfold eq in Heq. subst.
+    rewrite Heq1 in Heq2. discriminate Heq2.
+  - right. intros Heq. unfold eq in Heq. subst.
+    rewrite Heq1 in Heq2. discriminate Heq2.
   - apply total in Heq1.
-    rewrite Heq1 in Heq2; inversion Heq2.
+    rewrite Heq1 in Heq2. discriminate Heq2.
   Qed.
 
   Definition le x y := is_true (@leb B.t x y).

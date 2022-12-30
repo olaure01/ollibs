@@ -71,8 +71,9 @@ Section In_Forall_inf.
   Lemma In_Forall_inf_to_In_inf l (L : list A) (p : P l) : forall (PL : Forall_inf P L),
     In_Forall_inf p PL -> In_inf l L.
   Proof.
-  intros PL Hin; induction PL; [ inversion Hin | inversion Hin as [He|]]; intuition.
-  now left; inversion He.
+  intros PL Hin; induction PL; [ inversion Hin | inversion Hin as [He|He]].
+  - now left; injection He.
+  - right; apply (IHPL He).
   Qed.
 
 End In_Forall_inf.

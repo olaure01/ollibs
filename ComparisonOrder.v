@@ -24,7 +24,7 @@ Definition eqb (c1 c2 : comparison) :=
   end.
 
 Lemma eqb_eq c1 c2 : eqb c1 c2 = true <-> c1 = c2.
-Proof. destr_comparison; now intuition. Qed.
+Proof. destr_comparison; split; intros H; (reflexivity + discriminate H). Qed.
 
 (** * [le] *)
 
@@ -52,7 +52,7 @@ Lemma Lt_le c : le Lt c.
 Proof. destr_comparison. Qed.
 
 #[export] Instance le_compat : Proper (eq ==> eq ==> iff) le.
-Proof. intuition. Qed.
+Proof. intros a b ->; reflexivity. Qed.
 
 
 (** * [lt] *)
@@ -78,13 +78,15 @@ Lemma lt_trans c1 c2 c3 :
 Proof. destr_comparison. Qed.
 
 #[export] Instance lt_compat : Proper (eq ==> eq ==> iff) lt.
-Proof. intuition. Qed.
+Proof. intros a b ->; reflexivity. Qed.
 
 Lemma lt_total c1 c2 : lt c1 c2 \/ c1 = c2 \/ lt c2 c1.
 Proof. destr_comparison; auto. Qed.
 
 Lemma le_lteq c1 c2 : le c1 c2 <-> lt c1 c2 \/ c1 = c2.
-Proof. destr_comparison; now intuition. Qed.
+Proof.
+destr_comparison; (split; [ intros H | intros [H|H]]); (easy + (now left) + (now right)).
+Qed.
 
 
 (** * [compare] *)
@@ -108,7 +110,7 @@ Definition compare (c1 c2 : comparison) :=
 
 Lemma compare_spec c1 c2 :
   CompareSpec (c1 = c2) (lt c1 c2) (lt c2 c1) (compare c1 c2).
-Proof. destr_comparison; intuition. Qed.
+Proof. now destr_comparison; constructor. Qed.
 
 
 (** * Order structures *)

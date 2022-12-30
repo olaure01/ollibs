@@ -7,6 +7,7 @@ Set Implicit Arguments.
 Import ListNotations.
 Open Scope list_scope.
 
+Local Ltac Tauto.intuition_solver ::= auto with datatypes.
 
 Section Lists.
 

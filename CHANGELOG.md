@@ -1,5 +1,12 @@
 # Versions 2.0.x
 
+## Version 2.0.4
+
+Ongoing development.
+
+* adapt to Coq v8.17.0
+    * clean uses of tactic `intuition`
+
 ## Version 2.0.3
 
 * `arrow`

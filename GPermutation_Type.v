@@ -75,10 +75,10 @@ Section GPermutationType.
   Proof. now case_perm; [ apply CPermutation_Permutation_Type | ]. Qed.
 
   #[export] Instance eq_PCEPermutation_Type : Proper (eq ==> PCEPermutation_Type) id.
-  Proof. case_perm_tri; intuition. Qed.
+  Proof. case_perm_tri; repeat intro; subst; reflexivity. Qed.
 
   #[export] Instance eq_PEPermutation_Type : Proper (eq ==> PEPermutation_Type) id.
-  Proof. case_perm; intuition. Qed.
+  Proof. case_perm; repeat intro; subst; reflexivity. Qed.
 
 
   (** ** Properties of [PCEPermutation_Type] *)

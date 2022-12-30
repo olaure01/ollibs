@@ -53,10 +53,10 @@ Section GPermutation.
   Proof. now case_perm; [ apply CPermutation_Permutation | ]. Qed.
 
   #[export] Instance eq_PCEPermutation : Proper (eq ==> PCEPermutation) id.
-  Proof. case_perm_tri; intuition. Qed.
+  Proof. case_perm_tri; repeat intro; subst; reflexivity. Qed.
 
   #[export] Instance eq_PEPermutation : Proper (eq ==> PEPermutation) id.
-  Proof. case_perm; intuition. Qed.
+  Proof. case_perm; repeat intro; subst; reflexivity. Qed.
 
 
   (** ** Properties of [PCEPermutation] *)

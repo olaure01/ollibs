@@ -36,9 +36,10 @@ Section DecTypes.
 
   Lemma eqb_neq x y : eqb x y = false <-> x <> y.
   Proof.
-  case_eq (eqb x y); intros Heq; split; intros; intuition.
-  - apply eqb_eq in Heq; subst; intuition.
-  - subst; rewrite eqb_refl in Heq; inversion Heq.
+  destruct (eqb x y) eqn:Heq; split; intros Hb; [ | | | reflexivity ].
+  - discriminate Hb.
+  - apply eqb_eq in Heq as ->. contradiction Hb; reflexivity.
+  - intros ->. rewrite eqb_refl in Heq. discriminate Heq.
   Qed.
 
   Lemma eq_dt_dec x y : {x = y} + {x <> y}.

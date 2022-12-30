@@ -449,8 +449,8 @@ revert l1 l2; induction L as [|l' L IHL]; simpl; intros l1 l2 eq.
 - dichot_elt_app_inf_exec eq.
   + now split with (nil, L, l1, l); subst.
   + destruct IHL with l0 l2 as ((((L1, L2), l1'), l2') & (eqb & eqt & eq)); [symmetry ; apply eq1 |].
-    split with ((l' :: L1), L2, l1', l2'); subst; intuition.
-    apply app_assoc.
+    split with ((l' :: L1), L2, l1', l2'); subst.
+    split; [ apply app_assoc | auto ].
 Qed.
 
 Lemma concat_Forall2_inf A B (L : list (list A)) (l : list B) R :
@@ -545,18 +545,18 @@ Lemma Forall2_inf_in_l A B l1 l2 a (R : A -> B -> Type) :
   Forall2_inf R l1 l2 -> In_inf a l1 -> { b & prod (In_inf b l2) (R a b) }.
 Proof.
 intros HF; induction HF as [| x y ? ? ? ? IHF]; intro Hin; inversion Hin.
-- subst; split with y; intuition.
+- subst; split with y. now split; [ left | ].
 - destruct IHF as (b & Hinb & HRab); auto.
-  split with b; intuition.
+  split with b. now split; [ right | ].
 Qed.
 
 Lemma Forall2_inf_in_r A B l1 l2 b (R : A -> B -> Type) :
   Forall2_inf R l1 l2 -> In_inf b l2 -> { a & prod (In_inf a l1) (R a b) }.
 Proof.
 intros HF; induction HF as [| x y ? ? ? ? IHF]; intro Hin; inversion Hin.
-- subst; split with x; intuition.
-- destruct IHF as (a & Hina & HRab); auto.
-  split with a; intuition.
+- subst; split with x. now split; [ left | ].
+- destruct IHF as (a & Hina & HRab); [ assumption | ].
+  split with a. now split; [ right | ].
 Qed.
 
 
