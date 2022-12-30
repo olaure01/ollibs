@@ -248,16 +248,16 @@ Qed.
 Record InfDecType := {
   infcar :> DecType;
   fresh : list infcar -> infcar;
-  fresh_prop : forall l, ~ In (fresh l) l }.
+  fresh_spec : forall l, ~ In (fresh l) l }.
 Arguments fresh {_}.
-Arguments fresh_prop {_}.
+Arguments fresh_spec {_}.
 
 Section InfDecTypes.
 
   Variable X : InfDecType.
 
   Lemma infinite_nat_injective : nat_injective X.
-  Proof. apply choice_nat_injective. exists fresh. apply fresh_prop. Qed.
+  Proof. apply choice_nat_injective. exists fresh. apply fresh_spec. Qed.
 
   (* A list (of length [n]+1) of distinct fresh elements (not in [l]) *)
   Fixpoint freshlist_of_list (l : list X)  n :=
@@ -271,9 +271,9 @@ Section InfDecTypes.
   Lemma freshlist_of_list_fresh l n x : In x (freshlist_of_list l n) -> ~ In x l.
   Proof.
   induction n; cbn; intros [Hin1 | Hin2] Hinl; subst.
-  - exact (fresh_prop _ Hinl).
+  - exact (fresh_spec _ Hinl).
   - assumption.
-  - apply fresh_prop with (freshlist_of_list l n ++ l).
+  - apply fresh_spec with (freshlist_of_list l n ++ l).
     apply in_or_app. right. assumption.
   - apply (IHn Hin2 Hinl).
   Qed.
@@ -295,7 +295,7 @@ Section InfDecTypes.
   Lemma freshlist_of_list_NoDup l n : NoDup (freshlist_of_list l n).
   Proof.
   induction n; cbn; constructor; [ intros [] | constructor | | assumption ].
-  intros Hin. apply fresh_prop with (freshlist_of_list l n ++ l).
+  intros Hin. apply fresh_spec with (freshlist_of_list l n ++ l).
   apply in_or_app. left. assumption.
   Qed.
 
@@ -340,11 +340,11 @@ Arguments Inh_of_InfDecType _ : clear implicits.
 Definition nat_infdectype := {|
   infcar := nat_dectype;
   fresh := (proj1_sig (section_choice (nat_bijective_section (existT _ id (id_bijective)))));
-  fresh_prop := (proj2_sig (section_choice (nat_bijective_section (existT _ id (id_bijective)))));
+  fresh_spec := (proj2_sig (section_choice (nat_bijective_section (existT _ id (id_bijective)))));
 |}.
 (* alternative direct construction *)
 Definition nat_fresh l := S (list_max l).
-Lemma nat_fresh_prop l : ~ In (nat_fresh l) l.
+Lemma nat_fresh_spec l : ~ In (nat_fresh l) l.
 Proof.
 enough (forall n h, ~ In (n + nat_fresh (h ++ l)) l) as Hh
   by (rewrite <- (app_nil_l l) at 1; apply (Hh 0)).
@@ -359,7 +359,7 @@ Qed.
 Definition nat_infdectype := {|
   infcar := nat_dectype;
   fresh := nat_fresh;
-  fresh_prop := nat_fresh_prop
+  fresh_spec := nat_fresh_spec
 |}.
 *)
 
@@ -375,7 +375,7 @@ Definition option_infdectype (D : InfDecType) := {|
   infcar := option_dectype D;
   fresh := (proj1_sig (@nat_injective_choice (option_dectype D)
                       (nat_injective_option infinite_nat_injective)));
-  fresh_prop := (proj2_sig (@nat_injective_choice (option_dectype D)
+  fresh_spec := (proj2_sig (@nat_injective_choice (option_dectype D)
                            (nat_injective_option infinite_nat_injective))); |}.
 (* alternative definition could use: fresh := fun L => Some (fresh (SomeDown L))
                                with: SomeDown := nil => nil
@@ -394,7 +394,7 @@ Definition suml_infdectype (D1 : InfDecType) (D2 : DecType) := {|
   infcar := sum_dectype D1 D2;
   fresh := (proj1_sig (@nat_injective_choice (sum_dectype D1 D2)
                       (nat_injective_suml _ infinite_nat_injective)));
-  fresh_prop := (proj2_sig (@nat_injective_choice (sum_dectype D1 D2)
+  fresh_spec := (proj2_sig (@nat_injective_choice (sum_dectype D1 D2)
                            (nat_injective_suml _ infinite_nat_injective))); |}.
 (* alternative definition could use direct definition of fresh *)
 
@@ -409,7 +409,7 @@ Definition sumr_infdectype (D1 : DecType) (D2 : InfDecType) := {|
   infcar := sum_dectype D1 D2;
   fresh := (proj1_sig (@nat_injective_choice (sum_dectype D1 D2)
                       (nat_injective_sumr _ infinite_nat_injective)));
-  fresh_prop := (proj2_sig (@nat_injective_choice (sum_dectype D1 D2)
+  fresh_spec := (proj2_sig (@nat_injective_choice (sum_dectype D1 D2)
                 (nat_injective_sumr _ infinite_nat_injective))); |}.
 (* alternative definition could use direct definition of fresh *)
 
@@ -425,13 +425,13 @@ Section Prod.
   Proof.
   intros l Hin.
   apply (in_map fst) in Hin.
-  now apply fresh_prop in Hin.
+  now apply fresh_spec in Hin.
   Qed.
 
   Definition prodl_infdectype := {|
     infcar := prod_dectype ID D;
     fresh := prodl_fresh;
-    fresh_prop := notin_prodl_fresh; |}.
+    fresh_spec := notin_prodl_fresh; |}.
 
   Definition prodr_fresh : list (prod D ID) -> prod D ID :=
     fun l => (inhabitant_inf inh_dt, fresh (map snd l)).
@@ -440,13 +440,13 @@ Section Prod.
   Proof.
   intros l Hin.
   apply (in_map snd) in Hin.
-  now apply fresh_prop in Hin.
+  now apply fresh_spec in Hin.
   Qed.
 
   Definition prodr_infdectype := {|
     infcar := prod_dectype D ID;
     fresh := prodr_fresh;
-    fresh_prop := notin_prodr_fresh; |}.
+    fresh_spec := notin_prodr_fresh; |}.
 
 End Prod.
 
@@ -464,5 +464,5 @@ Qed.
 Definition list_infdectype (D : InhDecType) := {|
   infcar := list_dectype D;
   fresh := (proj1_sig (@nat_injective_choice (list_dectype D) (nat_injective_list inh_dt)));
-  fresh_prop := (proj2_sig (@nat_injective_choice (list_dectype D) (nat_injective_list inh_dt))); |}.
+  fresh_spec := (proj2_sig (@nat_injective_choice (list_dectype D) (nat_injective_list inh_dt))); |}.
 (* alternative definition could use: (x : D) : fresh := fun L => x :: concat L *)

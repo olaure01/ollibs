@@ -4,6 +4,7 @@
 
 Ongoing development.
 
+* rename `fresh_prop` into `fresh_spec` in `infinite`
 * adapt to Coq v8.17.0
     * clean uses of tactic `intuition`
 
