@@ -9,6 +9,10 @@ Open Scope list_scope.
 
 Local Ltac Tauto.intuition_solver ::= auto with datatypes.
 
+(* TODO find better place *)
+Definition iffT (A B : Type) := ((A -> B) * (B -> A))%type.
+
+
 Section Lists.
 
   Variable A : Type.

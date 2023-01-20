@@ -625,6 +625,45 @@ Lemma fold_right_app_assoc A f (e : A) l1 l2 :
 Proof. intros Hassoc Hunit; apply fold_right_app_assoc2; [ assumption | apply Hunit ]. Qed.
 
 
+(** ** Tactics for automatic solving *)
+
+Ltac in_solve :=
+  simpl; repeat split;
+  repeat (apply in_or_app; simpl);
+  repeat (
+    repeat match goal with
+    | H : ?P /\ ?Q |- _ => destruct H
+    | H : ?P \/ ?Q |- _ => destruct H
+    end;
+    repeat match goal with
+    | H : In _ _ |- _ => progress simpl in H
+    end;
+    repeat match goal with
+    | H : In _ (_ :: _) |- _ => inversion H
+    end;
+    repeat match goal with
+    | H : In _ _ |- _ => simpl in H; apply in_app_or in H; destruct H
+    end);
+  intuition auto with *; fail.
+
+Ltac Forall_inf_cbn_hyp :=
+  repeat (
+    match goal with
+    | H:Forall_inf _ (_ ++ _) |- _ => let H1 := fresh H in assert (H1 := Forall_inf_app_l _ _ H);
+                                      let H2 := fresh H in assert (H2 := Forall_inf_app_r _ _ H);
+                                      clear H
+    | H:Forall_inf _ (_ :: _) |- _ => inversion H; clear H
+    end).
+Ltac Forall_inf_solve_rec :=
+  match goal with
+  | |- Forall_inf _ (_ ++ _) => apply Forall_inf_app ; Forall_inf_solve_rec
+  | |- Forall_inf _ (_ :: _) => constructor; [ assumption | Forall_inf_solve_rec ]
+  | |- Forall_inf _ nil => constructor
+  | _ => try assumption
+  end.
+Ltac Forall_inf_solve := Forall_inf_cbn_hyp; cbn; Forall_inf_solve_rec; fail.
+
+
 (** misc *)
 
 (* TODO included in PR #11966 submitted, remove once merged and released *)
