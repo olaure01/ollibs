@@ -1,8 +1,7 @@
 (** Add-ons for [List] library:
 Properties of [flat_map]. *)
 
-From OLlibs Require Import funtheory List_more
-                           Permutation_Type_more CPermutation_Type.
+From OLlibs Require Import funtheory List_more Permutation_Type_more CPermutation_Type GPermutation_Type.
 
 Set Implicit Arguments.
 
@@ -407,6 +406,15 @@ dichot_app_inf_exec Heq2; subst.
       -- rewrite 2 flat_map_app; simpl; rewrite flat_map_app; simpl; rewrite (app_assoc l).
          now etransitivity; [ | apply cperm_Type ]; rewrite <- ? app_assoc.
 Qed.
+
+Lemma PCPermutation_Type_app_flat_map b B T (f : B -> T) lw0 L lw l :
+  PCPermutation_Type b lw (l ++ flat_map (fun '(p1,p2) => f p1 :: p2) L) ->
+  {'(L', lw') & prod (L <> nil -> L' <> nil)
+      (prod (lw = lw' ++ flat_map (fun '(p1,p2) => f p1 :: p2) L')
+            (PCPermutation_Type b (lw' ++ flat_map (fun '(p1,p2) => app lw0 p2) L')
+                               (l ++ flat_map (fun '(p1,p2) => app lw0 p2) L))) }.
+Proof. destruct b; [ apply Permutation_Type_app_flat_map | apply CPermutation_Type_app_flat_map ]. Qed.
+
 
 Lemma app_vs_flat_map_cst T (A : T) L l1 l2 :
   l1 ++ l2 = flat_map (cons A) L ->
