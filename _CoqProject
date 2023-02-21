@@ -3,6 +3,7 @@
 issue12394.v
 
 AFC.v
+Bool_more.v
 BOrders.v
 ComparisonOrder.v
 CPermutation_more.v

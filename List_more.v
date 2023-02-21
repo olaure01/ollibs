@@ -94,7 +94,7 @@ Ltac unit_vs_elt_inv H :=
       let Hnil1 := fresh in
       let Hnil2 := fresh in
       symmetry in H; apply elt_eq_unit in H as [H [Hnil1 Hnil2]];
-      (try subst x); (try subst a); rewrite_all Hnil1; rewrite_all Hnil2;
+      (try subst x); (try subst a); rewrite ? Hnil1, ? Hnil2 in *;
       clear Hnil1 Hnil2; (try clear l1); (try clear l2)
   end.
 
