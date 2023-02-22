@@ -477,6 +477,80 @@ Lemma flat_map_map A B C (f : A -> B) (g : B -> list C) l :
   flat_map g (map f l) = flat_map (fun x => g (f x)) l.
 Proof. now intros; rewrite flat_map_concat_map, map_map, <- flat_map_concat_map. Qed.
 
+(** ** [filter] *)
+
+Lemma filter_filter_id A f (l : list A) : filter f (filter f l) = filter f l.
+Proof.
+induction l as [|a l IHl]; [ reflexivity | cbn ].
+destruct (f a) eqn:Hfa; cbn; rewrite ? Hfa, IHl; reflexivity.
+Qed.
+
+Lemma filter_negb_filter A f (l : list A) : filter (fun x => negb (f x)) (filter f l) = nil.
+Proof.
+induction l as [|a l IHl]; [ reflexivity | cbn ].
+destruct (f a) eqn:Hfa; cbn; rewrite ? Hfa, IHl; reflexivity.
+Qed.
+
+Lemma filter_filter_comm A f g (l : list A) : filter f (filter g l) = filter g (filter f l).
+Proof.
+induction l as [|a l IHl]; [ reflexivity | cbn ].
+destruct (f a) eqn:Hfa, (g a) eqn:Hga; cbn; rewrite ? Hfa, ? Hga, IHl; reflexivity.
+Qed.
+
+Lemma forallb_filter A f (l : list A) : forallb f (filter f l) = true.
+Proof.
+induction l as [|a l IHl]; [ reflexivity | cbn ].
+destruct (f a) eqn:Hfa; cbn; [ rewrite Hfa | ]; assumption.
+Qed.
+
+Lemma forallb_true_filter A f (l : list A) : forallb f l = true -> filter f l = l.
+Proof.
+induction l as [|a l IHl]; [ reflexivity | cbn; intros [-> Hb]%andb_prop ]. rewrite (IHl Hb). reflexivity.
+Qed.
+
+Lemma forallb_filter_forallb A f g (l : list A) : forallb f l = true -> forallb f (filter g l) = true.
+Proof.
+induction l as [|a l IHl]; [ reflexivity | cbn; intros [Ha Hf]%andb_true_iff ].
+destruct (g a); cbn; now rewrite ? Ha, IHl.
+Qed.
+
+(** ** [partition] *)
+
+Lemma partition_filter A f (l : list A) : partition f l = (filter f l, filter (fun x => negb (f x)) l).
+Proof.
+induction l as [|a l IHl]; [ reflexivity | cbn ].
+destruct (f a), (partition f l); injection IHl as [= -> ->]; reflexivity.
+Qed.
+
+Lemma partition_incl1 A f (l : list A) : incl (fst (partition f l)) l.
+Proof. rewrite partition_filter. apply incl_filter. Qed.
+
+Lemma partition_incl2 A f (l : list A) : incl (snd (partition f l)) l.
+Proof. rewrite partition_filter. apply incl_filter. Qed.
+
+Lemma forallb_true_partition A f (l : list A) : forallb f l = true -> partition f l = (l, nil).
+Proof.
+intros Hf. rewrite partition_filter.
+rewrite <- (forallb_true_filter f l) at 2 by assumption.
+now rewrite filter_negb_filter, forallb_true_filter.
+Qed.
+
+Lemma partition_app A f (l1 l2 : list A) :
+  partition f (l1 ++ l2) = prod_map2 _ _ _ (@app A) (partition f l1) (partition f l2).
+Proof.
+induction l1 as [|a l1 IHl1]; cbn.
+- destruct (partition f l2); reflexivity.
+- destruct (f a); rewrite IHl1; destruct (partition f l1), (partition f l2); reflexivity.
+Qed.
+
+
+Lemma partition_incl1_inf A f (l : list A) : incl_inf (fst (partition f l)) l.
+Proof. rewrite partition_filter. apply incl_inf_filter. Qed.
+
+Lemma partition_incl2_inf A f (l : list A) : incl_inf (snd (partition f l)) l.
+Proof. rewrite partition_filter. apply incl_inf_filter. Qed.
+
+
 (** ** [Forall] and [Exists] *)
 
 Lemma Forall_map A B (f : A -> B) l :
@@ -495,7 +569,6 @@ induction l as [|b l IHl]; split; intro H.
   + apply IHl.
     now exists l0.
 Qed.
-
 
 (** ** [Forall_inf] *)
 
@@ -539,6 +612,7 @@ induction FL ; simpl.
     destruct (Forall_to_list_support FL) ; reflexivity.
   + rewrite IHFL ; reflexivity.
 Qed.
+
 
 (** ** [Forall2_inf] *)
 

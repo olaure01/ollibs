@@ -107,3 +107,32 @@ revert l2; induction l1; intros l2 Hi HP.
       destruct Hy' as [ Hy' | Hy' ]; apply in_or_app; [left|right]; auto.
       now apply in_cons.
 Qed.
+
+Lemma partition_Permutation A f (l l1 l2 : list A) : partition f l = (l1, l2) -> Permutation l (l1 ++ l2).
+Proof.
+induction l as [|a l IHl] in l1, l2 |- *; cbn; intros Hp.
+- injection Hp as [= <- <-]. reflexivity.
+- destruct (partition f l), (f a); injection Hp as [= <- <-].
+  + apply Permutation_cons, IHl; reflexivity.
+  + apply Permutation_cons_app, IHl. reflexivity.
+Qed.
+
+Lemma Permutation_partition A f (l l' l1 l2 l1' l2' : list A) :
+  Permutation l l' -> partition f l = (l1, l2) -> partition f l' = (l1', l2') ->
+  Permutation l1 l1' /\ Permutation l2 l2'.
+Proof.
+intros HP; induction HP as [ | x l l' HP IHHP | x y l
+                           | l l' l'' HP1 IHHP1 HP2 IHHP2 ] in l1, l2, l1', l2' |- *;
+  cbn; intros Hp1 Hp2.
+- injection Hp1 as [= <- <-]. injection Hp2 as [= <- <-]. split; reflexivity.
+- destruct (partition f l) as [l3 l4], (partition f l') as [l3' l4'], (f x);
+    injection Hp1 as [= <- <-]; injection Hp2 as [= <- <-];
+    destruct (IHHP l3 l4 l3' l4' eq_refl eq_refl); split; now try apply Permutation_cons.
+- destruct (partition f l) as [l3 l4], (f x), (f y);
+    injection Hp1 as [= <- <-]; injection Hp2 as [= <- <-]; split; (reflexivity + apply perm_swap).
+- destruct (partition f l) as [l3 l4], (partition f l') as [l3' l4'],
+           (partition f l'') as [l3'' l4''];
+     injection Hp1 as [= <- <-]; injection Hp2 as [= <- <-];
+     destruct (IHHP1 l3 l4 l3' l4' eq_refl eq_refl);
+     destruct (IHHP2 l3' l4' l3'' l4'' eq_refl eq_refl); split; etransitivity; eassumption.
+Qed.
