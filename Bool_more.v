@@ -1,7 +1,7 @@
 (* TODO submit to stdlib *)
 
 From Coq Require Export Bool.
-From OLlibs Require Import List_Type.
+From OLlibs Require Import Datatypes_more.
 
 Lemma reflect_neg P b : reflect P b -> reflect (not P) (negb b).
 Proof. intros H. now inversion H; constructor. Qed.

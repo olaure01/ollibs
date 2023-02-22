@@ -3,6 +3,7 @@ Usefull tactics and properties apparently missing in the List library. *)
 
 From Coq Require Import PeanoNat.
 From Coq Require Export List.
+From OLlibs Require Import Datatypes_more Bool_more.
 From OLlibs Require Export List_Type.
 Import EqNotations.
 
