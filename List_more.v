@@ -681,3 +681,32 @@ Ltac Forall_inf_solve := Forall_inf_cbn_hyp; cbn; Forall_inf_solve_rec; fail.
     intros HF; induction HF as [|? ? ? ? ? ? IHF]; auto.
     now simpl; rewrite IHF.
   Qed.
+
+
+(** reflect *)
+
+Lemma Forall_forallb_reflect A P f (l : list A) :
+  (forall a, reflect (P a) (f a)) -> reflect (Forall P l) (forallb f l).
+Proof.
+intros Hspec.
+induction l as [|a l IHl]; [ constructor; constructor | cbn ].
+specialize (Hspec a).
+destruct (f a), (forallb f l); inversion Hspec as [Hspect|Hspecf]; inversion IHl as [IHlt|IHlf]; constructor.
+- constructor; assumption.
+- intros HF. apply IHlf. inversion HF. assumption.
+- intros HF. apply Hspecf. inversion HF. assumption.
+- intros HF. apply IHlf. inversion HF. assumption.
+Qed.
+
+Lemma Forall_inf_forallb_reflectT A P f (l : list A) :
+  (forall a, reflectT (P a) (f a)) -> reflectT (Forall_inf P l) (forallb f l).
+Proof.
+intros Hspec.
+induction l as [|a l IHl]; [ constructor; constructor | cbn ].
+specialize (Hspec a).
+destruct (f a), (forallb f l); inversion Hspec as [Hspect|Hspecf]; inversion IHl as [IHlt|IHlf]; constructor.
+- constructor; assumption.
+- intros HF. apply IHlf. inversion HF. assumption.
+- intros HF. apply Hspecf. inversion HF. assumption.
+- intros HF. apply IHlf. inversion HF. assumption.
+Qed.
