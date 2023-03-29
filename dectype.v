@@ -189,9 +189,9 @@ match goal with
 | |- context f [?x ?= ?y] => destruct (x ?= y) eqn:Heq
 | |- context f [eqb ?x ?x] => rewrite (eqb_refl x)
 | |- context f [eqb ?x ?y] => case eq_dt_reflect; intros Heq; [ try subst x | ]
-| |- context f [eq_dt_dec ?x ?x] => rewrite (if_eq_dt_dec_refl x)
-| H : ?x <> ?y |- context f [eq_dt_dec ?x ?y] => rewrite (if_eq_dt_dec_neq x y H)
-| H : ?y <> ?x |- context f [eq_dt_dec ?x ?y] => rewrite (if_eq_dt_dec_neq x y (not_eq_sym H))
+| |- context f [eq_dt_dec ?x ?x] => rewrite (if_eq_dt_dec_refl _ x)
+| H : ?x <> ?y |- context f [eq_dt_dec ?x ?y] => rewrite (if_eq_dt_dec_neq _ H)
+| H : ?y <> ?x |- context f [eq_dt_dec ?x ?y] => rewrite (if_eq_dt_dec_neq _ (not_eq_sym H))
 | |- context f [eq_dt_dec ?x ?y] => destruct (eq_dt_dec x y) eqn:Heq; [ try subst x | ]
 end; cbn.
 
