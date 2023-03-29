@@ -49,6 +49,9 @@ Section Function.
   (** Same definition as in standard library [Coq.Sets.Image] *)
   Definition injective := forall x y, f x = f y -> x = y.
 
+  Lemma injective_neq : injective -> forall x y, x <> y -> f x <> f y.
+  Proof. intros Hi x y Hneq Heq. exact (Hneq (Hi _ _ Heq)). Qed.
+
   Lemma section_injective g : retract g f -> injective.
   Proof. intros Hsec x y Hf. rewrite <- Hsec, Hf, Hsec. reflexivity. Qed.
 

@@ -21,7 +21,7 @@ Proof. intros Hspec1 Hspec2. destruct b1, b2; cbn; constructor; inversion Hspec1
 
 (** * ReflectT *)
 
-Inductive reflectT (P : Type) : bool -> Type :=
+Variant reflectT (P : Type) : bool -> Type :=
   | ReflectTT : P -> reflectT P true
   | ReflectTF : notT P -> reflectT P false.
 #[global] Hint Constructors reflectT : bool.

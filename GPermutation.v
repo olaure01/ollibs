@@ -97,9 +97,9 @@ Section GPermutation.
       (forall l0, PCEPermutation (l1 ++ l0 ++ l2) (l3 ++ l0 ++ l4)) /\ l = l3 ++ a :: l4.
   Proof.
   case_perm_tri; intros HP.
-  - apply CPermutation_vs_elt_subst; assumption.
-  - exists l1, l2; split; [ reflexivity | assumption ].
-  - apply Permutation_vs_elt_subst; assumption.
+  - apply CPermutation_vs_elt_subst, HP.
+  - exists l1, l2; split; [ reflexivity | exact HP ].
+  - apply Permutation_vs_elt_subst, HP.
   Qed.
 
   #[export] Instance PCEPermutation_in a : Proper (PCEPermutation ==> Basics.impl) (In a).

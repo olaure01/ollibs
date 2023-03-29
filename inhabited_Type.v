@@ -4,7 +4,7 @@ Set Implicit Arguments.
 
 (** * Inhabitation *)
 
-Inductive inhabited_inf A : Type := inhabits_inf : A -> inhabited_inf A.
+Variant inhabited_inf A : Type := | inhabits_inf : A -> inhabited_inf A.
 
 Definition inhabitant_inf A (Hinh : inhabited_inf A) := match Hinh with inhabits_inf a => a end.
 
