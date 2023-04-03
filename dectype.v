@@ -272,12 +272,26 @@ End UsualBoolEq_as_ModDecType.
 
 (** Functions *)
 
+Lemma section_coimage_option A (B : DecType) (f : A -> B) g : retract g f ->
+  forall y, { s & forall x, s = Some x <-> y = f x }.
+Proof.
+intros Hr y.
+destruct (eq_dt_dec y (f (g y))) as [-> | Hneq].
+- exists (Some (g y)).
+  intro x. split; intro Heq.
+  + injection Heq as [= ->]. reflexivity.
+  + f_equal. apply (section_injective Hr), Heq.
+- exists None.
+  intro x. split; intro Heq.
+  + discriminate Heq.
+  + contradiction Hneq.
+    subst y. rewrite Hr. reflexivity.
+Qed.
+
 Lemma section_decidable_image A (B : DecType) (f : A -> B) g : retract g f -> decidable_image f.
 Proof.
-intros Hsec y.
-destruct (eq_dt_dec y (f (g y))) as [-> | Hneq].
-- left. exists (g y). reflexivity.
-- right. intros x ->.
-  apply Hneq.
-  rewrite Hsec. reflexivity.
+intros Hr y.
+destruct (section_coimage_option _ Hr y) as [[x|] Hx]; [ left | right ].
+- exists x. apply Hx. reflexivity.
+- intros x ->. discriminate (proj2 (Hx x) eq_refl).
 Qed.
