@@ -2,11 +2,21 @@
 
 ## Version 2.0.4
 
-Ongoing development.
-
-* rename `fresh_prop` into `fresh_spec` in `infinite`
+* rename `fresh_prop` into `fresh_spec`
+* correct arguments in tactic `case_analysis`
+* turn some `_ -> False` into `notT _`
+* add `PCPermutation_Type_app_flat_map`, `injective_neq` and `section_coimage_option`
+* add results on `filter` and `partition`
+* add automatic tactics `in_solve` and `Forall_inf_cbn_hyp` for lists
+* create `Datatypes_more.v`
+    * add `iffT`, `prod_map` and `prod_map2`
+* create `Bool_more.v`
+    * add `reflectT` and associated results
+	* add `reflect_neg`, `Forall_forallb_reflect` and some results from `ssr.ssrbool`
+* integrate material for dealing with [Issue #12394](https://github.com/coq/coq/issues/12394) in file `issue12394.v`
 * adapt to Coq v8.17.0
     * clean uses of tactic `intuition`
+    * remove `Forall2_length` (integrated in the standard library in [PR #15986](https://github.com/coq/coq/pull/15986))
 
 ## Version 2.0.3
 
@@ -35,7 +45,6 @@ Ongoing development.
 * adapt to Coq v8.13.0
     * remove statements about `repeat` (moved into Coq stdlib: [PR #12799](https://github.com/coq/coq/pull/12799))
     * add locality attributes to `Hint` commands
-
 
 ## Version 2.0.0
 

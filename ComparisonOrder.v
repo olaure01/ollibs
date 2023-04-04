@@ -52,7 +52,7 @@ Lemma Lt_le c : le Lt c.
 Proof. destr_comparison. Qed.
 
 #[export] Instance le_compat : Proper (eq ==> eq ==> iff) le.
-Proof. intros a b ->; reflexivity. Qed.
+Proof. intros a b ->. reflexivity. Qed.
 
 
 (** * [lt] *)
@@ -71,22 +71,19 @@ Definition lt (c1 c2 : comparison) :=
   end.
 
 Lemma lt_irrefl c : ~ lt c c.
-Proof. destr_comparison; auto. Qed.
+Proof. now destr_comparison. Qed.
 
-Lemma lt_trans c1 c2 c3 :
-  lt c1 c2 -> lt c2 c3 -> lt c1 c3.
+Lemma lt_trans c1 c2 c3 : lt c1 c2 -> lt c2 c3 -> lt c1 c3.
 Proof. destr_comparison. Qed.
 
 #[export] Instance lt_compat : Proper (eq ==> eq ==> iff) lt.
-Proof. intros a b ->; reflexivity. Qed.
+Proof. intros a b ->. reflexivity. Qed.
 
 Lemma lt_total c1 c2 : lt c1 c2 \/ c1 = c2 \/ lt c2 c1.
 Proof. destr_comparison; auto. Qed.
 
 Lemma le_lteq c1 c2 : le c1 c2 <-> lt c1 c2 \/ c1 = c2.
-Proof.
-destr_comparison; (split; [ intros H | intros [H|H]]); (easy + (now left) + (now right)).
-Qed.
+Proof. destr_comparison; (split; [ intros H | intros [H|H]]); (easy + (now left) + (now right)). Qed.
 
 
 (** * [compare] *)
@@ -108,8 +105,7 @@ Definition compare (c1 c2 : comparison) :=
           end
   end.
 
-Lemma compare_spec c1 c2 :
-  CompareSpec (c1 = c2) (lt c1 c2) (lt c2 c1) (compare c1 c2).
+Lemma compare_spec c1 c2 : CompareSpec (c1 = c2) (lt c1 c2) (lt c2 c1) (compare c1 c2).
 Proof. now destr_comparison; constructor. Qed.
 
 
@@ -117,18 +113,10 @@ Proof. now destr_comparison; constructor. Qed.
 
 (* Class structure *)
 #[export] Instance le_preorder : PreOrder le.
-Proof.
-split.
-- intros c; apply le_refl.
-- intros c1 c2 c3; apply le_trans.
-Qed.
+Proof. split; intro; [ apply le_refl | apply le_trans ]. Qed.
 
 #[export] Instance lt_strorder : StrictOrder lt.
-Proof.
-split.
-- intros c; apply lt_irrefl.
-- intros c1 c2 c3; apply lt_trans.
-Qed.
+Proof. split; intro; [ apply lt_irrefl | apply lt_trans ]. Qed.
 
 (* Module structure *)
 Module ComparisonOrd <: UsualDecidableTypeFull <: OrderedTypeFull <: TotalOrder.

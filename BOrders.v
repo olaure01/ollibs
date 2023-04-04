@@ -14,8 +14,8 @@ Class BOrder := {
   leb : brelation car;
   total a b : leb a b = false -> leb b a = true;
   asym a b : leb a b = true -> leb b a = true -> a = b;
-  trans a b c : leb a b = true -> leb b c = true -> leb a c = true}.
-Coercion car : BOrder >-> Sortclass.
+  trans a b c : leb a b = true -> leb b c = true -> leb a c = true }.
+Coercion car : BOrder >-> Sortclass. (* TODO integrate as [car :> Type] when avalaible for coercion *)
 
 (** ** Equivalence with [UsualOrderedTypeFull] *)
 Module Type ModBOrder.

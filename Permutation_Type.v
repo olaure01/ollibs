@@ -421,9 +421,11 @@ Qed.
 Lemma Permutation_Type_NoDup_inf l l' : Permutation_Type l l' -> NoDup_inf l -> NoDup_inf l'.
 Proof.
  induction 1; auto.
- * inversion_clear 1; constructor; eauto using Permutation_Type_in_inf.
- * inversion_clear 1 as [|? ? H1 H2]. inversion_clear H2; simpl in *.
-   constructor. simpl; intuition. constructor; intuition.
+ - inversion_clear 1; constructor; eauto using Permutation_Type_in_inf.
+ - inversion_clear 1 as [|? ? H1 H2]. inversion_clear H2; simpl in *.
+   constructor.
+   + intros [|]; auto.
+   + constructor; auto.
 Qed.
 
 #[export] Instance Permutation_Type_NoDup_inf' :

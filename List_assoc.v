@@ -27,14 +27,13 @@ Section RemoveAssoc.
     remove eq_dt_dec x (map fst L) = map fst (remove_assoc L).
   Proof.
   induction L as [|a L IHL]; simpl; [ reflexivity | rewrite IHL ]; destruct a; simpl.
-  repeat case_analysis; intuition.
-  exfalso; intuition.
+  now repeat case_analysis; [ | exfalso | ].
   Qed.
 
   Lemma remove_assoc_notin L y a:
     x <> y -> In (y, a) L -> In (y, a) (remove_assoc L).
   Proof.
-  intros; apply filter_In; split; auto.
+  intros; apply filter_In; split; [ assumption | ].
   now apply negb_true_iff, eqb_neq.
   Qed.
 
@@ -47,10 +46,10 @@ Section RemoveAssoc.
   Proof.
   induction L as [|a L IHL]; simpl; intros Hnd; [ constructor | destruct a ].
   inversion_clear Hnd as [| ? ? Hnin Hnd2 ].
-  case_analysis; intuition.
-  constructor; try intros Hin; intuition.
+  case_analysis; [ auto | ].
+  constructor; try intros Hin; [ | auto ].
   apply snd_remove_assoc in Hin.
-  now apply Hnin.
+  apply Hnin, Hin.
   Qed.
 
   Lemma NoDup_remove_assoc_in L y i :
@@ -58,21 +57,20 @@ Section RemoveAssoc.
     In (y, i) (remove_assoc L).
   Proof.
   intros Hnd Hin1 Hin2.
-  apply remove_assoc_notin; [ | apply snd_remove_assoc in Hin2; intuition ].
-  intros Heq; symmetry in Heq; subst.
-  revert Hnd Hin1 Hin2; clear; induction L as [|(t1, t2) L IHL]; simpl; [ intuition | ].
-  intros Hnd Hin1; inversion Hnd as [| ? ? Hnin Hnd2]; case_analysis; intros Hin2.
-  - symmetry in Heq; subst.
-    apply IHL; intuition.
-    exfalso; inversion H; subst.
-    apply Hnin.
-    now apply snd_remove_assoc in Hin2.
+  apply remove_assoc_notin; [ | apply snd_remove_assoc in Hin2; exact Hin1 ].
+  intros <-.
+  revert Hnd Hin1 Hin2. clear. induction L as [|(t1, t2) L IHL]; simpl; [ trivial | ].
+  intros Hnd Hin1. inversion Hnd as [| ? ? Hnin Hnd2]; case_analysis; intros Hin2.
+  - subst.
+    apply IHL; [ assumption | | assumption ].
+    destruct Hin1 as [[= ->]|]; [ | assumption ].
+    contradiction Hnin.
+    apply snd_remove_assoc in Hin2. exact Hin2.
   - destruct Hin2 as [ Heq' | Hin2 ]; subst.
-    + destruct Hin1 as [ Hin1 | Hin1 ].
-      * inversion Hin1; subst; intuition.
-      * apply Hnin; now apply in_map with (f:= snd) in Hin1.
-    + apply IHL in Hin2; destruct Hin1 as [Heq'|Hin1]; intuition.
-      exfalso; apply Heq; now inversion Heq'.
+    + destruct Hin1 as [ [= ->] | Hin1 ].
+      * contradiction.
+      * apply Hnin. apply in_map with (f:= snd) in Hin1. exact Hin1.
+    + apply IHL in Hin2; destruct Hin1 as [[= ->]|Hin1]; auto; exfalso; auto.
   Qed.
 
 End RemoveAssoc.

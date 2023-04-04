@@ -411,17 +411,17 @@ Qed.
 Lemma Permutation_Type_list_sum l1 l2 :
   Permutation_Type l1 l2 -> list_sum l1 = list_sum l2.
 Proof.
-unfold list_sum; intros HP; induction HP; simpl; intuition.
+unfold list_sum. intros HP. induction HP; simpl; [ auto | auto | | ].
 - apply Nat.add_shuffle3.
-- now rewrite IHHP1.
+- etransitivity; eassumption.
 Qed.
 
 Lemma Permutation_Type_list_max l1 l2 :
   Permutation_Type l1 l2 -> list_max l1 = list_max l2.
 Proof.
-unfold list_max; intros HP; induction HP; simpl; intuition.
-- now rewrite ? Nat.max_assoc, (Nat.max_comm x y).
-- now rewrite IHHP1.
+unfold list_max. intros HP. induction HP; simpl; [ auto | auto | | ].
+- rewrite ? Nat.max_assoc, (Nat.max_comm x y). reflexivity.
+- etransitivity; eassumption.
 Qed.
 
 Lemma partition_Permutation_Type A f (l l1 l2 : list A) :
@@ -438,7 +438,7 @@ Lemma Permutation_Type_partition A f (l l' l1 l2 l1' l2' : list A) :
   Permutation_Type l l' -> partition f l = (l1, l2) -> partition f l' = (l1', l2') ->
   Permutation_Type l1 l1' * Permutation_Type l2 l2'.
 Proof.
-intros HP; induction HP as [ | x l l' HP IHHP | x y l
+intros HP. induction HP as [ | x l l' HP IHHP | x y l
                            | l l' l'' HP1 IHHP1 HP2 IHHP2 ] in l1, l2, l1', l2' |- *;
   cbn; intros Hp1 Hp2.
 - injection Hp1 as [= <- <-]. injection Hp2 as [= <- <-]. split; reflexivity.
