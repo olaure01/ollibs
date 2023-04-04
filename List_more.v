@@ -749,13 +749,6 @@ Ltac Forall_inf_solve := Forall_inf_cbn_hyp; cbn; Forall_inf_solve_rec; fail.
       now exists a, l.
     Qed.
 
-  Lemma Forall2_length A B (R : A -> B -> Prop) l1 l2 :
-    Forall2 R l1 l2 -> length l1 = length l2.
-  Proof.
-    intros HF; induction HF as [|? ? ? ? ? ? IHF]; auto.
-    now simpl; rewrite IHF.
-  Qed.
-
 
 (** reflect *)
 
