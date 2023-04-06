@@ -35,7 +35,7 @@ Section In_Forall_inf.
     exists Pa. right. assumption.
   Qed.
 
-  Lemma In_Forall_inf_in l a (Fl : Forall_inf P l) : In_inf a l -> { Pa : P a & In_Forall_inf Pa Fl }.
+  Lemma In_Forall_inf_in l a (Fl : Forall_inf P l) : InT a l -> { Pa : P a & In_Forall_inf Pa Fl }.
   Proof.
   induction l as [|b l IHl] in a, Fl |- *; intros Hin; inversion Hin; subst.
   - remember (a :: l) as l' eqn:Heql'.
@@ -65,7 +65,7 @@ Section In_Forall_inf.
     = Forall_inf_sum f Pl1 + Forall_inf_sum f Pl2.
   Proof. induction Pl1 as [| ? ? ? ? IHPl1]; [ reflexivity | ]. simpl. rewrite IHPl1. apply Nat.add_assoc. Qed.
 
-  Lemma In_Forall_inf_to_In_inf l (L : list A) (p : P l) (PL : Forall_inf P L) : In_Forall_inf p PL -> In_inf l L.
+  Lemma In_Forall_inf_InT l (L : list A) (p : P l) (PL : Forall_inf P L) : In_Forall_inf p PL -> InT l L.
   Proof.
   intros Hin. induction PL; [ inversion Hin | inversion Hin as [He|]]; [ left | right; auto ].
   injection He as [= ->]. reflexivity.

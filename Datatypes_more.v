@@ -10,6 +10,8 @@ match o with
 | None => False
 end.
 
+(* TODO make it universe polymorphic: cf CRelationClasses.iffT *)
+(* TODO put in Logic rather than Datatypes ? *)
 Definition iffT (A B : Type) := ((A -> B) * (B -> A))%type.
 
 Definition prod_map A B (f : A -> B) p :=

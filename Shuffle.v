@@ -307,7 +307,7 @@ induction l as [|a l IHl] in l1, l2 |- *; intro Hp.
   destruct (f a), (partition f l); cbn in *; injection Hp as [= <- <-]; constructor; apply IHl; reflexivity.
 Qed.
 
-Lemma elements_in_shuffle A (l1 l2 l3 : list A) :
+Lemma in_shuffle A (l1 l2 l3 : list A) :
   shuffle l1 l2 l3 -> forall a, In a l1 \/ In a l2 <-> In a l3.
 Proof.
 intro s. induction s as [ | x l' l'' l''' s IHs | x l' l'' l''' s IHs ]; intro a; split; cbn.

@@ -138,7 +138,7 @@ destruct l1 as [|x [|y l1]].
 - left. left. rewrite app_nil_r. reflexivity.
 - left. right. injection Heq1 as [= -> ->]. reflexivity.
 - injection Heq1 as [= -> -> Heq].
-  apply app_eq_unit_inf in Heq as [[-> ->]|[-> ->]].
+  apply app_eq_unitT in Heq as [[-> ->]|[-> ->]].
   + right. reflexivity.
   + left. left. reflexivity.
 Qed.

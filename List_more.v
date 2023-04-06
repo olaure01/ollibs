@@ -137,7 +137,7 @@ Ltac decomp_unit_eq_elt H :=
       clear Hnil1 Hnil2; (try clear l1); (try clear l2)
   end.
 
-Lemma trichot_app_inf A (l1 l2 l3 l4 : list A) : l1 ++ l2 = l3 ++ l4 ->
+Lemma trichot_appT A (l1 l2 l3 l4 : list A) : l1 ++ l2 = l3 ++ l4 ->
     { l2' | l2' <> nil & l1 ++ l2' = l3 /\ l2 = l2' ++ l4 }
   + ((l1 = l3) * (l2 = l4))
   + { l4' | l4' <> nil & l1 = l3 ++ l4' /\ l4' ++ l2 = l4 }.
@@ -153,11 +153,11 @@ induction l1 as [|b l1 IHl1] in l2, l3, l4 |- *; induction l3 as [|c l3 IHl3] in
   + now right; exists l4'.
 Qed.
 
-Lemma dichot_app_eq_app_inf A (l1 l2 l3 l4 : list A) : l1 ++ l2 = l3 ++ l4 ->
+Lemma dichot_app_eq_appT A (l1 l2 l3 l4 : list A) : l1 ++ l2 = l3 ++ l4 ->
      { l2' | l1 ++ l2' = l3 & l2 = l2' ++ l4 }
    + { l4' | l1 = l3 ++ l4' & l4' ++ l2 = l4 }.
 Proof.
-intros [[[l2' Hnil [<- ->]]|[-> ->]]|[l4' Hnil [-> <-]]]%trichot_app_inf.
+intros [[[l2' Hnil [<- ->]]|[-> ->]]|[l4' Hnil [-> <-]]]%trichot_appT.
 - left. exists l2'; reflexivity.
 - left. exists nil; list_simpl; reflexivity.
 - right. exists l4'; reflexivity.
@@ -165,7 +165,7 @@ Qed.
 
 #[local] Ltac decomp_app_eq_app_core H p :=
   match type of H with
-  | _ ++ _ = _ ++ _ => apply dichot_app_eq_app_inf in H as p
+  | _ ++ _ = _ ++ _ => apply dichot_app_eq_appT in H as p
   end.
 Tactic Notation "decomp_app_eq_app" hyp(H) "as" simple_intropattern(p) := decomp_app_eq_app_core H p.
 Tactic Notation "decomp_app_eq_app" hyp(H) :=
@@ -201,7 +201,7 @@ Tactic Notation "decomp_elt_eq_app" hyp(H) :=
   let H2 := fresh H in
   decomp_elt_eq_app_core H ipattern:([[l H1 H2]|[l H1 H2]]).
 
-Lemma trichot_elt_app_inf A l1 (a : A) l2 l3 l4 l5 : l1 ++ a :: l2 = l3 ++ l4 ++ l5 ->
+Lemma trichot_elt_appT A l1 (a : A) l2 l3 l4 l5 : l1 ++ a :: l2 = l3 ++ l4 ++ l5 ->
      { l2' | l1 ++ a :: l2' = l3 & l2 = l2' ++ l4 ++ l5 }
    + {'(l3', l4') | l1 = l3 ++ l3' & l3' ++ a :: l4' = l4 /\ l2 = l4' ++ l5 }
    + { l5' | l1 = l3 ++ l4 ++ l5' & l5' ++ a :: l2 = l5 }.
@@ -225,9 +225,9 @@ Qed.
 
 #[local] Ltac decomp_elt_eq_app_app_core H p :=
   match type of H with
-  | _ ++ _ :: _ = _ ++ _ ++ _ => apply trichot_elt_app_inf in H as p
+  | _ ++ _ :: _ = _ ++ _ ++ _ => apply trichot_elt_appT in H as p
   | _ ++ _ ++ _ = _ ++ _ :: _ => simple apply eq_sym in H;
-                                 apply trichot_elt_app_inf in H as p
+                                 apply trichot_elt_appT in H as p
   end.
 Tactic Notation "decomp_elt_eq_app_app" hyp(H) "as" simple_intropattern(p) :=
   decomp_elt_eq_app_app_core H p.
@@ -238,7 +238,7 @@ Tactic Notation "decomp_elt_eq_app_app" hyp(H) :=
   let H2 := fresh H in
   decomp_elt_eq_app_app_core H ipattern:([[[l1 H1 H2] | [[l1 l2] H1 [H2 H3]] ] | [l2 H1 H2] ]).
 
-Lemma trichot_elt_elt_inf A l1 (a : A) l2 l3 b l4 : l1 ++ a :: l2 = l3 ++ b :: l4 ->
+Lemma trichot_elt_eltT A l1 (a : A) l2 l3 b l4 : l1 ++ a :: l2 = l3 ++ b :: l4 ->
      { l2' | l1 ++ a :: l2' = l3 & l2 = l2' ++ b :: l4 }
    + { l1 = l3 /\ a = b /\ l2 = l4 }
    + { l4' | l1 = l3 ++ b :: l4' & l4' ++ a :: l2 = l4 }.
@@ -253,7 +253,7 @@ Qed.
 #[local] Ltac decomp_elt_eq_elt_core H p :=
   match type of H with
   | ?lh ++ _ :: ?lr = ?l1 ++ ?x :: ?l2 =>
-      apply trichot_elt_elt_inf in H as p;
+      apply trichot_elt_eltT in H as p;
         [ try subst l1; try subst lr
         | try subst x; try subst l1; try subst l2
         | try subst l2; try subst lh ]
@@ -409,7 +409,7 @@ Ltac decomp_map_eq H :=
                         let l2 := fresh "l" in
                         let H1 := fresh H in
                         let H2 := fresh H in
-                        apply map_eq_app_inf in H as [(l1, l2) [-> [H1 H2]]];
+                        apply map_eq_appT in H as [(l1, l2) -> [H1 H2]];
                         assert (H := I); (* protect name [H] *)
                         decomp_map_eq H1; decomp_map_eq H2;
                         clear H; assert (H := conj H1 H2); clear H1 H2
@@ -417,7 +417,7 @@ Ltac decomp_map_eq H :=
                         let l2 := fresh "l" in
                         let H1 := fresh H in
                         let H2 := fresh H in
-                        apply map_eq_cons_inf in H as [(x, l2) [-> [H1 H2]]];
+                        apply map_eq_consT in H as [(x, l2) -> [H1 H2]];
                         assert (H := I); (* protect name [H] *)
                         decomp_map_eq H2;
                         clear H; assert (H := conj H1 H2); clear H1 H2
@@ -564,11 +564,11 @@ induction l1 as [|a l1 IHl1]; cbn.
 - destruct (f a); rewrite IHl1; destruct (partition f l1), (partition f l2); reflexivity.
 Qed.
 
-Lemma partition_incl1_inf A f (l : list A) : incl_inf (fst (partition f l)) l.
-Proof. rewrite partition_as_filter. apply incl_inf_filter. Qed.
+Lemma partition_incl1T A f (l : list A) : inclT (fst (partition f l)) l.
+Proof. rewrite partition_as_filter. apply inclT_filter. Qed.
 
-Lemma partition_incl2_inf A f (l : list A) : incl_inf (snd (partition f l)) l.
-Proof. rewrite partition_as_filter. apply incl_inf_filter. Qed.
+Lemma partition_incl2T A f (l : list A) : inclT (snd (partition f l)) l.
+Proof. rewrite partition_as_filter. apply inclT_filter. Qed.
 
 
 (** ** [incl] *)
@@ -686,7 +686,7 @@ Qed.
 (** ** [Forall2_inf] *)
 
 Lemma Forall2_inf_in_l A B (R : A -> B -> Type) l1 l2 a :
-  Forall2_inf R l1 l2 -> In_inf a l1 -> { b & In_inf b l2 & R a b }.
+  Forall2_inf R l1 l2 -> InT a l1 -> { b & InT b l2 & R a b }.
 Proof.
 intro HF. induction HF as [| x y ? ? ? ? IHF]; intros [].
 - subst. now split with y; [ left | ].
@@ -695,7 +695,7 @@ intro HF. induction HF as [| x y ? ? ? ? IHF]; intros [].
 Qed.
 
 Lemma Forall2_inf_in_r A B (R : A -> B -> Type) l1 l2 b :
-  Forall2_inf R l1 l2 -> In_inf b l2 -> { a & In_inf a l1 & R a b }.
+  Forall2_inf R l1 l2 -> InT b l2 -> { a & InT a l1 & R a b }.
 Proof.
 intro HF. induction HF as [| x y ? ? ? ? IHF]; intros [].
 - subst. now split with x; [ left | ].

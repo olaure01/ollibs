@@ -179,8 +179,8 @@ Section InfiniteDec.
   Proof.
   intro l1. induction l1 as [|a l1 IHl1]; cbn; intros l2 Hnd Hl; [ exfalso; lia | ].
   destruct (in_dec eq_dt_dec a l2) as [Hin|].
-  - apply NoDup_NoDup_inf in Hnd.
-    inversion_clear Hnd as [ | ? ? Hnin%notin_inf_notin Hnd2%NoDup_inf_NoDup ].
+  - apply NoDup_NoDupT in Hnd.
+    inversion_clear Hnd as [ | ? ? Hnin%notT_inT_not_in Hnd2%NoDupT_NoDup ].
     apply IHl1 with (remove eq_dt_dec a l2) in Hnd2 as [b Hb Hnb].
     + exists b.
       * right. assumption.

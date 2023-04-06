@@ -310,8 +310,8 @@ induction l as [|a l IHl] in l1, l2 |- *; intro Hp.
   destruct (f a), (partition f l); cbn in *; injection Hp as [= <- <-]; constructor; apply IHl; reflexivity.
 Qed.
 
-Lemma elements_in_shuffleT A (l1 l2 l3 : list A) :
-  shuffleT l1 l2 l3 -> forall a, iffT (In_inf a l1 + In_inf a l2) (In_inf a l3).
+Lemma inT_shuffleT A (l1 l2 l3 : list A) :
+  shuffleT l1 l2 l3 -> forall a, iffT (InT a l1 + InT a l2) (InT a l3).
 Proof.
 intro s. induction s as [ | x l' l'' l''' s IHs | x l' l'' l''' s IHs ]; intro a; split; cbn.
 - intros [[] | []].
@@ -328,20 +328,20 @@ Proof. intro s. induction s; constructor; assumption. Qed.
 Lemma shuffleT_sublist_r A (l1 l2 l3 : list A) : shuffleT l1 l2 l3 -> sublist l2 l3.
 Proof. intro s. induction s; constructor; assumption. Qed.
 
-Lemma NoDup_inf_shuffleT_l A (l1 l2 l3 : list A) : shuffleT l1 l2 l3 -> NoDup_inf l3 -> NoDup_inf l1.
+Lemma NoDupT_shuffleT_l A (l1 l2 l3 : list A) : shuffleT l1 l2 l3 -> NoDupT l3 -> NoDupT l1.
 Proof.
 intro s. induction s as [ | x l' l'' l''' s IHs | x l' l'' l''' s IHs ]; intro Hnd.
 - constructor.
 - inversion Hnd. subst.
   constructor.
   + intro Hin.
-    apply Permutation_Type_shuffleT, (Permutation_Type_in_inf x) in s.
+    apply Permutation_Type_shuffleT, (Permutation_Type_inT x) in s.
     * contradiction s.
-    * apply in_inf_or_app. left. assumption.
+    * apply inT_or_app. left. assumption.
   + apply IHs. assumption.
 - inversion Hnd. subst.
   apply IHs. assumption.
 Qed.
 
-Lemma NoDup_inf_shuffleT_r A (l1 l2 l3 : list A) : shuffleT l1 l2 l3 -> NoDup_inf l3 -> NoDup_inf l2.
-Proof. intros Hs%shuffleT_comm. exact (NoDup_inf_shuffleT_l Hs). Qed.
+Lemma NoDupT_shuffleT_r A (l1 l2 l3 : list A) : shuffleT l1 l2 l3 -> NoDupT l3 -> NoDupT l2.
+Proof. intros Hs%shuffleT_comm. exact (NoDupT_shuffleT_l Hs). Qed.

@@ -1,3 +1,12 @@
+# Versions 2.1.x
+
+## Version 2.1.0
+
+* use names ending with `T` rather than `_Type` or `_inf`
+* use `iffT` for equivalence statements in `Type`
+* use `notT` for negation in `Type`
+
+
 # Versions 2.0.x
 
 ## Version 2.0.8
