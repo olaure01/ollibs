@@ -1,5 +1,9 @@
 # Versions 2.0.x
 
+## Version 2.0.5
+
+Ongoing development.
+
 ## Version 2.0.4
 
 * rename `fresh_prop` into `fresh_spec`

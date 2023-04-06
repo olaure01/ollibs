@@ -16,8 +16,8 @@ Manual installation procedure:
 
 ## Extensions of Standard Library
 
-* `Bool_more`       : add-ons for standard library List
-* `Datatypes_more`  : add-ons for standard library List
+* `Bool_more`       : add-ons for standard library Bool
+* `Datatypes_more`  : add-ons for standard library Datatypes
 * `List_more`       : add-ons for standard library List
 * `funtheory`       : properties of functions
 * `dectype`         : types with decidable/Boolean equality (using records rather than modules)
