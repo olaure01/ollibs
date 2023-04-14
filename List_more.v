@@ -77,16 +77,15 @@ Ltac cons2app_all := cons2app_hyps ; cons2app.
 
 (** ** Decomposition of lists and [list] equalities *)
 
-Lemma decomp_length_plus A (l : list A) n m :
+Lemma decomp_length_add A (l : list A) n m :
     length l = n + m ->
-    {'(l1, l2) | length l1 = n /\ length l2 = m /\ l = l1 ++ l2 }.
+    {'(l1, l2) | length l1 = n /\ length l2 = m & l = l1 ++ l2 }.
 Proof.
 revert l m; induction n as [| n IHn]; intros l m Heq.
 - split with (nil, l); auto.
 - destruct l as [|a l]; inversion Heq as [Heq2].
-  specialize (IHn l m Heq2) as ((l1, l2) & Heql1 & Heql2 & HeqL).
-  split with (a :: l1, l2).
-  now repeat split; simpl; subst.
+  specialize (IHn l m Heq2) as [(l1, l2) [<- <-] ->].
+  split with (a :: l1, l2); [ split | ]; reflexivity.
 Qed.
 
 Ltac unit_vs_elt_inv H := 
