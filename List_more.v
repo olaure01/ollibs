@@ -496,13 +496,15 @@ induction l as [|a l IHl]; [ reflexivity | cbn ].
 destruct (f a) eqn:Hfa, (g a) eqn:Hga; cbn; rewrite ? Hfa, ? Hga, IHl; reflexivity.
 Qed.
 
+(* TODO remove in Coq 8.18: included in PR #17027 *)
 Lemma forallb_filter A f (l : list A) : forallb f (filter f l) = true.
 Proof.
 induction l as [|a l IHl]; [ reflexivity | cbn ].
 destruct (f a) eqn:Hfa; cbn; [ rewrite Hfa | ]; assumption.
 Qed.
 
-Lemma forallb_true_filter A f (l : list A) : forallb f l = true -> filter f l = l.
+(* TODO remove in Coq 8.18: included in PR #17027 *)
+Lemma forallb_filter_id A f (l : list A) : forallb f l = true -> filter f l = l.
 Proof.
 induction l as [|a l IHl]; [ reflexivity | cbn; intros [-> Hb]%andb_prop ]. rewrite (IHl Hb). reflexivity.
 Qed.
@@ -515,23 +517,24 @@ Qed.
 
 (** ** [partition] *)
 
-Lemma partition_filter A f (l : list A) : partition f l = (filter f l, filter (fun x => negb (f x)) l).
+(* TODO remove in Coq 8.18: included in PR #17027 *)
+Lemma partition_as_filter A f (l : list A) : partition f l = (filter f l, filter (fun x => negb (f x)) l).
 Proof.
 induction l as [|a l IHl]; [ reflexivity | cbn ].
 destruct (f a), (partition f l); injection IHl as [= -> ->]; reflexivity.
 Qed.
 
 Lemma partition_incl1 A f (l : list A) : incl (fst (partition f l)) l.
-Proof. rewrite partition_filter. apply incl_filter. Qed.
+Proof. rewrite partition_as_filter. apply incl_filter. Qed.
 
 Lemma partition_incl2 A f (l : list A) : incl (snd (partition f l)) l.
-Proof. rewrite partition_filter. apply incl_filter. Qed.
+Proof. rewrite partition_as_filter. apply incl_filter. Qed.
 
 Lemma forallb_true_partition A f (l : list A) : forallb f l = true -> partition f l = (l, nil).
 Proof.
-intros Hf. rewrite partition_filter.
-rewrite <- (forallb_true_filter f l) at 2 by assumption.
-now rewrite filter_negb_filter, forallb_true_filter.
+intros Hf. rewrite partition_as_filter.
+rewrite <- (forallb_filter_id f l) at 2 by assumption.
+now rewrite filter_negb_filter, forallb_filter_id.
 Qed.
 
 Lemma partition_app A f (l1 l2 : list A) :
@@ -542,12 +545,11 @@ induction l1 as [|a l1 IHl1]; cbn.
 - destruct (f a); rewrite IHl1; destruct (partition f l1), (partition f l2); reflexivity.
 Qed.
 
-
 Lemma partition_incl1_inf A f (l : list A) : incl_inf (fst (partition f l)) l.
-Proof. rewrite partition_filter. apply incl_inf_filter. Qed.
+Proof. rewrite partition_as_filter. apply incl_inf_filter. Qed.
 
 Lemma partition_incl2_inf A f (l : list A) : incl_inf (snd (partition f l)) l.
-Proof. rewrite partition_filter. apply incl_inf_filter. Qed.
+Proof. rewrite partition_as_filter. apply incl_inf_filter. Qed.
 
 
 (** ** [Forall] and [Exists] *)
