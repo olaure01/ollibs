@@ -48,11 +48,9 @@ Proof.
 intros l1 l2 l3 HC1 HC2.
 inversion HC1 ; inversion HC2 ; subst.
 apply dichot_app_inf in H1.
-destruct H1 as [[l2' [Hl1 Hl2]] | [l4' [Hr1 Hr2]]] ; subst.
-- rewrite <- app_assoc, app_assoc.
-  apply cperm_Type.
-- rewrite <- app_assoc, (app_assoc l6).
-  apply cperm_Type.
+destruct H1 as [[l2' <- ->] | [l4' -> <-]].
+- rewrite <- app_assoc, app_assoc. apply cperm_Type.
+- rewrite <- app_assoc, (app_assoc l6). apply cperm_Type.
 Qed.
 
 #[export] Instance CPermutation_Type_equiv A : Equivalence (@CPermutation_Type A).
@@ -346,7 +344,7 @@ revert l2; induction HP; intros l2' HF; inversion HF; subst.
     * now rewrite app_nil_l in HF; simpl; rewrite app_nil_r.
   + apply Forall2_inf_app_inv_l in X0 as [(la, lb) [HF1 HF2] ->].
     exists (lb ++ y :: la).
-    * rewrite app_comm_cons; constructor.
+    * rewrite app_comm_cons. constructor.
     * apply Forall2_inf_app; auto.
 Qed.
 
@@ -373,7 +371,7 @@ Lemma CPermutation_Type_map_inv_inj_local A B : forall (f : A -> B) l1 l2,
   (forall x y, In x l1 -> In y l2 -> f x = f y -> x = y) ->
     CPermutation_Type (map f l1) (map f l2) -> CPermutation_Type l1 l2.
 Proof.
-intros f l1 l2 Hi HP; inversion HP as [l3 l4 Heq1 Heq2].
+intros f l1 l2 Hi HP. inversion HP as [l3 l4 Heq1 Heq2].
 symmetry in Heq1; symmetry in Heq2.
 decomp_map_inf Heq1; decomp_map_inf Heq2; subst.
 symmetry in Heq5; symmetry in Heq6.

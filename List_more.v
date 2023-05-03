@@ -16,13 +16,13 @@ Set Implicit Arguments.
 
 Ltac list_simpl :=
   repeat (
-    repeat simpl ;
+    repeat simpl;
     rewrite <- ? app_assoc, <- ? app_comm_cons, ? app_nil_r;
     rewrite <- ? map_rev, ? rev_involutive, ? rev_app_distr, ? rev_unit;
     rewrite ? map_app, ? flat_map_app).
 Ltac list_simpl_hyp H :=
   repeat (
-    repeat simpl in H ;
+    repeat simpl in H;
     rewrite <- ? app_assoc, <- ? app_comm_cons, ? app_nil_r in H;
     rewrite <- ? map_rev, ? rev_involutive, ? rev_app_distr, ? rev_unit in H;
     rewrite ? map_app, ? flat_map_app in H).
@@ -61,7 +61,7 @@ Ltac cons2app_hyp H :=
       | nil => fail
       | _ =>  rewrite (cons_is_app x l) in H
            (* one could prefer
-                 change (cons x l) with (app (cons x nil) l) in 
+                 change (cons x l) with (app (cons x nil) l) in H
               which leads to simpler generated term
               but does work not with existential variables *)
       end
@@ -69,20 +69,19 @@ Ltac cons2app_hyp H :=
 Tactic Notation "cons2app" "in" hyp(H) := cons2app_hyp H.
 Ltac cons2app_hyps :=
   match goal with
-  | H : _ |- _ => cons2app in H ; revert H ; cons2app_hyps ; intro H
+  | H : _ |- _ => cons2app in H; revert H; cons2app_hyps; intro H
   | _ => idtac
   end.
-Ltac cons2app_all := cons2app_hyps ; cons2app.
+Ltac cons2app_all := cons2app_hyps; cons2app.
 
 
 (** ** Decomposition of lists and [list] equalities *)
 
-Lemma decomp_length_add A (l : list A) n m :
-    length l = n + m ->
-    {'(l1, l2) | length l1 = n /\ length l2 = m & l = l1 ++ l2 }.
+Lemma decomp_length_add A (l : list A) n m : length l = n + m ->
+  {'(l1, l2) | length l1 = n /\ length l2 = m & l = l1 ++ l2 }.
 Proof.
-revert l m; induction n as [| n IHn]; intros l m Heq.
-- split with (nil, l); auto.
+induction n as [| n IHn] in l, m |- *; intro Heq.
+- now split with (nil, l).
 - destruct l as [|a l]; inversion Heq as [Heq2].
   specialize (IHn l m Heq2) as [(l1, l2) [<- <-] ->].
   split with (a :: l1, l2); [ split | ]; reflexivity.
@@ -98,8 +97,7 @@ Ltac unit_vs_elt_inv H :=
       clear Hnil1 Hnil2; (try clear l1); (try clear l2)
   end.
 
-Lemma dichot_app A (l1 l2 l3 l4 : list A) :
-  l1 ++ l2 = l3 ++ l4 ->
+Lemma dichot_app A (l1 l2 l3 l4 : list A) : l1 ++ l2 = l3 ++ l4 ->
      (exists l2', l1 ++ l2' = l3 /\ l2 = l2' ++ l4)
   \/ (exists l4', l1 = l3 ++ l4' /\ l4' ++ l2 = l4).
 Proof.
@@ -115,7 +113,7 @@ Qed.
 
 Ltac dichot_app_exec H :=
   match type of H with
-  | _ ++ _ = _ ++ _ => apply dichot_app in H ;
+  | _ ++ _ = _ ++ _ => apply dichot_app in H;
                          let l2 := fresh "l" in
                          let l4 := fresh "l" in
                          let H1 := fresh H in
@@ -123,8 +121,7 @@ Ltac dichot_app_exec H :=
                          destruct H as [[l2 [H1 H2]] | [l4 [H1 H2]]]
   end.
 
-Lemma dichot_elt_app A l1 (a : A) l2 l3 l4 :
-  l1 ++ a :: l2 = l3 ++ l4 ->
+Lemma dichot_elt_app A l1 (a : A) l2 l3 l4 : l1 ++ a :: l2 = l3 ++ l4 ->
      (exists l2', l1 ++ a :: l2' = l3 /\ l2 = l2' ++ l4)
   \/ (exists l4', l1 = l3 ++ l4' /\ l4' ++ a :: l2 = l4).
 Proof.
@@ -140,14 +137,13 @@ Qed.
 
 Ltac dichot_elt_app_exec H :=
   match type of H with
-  | _ ++ _ :: _ = _ ++ _ => apply dichot_elt_app in H ;
+  | _ ++ _ :: _ = _ ++ _ => apply dichot_elt_app in H;
                               let l2 := fresh "l" in
                               let l4 := fresh "l" in
                               let H1 := fresh H in
                               let H2 := fresh H in
                               destruct H as [[l2 [H1 H2]] | [l4 [H1 H2]]]
-  | _ ++ _ = _ ++ _ :: _ => simple apply eq_sym in H ;
-                            apply dichot_elt_app in H ;
+  | _ ++ _ = _ ++ _ :: _ => simple apply eq_sym in H; apply dichot_elt_app in H;
                               let l2 := fresh "l" in
                               let l4 := fresh "l" in
                               let H1 := fresh H in
@@ -155,8 +151,7 @@ Ltac dichot_elt_app_exec H :=
                               destruct H as [[l2 [H1 H2]] | [l4 [H1 H2]]]
   end.
 
-Lemma trichot_elt_app A l1 (a : A) l2 l3 l4 l5 :
-  l1 ++ a :: l2 = l3 ++ l4 ++ l5 ->
+Lemma trichot_elt_app A l1 (a : A) l2 l3 l4 l5 : l1 ++ a :: l2 = l3 ++ l4 ++ l5 ->
       (exists l2', l1 ++ a :: l2' = l3 /\ l2 = l2' ++ l4 ++ l5)
    \/ (exists l2' l2'', l1 = l3 ++ l2' /\ l2' ++ a :: l2'' = l4 /\ l2 = l2'' ++ l5)
    \/ (exists l5', l1 = l3 ++ l4 ++ l5' /\ l5' ++ a :: l2 = l5).
@@ -181,15 +176,14 @@ Qed.
 
 Ltac trichot_elt_app_exec H :=
   match type of H with
-  | _ ++ _ :: _ = _ ++ _ ++ _ => apply trichot_elt_app in H ;
+  | _ ++ _ :: _ = _ ++ _ ++ _ => apply trichot_elt_app in H;
                                    let l2 := fresh "l" in
                                    let l4 := fresh "l" in
                                    let H1 := fresh H in
                                    let H2 := fresh H in
                                    destruct H as [ (l2 & H1 & H2)
                                                  | [ (l2 & l4 & H1 & H2) | (l4 & H1 & H2) ]]
-  | _ ++ _ ++ _ = _ ++ _ :: _ => simple apply eq_sym in H ;
-                                   apply trichot_elt_app in H ;
+  | _ ++ _ ++ _ = _ ++ _ :: _ => simple apply eq_sym in H; apply trichot_elt_app in H;
                                    let l2 := fresh "l" in
                                    let l4 := fresh "l" in
                                    let H1 := fresh H in
@@ -198,18 +192,17 @@ Ltac trichot_elt_app_exec H :=
                                                  | [ (l2 & l4 & H1 & H2) | (l4 & H1 & H2) ]]
   end.
 
-Lemma trichot_elt_elt A l1 (a : A) l2 l3 b l4 :
-  l1 ++ a :: l2 = l3 ++ b :: l4 ->
+Lemma trichot_elt_elt A l1 (a : A) l2 l3 b l4 : l1 ++ a :: l2 = l3 ++ b :: l4 ->
       (exists l2', l1 ++ a :: l2' = l3 /\ l2 = l2' ++ b :: l4)
    \/ (l1 = l3 /\ a = b /\ l2 = l4)
    \/ (exists l4', l1 = l3 ++ b :: l4' /\ l4' ++ a :: l2 = l4).
 Proof.
-intros Heq; change (b :: l4) with ((b :: nil) ++ l4) in Heq.
+intro Heq. change (b :: l4) with ((b :: nil) ++ l4) in Heq.
 apply trichot_elt_app in Heq;
-  destruct Heq as [ | [ (l2' & l2'' & H'1 & H'2 & H'3) | ]] ; subst ;
-  [ left | right ; left | right ; right ]; auto.
+  destruct Heq as [ | [ (l2' & l2'' & H'1 & H'2 & H'3) | ]]; subst;
+  [ left | right; left | right; right ]; auto.
 now destruct l2' as [|a' l2']; inversion H'2 as [[H1 H2]];
-  subst; [ | destruct l2'; inversion H2 ]; list_simpl.
+ subst; [ | destruct l2'; inversion H2 ]; list_simpl.
 Qed.
 
 Ltac trichot_elt_elt_exec H :=
@@ -221,76 +214,72 @@ Ltac trichot_elt_elt_exec H :=
         let H2 := fresh H in
         let H3 := fresh H in
         destruct H as [(l' & H1 & H2) | [(H1 & H2 & H3) | (l' & H1 & H2)]] ;
-        [ (try subst l1) ; (try subst lr)
-        | (try subst x) ; (try subst l1) ; (try subst l2)
-        | (try subst l2) ; (try subst lh) ]
+        [ (try subst l1); (try subst lr)
+        | (try subst x); (try subst l1); (try subst l2)
+        | (try subst l2); (try subst lh) ]
   end.
 
-Lemma dichot_app_inf A (l1 l2 l3 l4 : list A) :
-  l1 ++ l2 = l3 ++ l4 ->
-     { l2' | l1 ++ l2' = l3 /\ l2 = l2' ++ l4 }
-   + { l4' | l1 = l3 ++ l4' /\ l4' ++ l2 = l4 }.
+Lemma dichot_app_inf A (l1 l2 l3 l4 : list A) : l1 ++ l2 = l3 ++ l4 ->
+     { l2' | l1 ++ l2' = l3 & l2 = l2' ++ l4 }
+   + { l4' | l1 = l3 ++ l4' & l4' ++ l2 = l4 }.
 Proof.
-revert l2 l3 l4; induction l1 as [|b l1 IHl1]; intros l2 l3; induction l3 as [|c l3 IHl3];
-  intros ? Heq; simpl in Heq; inversion Heq as [[Heq'' Heq']]; subst.
+induction l1 as [|b l1 IHl1] in l2, l3, l4 |- *; induction l3 as [|c l3 IHl3] in l4 |- *;
+  cbn; intro Heq; inversion Heq as [[Heq'' Heq']]; subst.
 - now right; exists (@nil A).
 - now left; exists (c :: l3).
 - now right; exists (b :: l1).
-- destruct (IHl1 _ _ _ Heq') as [(l2' & <- & H2'2) | (l4' & -> & H4'2)].
+- destruct (IHl1 _ _ _ Heq') as [[l2' <- H2'2] | [l4' -> H4'2]].
   + now left; exists l2'.
   + now right; exists l4'.
 Qed.
 
 Ltac dichot_app_inf_exec H :=
   match type of H with
-  | _ ++ _ = _ ++ _ => apply dichot_app_inf in H ;
+  | _ ++ _ = _ ++ _ => apply dichot_app_inf in H;
                          let l2 := fresh "l" in
                          let l4 := fresh "l" in
                          let H1 := fresh H in
                          let H2 := fresh H in
-                         destruct H as [(l2 & H1 & H2) | (l4 & H1 & H2)]
+                         destruct H as [[l2 H1 H2] | [l4 H1 H2]]
   end.
 
-Lemma dichot_elt_app_inf A l1 (a : A) l2 l3 l4 :
-  l1 ++ a :: l2 = l3 ++ l4 ->
-     { l2' | l1 ++ a :: l2' = l3 /\ l2 = l2' ++ l4 }
-   + { l4' | l1 = l3 ++ l4' /\ l4' ++ a :: l2 = l4 }.
+Lemma dichot_elt_app_inf A l1 (a : A) l2 l3 l4 : l1 ++ a :: l2 = l3 ++ l4 ->
+     { l2' | l1 ++ a :: l2' = l3 & l2 = l2' ++ l4 }
+   + { l4' | l1 = l3 ++ l4' & l4' ++ a :: l2 = l4 }.
 Proof.
-revert l2 l3 l4; induction l1 as [|b l1 IHl1]; intros l2 l3; induction l3 as [|c l3 IHl3];
-  intros ? Heq; simpl in Heq; inversion Heq as [[Heq'' Heq']]; subst.
+induction l1 as [|b l1 IHl1] in l2, l3, l4 |- *; induction l3 as [|c l3 IHl3] in l4 |- *;
+  cbn; intro Heq; inversion Heq as [[Heq'' Heq']]; subst.
 - now right; exists (@nil A).
 - now left; exists l3.
 - now right; exists (b :: l1).
-- destruct (IHl1 _ _ _ Heq') as [(l2' & <- & H2'2) | (l4' & -> & H4'2)].
+- destruct (IHl1 _ _ _ Heq') as [[l2' <- H2'2] | [l4' -> H4'2]].
   + now left; exists l2'.
   + now right; exists l4'.
 Qed.
 
 Ltac dichot_elt_app_inf_exec H :=
   match type of H with
-  | _ ++ _ :: _ = _ ++ _ => apply dichot_elt_app_inf in H ;
+  | _ ++ _ :: _ = _ ++ _ => apply dichot_elt_app_inf in H;
                               let l2 := fresh "l" in
                               let l4 := fresh "l" in
                               let H1 := fresh H in
                               let H2 := fresh H in
-                              destruct H as [(l2 & H1 & H2) | (l4 & H1 & H2)]
-  | _ ++ _ = _ ++ _ :: _ => simple apply eq_sym in H ;
-                            apply dichot_elt_app_inf in H ;
+                              destruct H as [[l2 H1 H2] | [l4 H1 H2]]
+  | _ ++ _ = _ ++ _ :: _ => simple apply eq_sym in H; apply dichot_elt_app_inf in H;
                               let l2 := fresh "l" in
                               let l4 := fresh "l" in
                               let H1 := fresh H in
                               let H2 := fresh H in
-                              destruct H as [(l2 & H1 & H2) | (l4 & H1 & H2)]
+                              destruct H as [[l2 H1 H2] | [l4 H1 H2]]
   end.
 
-Lemma trichot_elt_app_inf A l1 (a : A) l2 l3 l4 l5 :
-  l1 ++ a :: l2 = l3 ++ l4 ++ l5 ->
-     { l2' | l1 ++ a :: l2' = l3 /\ l2 = l2' ++ l4 ++ l5 }
-   + {'(l3', l4') | l1 = l3 ++ l3' /\ l3' ++ a :: l4' = l4 /\ l2 = l4' ++ l5 }
-   + { l5' | l1 = l3 ++ l4 ++ l5' /\ l5' ++ a :: l2 = l5 }.
+Lemma trichot_elt_app_inf A l1 (a : A) l2 l3 l4 l5 : l1 ++ a :: l2 = l3 ++ l4 ++ l5 ->
+     { l2' | l1 ++ a :: l2' = l3 & l2 = l2' ++ l4 ++ l5 }
+   + {'(l3', l4') | l1 = l3 ++ l3' & l3' ++ a :: l4' = l4 /\ l2 = l4' ++ l5 }
+   + { l5' | l1 = l3 ++ l4 ++ l5' & l5' ++ a :: l2 = l5 }.
 Proof.
-revert l2 l3 l4 l5; induction l1 as [|b l1 IHl1]; intros l2 l3; induction l3 as [|c l3 IHl3];
-  intros l4 l5 Heq; simpl in Heq; inversion Heq as [[Heq' Heq'']]; subst.
+induction l1 as [|b l1 IHl1] in l2, l3, l4, l5 |- *; induction l3 as [|c l3 IHl3] in l4, l5 |- *;
+  cbn; intro Heq; inversion Heq as [[Heq' Heq'']]; subst.
 - destruct l4 as [| a' l4]; inversion Heq'.
   + now right; exists nil.
   + now left; right; exists (nil, l4).
@@ -300,8 +289,7 @@ revert l2 l3 l4 l5; induction l1 as [|b l1 IHl1]; intros l2 l3; induction l3 as 
   + dichot_elt_app_inf_exec Heq2; subst.
     * now left; right; exists (a' :: l1, l).
     * now right; exists l0.
-- destruct (IHl1 _ _ _ _ Heq'')
-    as [ [(l' & <- & ->) | ((l2', l2'') & -> & <- & ->)] | (l' & -> & <-) ].
+- destruct (IHl1 _ _ _ _ Heq'') as [ [[l' <- ->] | [(l2', l2'') -> [<- ->]]] | [l' -> <-] ].
   + now left; left; exists l'.
   + now left; right; exists (l2', l2'').
   + now right; exists l'.
@@ -309,35 +297,31 @@ Qed.
 
 Ltac trichot_elt_app_inf_exec H :=
   match type of H with
-  | _ ++ _ :: _ = _ ++ _ ++ _ => apply trichot_elt_app_inf in H ;
+  | _ ++ _ :: _ = _ ++ _ ++ _ => apply trichot_elt_app_inf in H;
                                    let l2 := fresh "l" in
                                    let l4 := fresh "l" in
                                    let H1 := fresh H in
                                    let H2 := fresh H in
-                                   destruct H as [ [ (l2 & H1 & H2) | ([l2 l4] & H1 & H2) ]
-                                                   | (l4 & H1 & H2) ] ;
-                                   simpl in H1 ; simpl in H2
-  | _ ++ _ ++ _ = _ ++ _ :: _ => simple apply eq_sym in H ;
-                                   apply trichot_elt_app_inf in H ;
+                                   let H3 := fresh H in
+                                   destruct H as [ [ [l2 H1 H2] | [[l2 l4] H1 [H2 H3]] ] | [l4 H1 H2] ];
+                                   simpl in H1; simpl in H2; try simpl in H3
+  | _ ++ _ ++ _ = _ ++ _ :: _ => simple apply eq_sym in H; apply trichot_elt_app_inf in H;
                                    let l2 := fresh "l" in
                                    let l4 := fresh "l" in
                                    let H1 := fresh H in
                                    let H2 := fresh H in
-                                   destruct H as [ [ (l2 & H1 & H2) | ([l2 l4] & H1 & H2) ]
-                                                   | (l4 & H1 & H2) ] ;
-                                   simpl in H1 ; simpl in H2
+                                   destruct H as [ [ [l2 H1 H2] | [[l2 l4] H1 [H2 H3]] ] | [l4 H1 H2] ];
+                                   simpl in H1; simpl in H2; try simpl in H3
   end.
 
-Lemma trichot_elt_elt_inf A l1 (a : A) l2 l3 b l4 :
-  l1 ++ a :: l2 = l3 ++ b :: l4 ->
-     { l2' | l1 ++ a :: l2' = l3 /\ l2 = l2' ++ b :: l4 }
+Lemma trichot_elt_elt_inf A l1 (a : A) l2 l3 b l4 : l1 ++ a :: l2 = l3 ++ b :: l4 ->
+     { l2' | l1 ++ a :: l2' = l3 & l2 = l2' ++ b :: l4 }
    + { l1 = l3 /\ a = b /\ l2 = l4 }
-   + { l4' | l1 = l3 ++ b :: l4' /\ l4' ++ a :: l2 = l4 }.
+   + { l4' | l1 = l3 ++ b :: l4' & l4' ++ a :: l2 = l4 }.
 Proof.
-intros Heq.
-change (b :: l4) with ((b :: nil) ++ l4) in Heq.
+intro Heq. change (b :: l4) with ((b :: nil) ++ l4) in Heq.
 apply trichot_elt_app_inf in Heq;
-  destruct Heq as [[ | ((l2', l2'') & H'1 & H'2 & H'3)] | ]; subst;
+  destruct Heq as [[ | [(l2', l2'') H'1 [H'2 H'3]]] | ]; subst;
   [ left; left | left; right | right ]; auto.
 now destruct l2' as [|a' l2']; inversion H'2 as [[H1 H2]];
   subst; [ | destruct l2'; inversion H2 ]; list_simpl.
@@ -346,15 +330,15 @@ Qed.
 Ltac trichot_elt_elt_inf_exec H :=
   match type of H with
   | ?lh ++ _ :: ?lr = ?l1 ++ ?x :: ?l2 =>
-      apply trichot_elt_elt_inf in H ;
+      apply trichot_elt_elt_inf in H;
         let l' := fresh "l" in
         let H1 := fresh H in
         let H2 := fresh H in
         let H3 := fresh H in
-        destruct H as [[(l' & H1 & H2) | (H1 & H2 & H3)] | (l' & H1 & H2)] ;
-        [ (try subst l1) ; (try subst lr)
-        | (try subst x) ; (try subst l1) ; (try subst l2)
-        | (try subst l2) ; (try subst lh) ]
+        destruct H as [[[l' H1 H2] | (H1 & H2 & H3)] | [l' H1 H2]];
+        [ try subst l1; try subst lr
+        | try subst x; try subst l1; try subst l2
+        | try subst l2; try subst lh ]
   end.
 
 (** ** Decomposition of [map] *)
