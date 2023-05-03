@@ -87,6 +87,11 @@ induction n as [| n IHn] in l, m |- *; intro Heq.
   split with (a :: l1, l2); [ split | ]; reflexivity.
 Qed.
 
+Ltac nil_vs_elt_inv H :=
+  match type of H with
+  | nil = ?l1 ++ ?x :: ?l2 => destruct l1; discriminate H
+  end.
+
 Ltac unit_vs_elt_inv H := 
   match type of H with
   | ?a :: nil = ?l1 ++ ?x :: ?l2 =>
