@@ -255,7 +255,7 @@ Section InfDecTypes.
   Proof. apply choice_nat_injective. exists fresh. apply fresh_spec. Qed.
 
   (* A list (of length [n]+1) of distinct fresh elements (not in [l]) *)
-  Fixpoint freshlist_of_list (l : list X)  n :=
+  Fixpoint freshlist_of_list (l : list X) n :=
     match n with
     | 0 => fresh l :: nil
     | S k => let lv := freshlist_of_list l k in fresh (lv ++ l) :: lv

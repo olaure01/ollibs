@@ -10,6 +10,18 @@ Import EqNotations.
 Set Implicit Arguments.
 
 
+(** misc *)
+
+(* TODO included in PR #11966 submitted, remove once merged and released *)
+
+    Lemma rev_case A (l : list A) : l = nil \/ exists a tl, l = tl ++ a :: nil.
+    Proof.
+      induction l as [|a l] using rev_ind; [ left | right ]; auto.
+      now exists a, l.
+    Qed.
+
+
+
 (** * Tactics *)
 
 (** ** Simplification in lists *)
@@ -560,6 +572,16 @@ induction l as [|b l IHl]; split; intro H.
     now exists l0.
 Qed.
 
+Lemma Forall2_rev A B (R : A -> B -> Prop) l1 l2 : Forall2 R l1 l2 -> Forall2 R (rev l1) (rev l2).
+Proof.
+induction l1 as [|a l1 IH] in l2 |- *; intro HF; destruct l2 as [|b l2]; inversion_clear HF.
+- constructor.
+- cbn. apply Forall2_app.
+  + apply IH. assumption.
+  + now constructor.
+Qed.
+
+
 (** ** [Forall_inf] *)
 
 (** Translation from [Forall_inf] to a list of dependent pairs *)
@@ -606,7 +628,7 @@ Qed.
 
 (** ** [Forall2_inf] *)
 
-Lemma Forall2_inf_in_l A B l1 l2 a (R : A -> B -> Type) :
+Lemma Forall2_inf_in_l A B (R : A -> B -> Type) l1 l2 a :
   Forall2_inf R l1 l2 -> In_inf a l1 -> { b & prod (In_inf b l2) (R a b) }.
 Proof.
 intros HF; induction HF as [| x y ? ? ? ? IHF]; intro Hin; inversion Hin.
@@ -615,13 +637,22 @@ intros HF; induction HF as [| x y ? ? ? ? IHF]; intro Hin; inversion Hin.
   split with b. now split; [ right | ].
 Qed.
 
-Lemma Forall2_inf_in_r A B l1 l2 b (R : A -> B -> Type) :
+Lemma Forall2_inf_in_r A B (R : A -> B -> Type) l1 l2 b :
   Forall2_inf R l1 l2 -> In_inf b l2 -> { a & prod (In_inf a l1) (R a b) }.
 Proof.
 intros HF; induction HF as [| x y ? ? ? ? IHF]; intro Hin; inversion Hin.
 - subst; split with x. now split; [ left | ].
 - destruct IHF as (a & Hina & HRab); [ assumption | ].
   split with a. now split; [ right | ].
+Qed.
+
+Lemma Forall2_inf_rev A B (R : A -> B -> Type) l1 l2 : Forall2_inf R l1 l2 -> Forall2_inf R (rev l1) (rev l2).
+Proof.
+induction l1 as [|a l1 IH] in l2 |- *; intro HF; destruct l2 as [|b l2]; inversion_clear HF.
+- constructor.
+- cbn. apply Forall2_inf_app.
+  + apply IH. assumption.
+  + now constructor.
 Qed.
 
 
@@ -727,17 +758,6 @@ Ltac Forall_inf_solve_rec :=
   | _ => try assumption
   end.
 Ltac Forall_inf_solve := Forall_inf_cbn_hyp; cbn; Forall_inf_solve_rec; fail.
-
-
-(** misc *)
-
-(* TODO included in PR #11966 submitted, remove once merged and released *)
-
-    Lemma rev_case A (l : list A) : l = nil \/ exists a tl, l = tl ++ a :: nil.
-    Proof.
-      induction l as [|a l] using rev_ind; [ left | right ]; auto.
-      now exists a, l.
-    Qed.
 
 
 (** reflect *)
