@@ -130,11 +130,7 @@ Section Facts.
   Qed.
 
   Lemma in_inf_elt : forall (x:A) l1 l2, In_inf x (l1 ++ x :: l2).
-  Proof.
-  intros.
-  apply in_inf_or_app.
-  right; left; reflexivity.
-  Qed.
+  Proof. intros. apply in_inf_or_app. right. apply in_inf_eq. Qed.
 
   Lemma in_inf_elt_inv : forall (x y : A) l1 l2,
     In_inf x (l1 ++ y :: l2) -> ((x = y) + In_inf x (l1 ++ l2))%type.
@@ -1426,7 +1422,7 @@ Section ForallPairs_inf.
     induction 1.
     inversion 1.
     simpl; destruct 1; destruct 1; subst; auto.
-    - left; right.
+    - left. right.
       apply Forall_inf_forall with _ _ _ y in f; eauto.
     - right.
       apply Forall_inf_forall with _ _ _ x in f; eauto.

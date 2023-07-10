@@ -62,7 +62,7 @@ Ltac cons2app :=
            (* one could prefer
                  change (cons x l) with (app (cons x nil) l)
               which leads to simpler generated term
-              but does work not with existential variables *)
+              but does not work with existential variables *)
          end
   end.
 Ltac cons2app_hyp H :=
@@ -75,7 +75,7 @@ Ltac cons2app_hyp H :=
            (* one could prefer
                  change (cons x l) with (app (cons x nil) l) in H
               which leads to simpler generated term
-              but does work not with existential variables *)
+              but does not work with existential variables *)
       end
   end.
 Tactic Notation "cons2app" "in" hyp(H) := cons2app_hyp H.
@@ -114,6 +114,7 @@ Ltac unit_vs_elt_inv H :=
       clear Hnil1 Hnil2; (try clear l1); (try clear l2)
   end.
 
+(* TODO compare with [List.app_eq_app] *)
 Lemma dichot_app A (l1 l2 l3 l4 : list A) : l1 ++ l2 = l3 ++ l4 ->
      (exists l2', l1 ++ l2' = l3 /\ l2 = l2' ++ l4)
   \/ (exists l4', l1 = l3 ++ l4' /\ l4' ++ l2 = l4).

@@ -144,7 +144,7 @@ Module UsualOrderedTypeFull_as_BOrder (T : UsualOrderedTypeFull).
     apply nleb_lt in Hf.
     apply le_leb.
     apply T.le_lteq.
-    left ; assumption.
+    left. assumption.
   - intros a b H1 H2.
     apply leb_le in H1.
     apply leb_le in H2.
@@ -279,7 +279,7 @@ destruct l0; repeat split; auto.
   destruct (leb a c).
   + inversion Hd as [ -> | ]; [ right | left ]; trivial.
   + inversion Hd as [ -> | Hin ].
-    * left. left. reflexivity.
+    * left. apply in_eq.
     * destruct s; inversion Hlen as [ Hlen' ].
       destruct (IH s (le_n _) a (exist _ l0 (is_sorted_tail _ _ _ Hsort)) Hlen') as [_ Hin'].
       apply Hin' in Hin.
