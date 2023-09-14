@@ -15,11 +15,21 @@ Set Implicit Arguments.
 (* TODO included in PR #11966 submitted, remove once merged and released *)
 
     Lemma rev_case A (l : list A) : l = nil \/ exists a tl, l = tl ++ a :: nil.
-    Proof.
-      induction l as [|a l] using rev_ind; [ left | right ]; auto.
-      now exists a, l.
-    Qed.
+    Proof. induction l as [|a l] using rev_ind; [ left | right; exists a, l ]; reflexivity. Qed.
 
+(* case analysis similar to [destruct l] but splitting at the end of the list in the spirit of [rev_ind] *)
+
+Inductive last_list_internal A : list A -> Type :=
+| last_list_nil_internal : last_list_internal nil
+| last_list_last_internal : forall a l, last_list_internal (l ++ a :: nil).
+
+Lemma last_case_internal A (l : list A) : last_list_internal l.
+Proof. induction l as [|a l] using rev_rect; constructor. Qed.
+
+Tactic Notation "last_destruct" constr(l) :=
+  destruct (last_case_internal l).
+Tactic Notation "last_destruct" constr(l) "as" simple_intropattern(p) :=
+  destruct (last_case_internal l) as p.
 
 
 (** * Tactics *)
