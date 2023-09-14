@@ -1,7 +1,7 @@
 # OLlibs
 **Add-ons for the Coq Standard Library**
 
-Working with `Coq 8.17.0`
+Working with `Coq 8.18.0`
 
 [Opam](https://coq.inria.fr/opam-using.html)-based installation procedure:
 

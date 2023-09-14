@@ -2,7 +2,11 @@
 
 ## Version 2.0.5
 
-Ongoing development.
+* rename `decomp_length_plus` into `decomp_length_add`
+* more uses of `sig2` rather than `sig` with `/\` in `List_more.v`
+* add tactics `nil_vs_elt_inv` and `last_destruct` for lists
+* add `Forall2_rev` and `Forall2_inf_rev`
+* remove statements already present in the standard library
 
 ## Version 2.0.4
 

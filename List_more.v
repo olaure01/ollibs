@@ -508,19 +508,6 @@ induction l as [|a l IHl]; [ reflexivity | cbn ].
 destruct (f a) eqn:Hfa, (g a) eqn:Hga; cbn; rewrite ? Hfa, ? Hga, IHl; reflexivity.
 Qed.
 
-(* TODO remove in Coq 8.18: included in PR #17027 *)
-Lemma forallb_filter A f (l : list A) : forallb f (filter f l) = true.
-Proof.
-induction l as [|a l IHl]; [ reflexivity | cbn ].
-destruct (f a) eqn:Hfa; cbn; [ rewrite Hfa | ]; assumption.
-Qed.
-
-(* TODO remove in Coq 8.18: included in PR #17027 *)
-Lemma forallb_filter_id A f (l : list A) : forallb f l = true -> filter f l = l.
-Proof.
-induction l as [|a l IHl]; [ reflexivity | cbn; intros [-> Hb]%andb_prop ]. rewrite (IHl Hb). reflexivity.
-Qed.
-
 Lemma forallb_filter_forallb A f g (l : list A) : forallb f l = true -> forallb f (filter g l) = true.
 Proof.
 induction l as [|a l IHl]; [ reflexivity | cbn; intros [Ha Hf]%andb_true_iff ].
@@ -528,13 +515,6 @@ destruct (g a); cbn; now rewrite ? Ha, IHl.
 Qed.
 
 (** ** [partition] *)
-
-(* TODO remove in Coq 8.18: included in PR #17027 *)
-Lemma partition_as_filter A f (l : list A) : partition f l = (filter f l, filter (fun x => negb (f x)) l).
-Proof.
-induction l as [|a l IHl]; [ reflexivity | cbn ].
-destruct (f a), (partition f l); injection IHl as [= -> ->]; reflexivity.
-Qed.
 
 Lemma partition_incl1 A f (l : list A) : incl (fst (partition f l)) l.
 Proof. rewrite partition_as_filter. apply incl_filter. Qed.
