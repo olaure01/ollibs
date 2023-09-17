@@ -1,5 +1,9 @@
 # Versions 2.0.x
 
+## Version 2.0.6
+
+Ongoing development.
+
 ## Version 2.0.5
 
 * rename `decomp_length_plus` into `decomp_length_add`
