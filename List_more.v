@@ -691,6 +691,9 @@ Qed.
 
 (** ** [fold_right] *)
 
+Lemma fold_id A l : fold_right (@cons A) nil l = l.
+Proof. induction l; [ reflexivity | cbn; f_equal; assumption ]. Qed.
+
 Lemma fold_right_app_assoc2 A B f (g : B -> A) h (e : A) l1 l2 :
     (forall x y z, h (g x) (f y z) = f (h (g x) y) z) ->
     (f e (fold_right (fun x => h (g x)) e l2) = (fold_right (fun x => h (g x)) e l2)) ->
