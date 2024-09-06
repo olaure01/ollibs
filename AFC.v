@@ -59,6 +59,24 @@ intros Hinc m HF. induction m as [|m IHm].
   + apply (Hinc _ k); [ apply Hk | ]; lia.
 Qed.
 
+Lemma AFCincdep m (R : nat -> forall n, n < m -> Prop) :
+  (forall i n H1 H2, R i n H1 -> R i n H2) ->
+  (forall n H i j, R i n H -> i < j -> R j n H) ->
+    (forall n H, exists k, R k n H) -> exists k, forall n H, R k n H.
+Proof.
+induction m as [|m IHm]; intros Hext Hinc HI.
+- exists 0. intros n Hn. inversion Hn.
+- assert (forall n H, exists k, R k n (Nat.lt_lt_succ_r _ _ H)) as [k Hk]%IHm by (intros; apply HI).
+  + assert (exists k, R k m (Nat.lt_succ_diag_r _)) as [k' Hk'] by apply HI.
+    exists (S (max k k')).
+    intros n Hn. inversion Hn; subst.
+    * apply (Hinc _ _ k'); [ | lia ].
+      exact (Hext _ _ _ _ Hk').
+    * apply (Hinc _ _ k); [ | lia ].
+      refine (Hext _ _ _ _ (Hk _ _)). lia.
+  + intros ? ? ? ? HR. exact (Hext _ _ _ _ HR).
+  + intros ? ? i. exact (Hinc _ _ i).
+Qed.
 
 (** * Axioms of Finite Choices over vectors *)
 Lemma AFCvec A (R : nat -> A -> Prop) n (l : Vector.t _ n) :
@@ -84,23 +102,4 @@ induction l as [| b n l IHl]; intros Hinc HF.
          ++ apply Vector.In_cons_hd.
          ++ do 2 apply Vector.In_cons_tl. assumption.
   + intros ? i. intros. apply Hinc with i; [ apply Vector.In_cons_tl | | lia ]; assumption.
-Qed.
-
-Lemma AFCvec_incdep m (R : nat -> forall n, n < m -> Prop) :
-  (forall i n H1 H2, R i n H1 -> R i n H2) ->
-  (forall n H i j, R i n H -> i < j -> R j n H) ->
-    (forall n H, exists k, R k n H) -> exists k, forall n H, R k n H.
-Proof.
-induction m as [|m IHm]; intros Hext Hinc HI.
-- exists 0. intros n Hn. inversion Hn.
-- assert (forall n H, exists k, R k n (Nat.lt_lt_succ_r _ _ H)) as [k Hk]%IHm by (intros; apply HI).
-  + assert (exists k, R k m (Nat.lt_succ_diag_r _)) as [k' Hk'] by apply HI.
-    exists (S (max k k')).
-    intros n Hn. inversion Hn; subst.
-    * apply (Hinc _ _ k'); [ | lia ].
-      exact (Hext _ _ _ _ Hk').
-    * apply (Hinc _ _ k); [ | lia ].
-      refine (Hext _ _ _ _ (Hk _ _)). lia.
-  + intros ? ? ? ? HR. exact (Hext _ _ _ _ HR).
-  + intros ? ? i. exact (Hinc _ _ i).
 Qed.
