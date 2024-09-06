@@ -28,6 +28,7 @@ Manual installation procedure:
 * `AFC`             : finite versions of the axiom of choice
 * `nattree`         : nat-labelled trees and coding into nat
 * `Wf_nat_more`     : well-founded order on products of `nat`
+* `Vector_more`     : add-ons for standard library Vector
 * `List_Type`       : `List` with output in `Type`
 * `inhabited_Type`  : `inhabited` with output in `Type`
 
