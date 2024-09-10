@@ -392,8 +392,8 @@ Ltac substitute_map_family H :=
                    assert (H := conj H1' H2'); clear H1' H2');
               try rename H1 into H;
               try rename H2 into H
-  | map _ ?l' = ?l => try (subst l; rename l' into l)
-  | _ ?b = ?a => try (subst a; rename b into a)
+  | _ ?b = ?a => subst a; rename b into a
+  | _ = ?a => try (subst a)
   end.
 
 Ltac decomp_map_core H Heq :=
@@ -408,73 +408,6 @@ Tactic Notation "decomp_map" ident(H) :=
   let Heq := fresh "Heq" in decomp_map_core H Heq; substitute_map_family Heq.
 Tactic Notation "decomp_map" ident(H) "eqn" ":" ident(Heq) := decomp_map_core H Heq; substitute_map_family Heq.
 
-(* OLD new version + replace decomp_map_inf with decomp_map
-Ltac decomp_map_eq H Heq :=
-  match type of H with
-  | map _ _ = _ ++ _ => let l1 := fresh "l" in
-                        let l2 := fresh "l" in
-                        let H1 := fresh H in
-                        let H2 := fresh H in
-                        let Heq1 := fresh Heq in
-                        apply map_eq_app in H as [l1 [l2 [Heq1 [H1 H2]]]];
-                        rewrite Heq1 in Heq; clear Heq1;
-                        decomp_map_eq H1 Heq; decomp_map_eq H2 Heq
-  | map _ _ = _ :: _ => let x := fresh "x" in
-                        let l2 := fresh "l" in
-                        let H1 := fresh H in
-                        let H2 := fresh H in
-                        let Heq1 := fresh Heq in
-                        apply map_eq_cons in H as [x [l2 [Heq1 [H1 H2]]]] ;
-                        rewrite Heq1 in Heq; clear Heq1;
-                        decomp_map_eq H2 Heq
-  | _ => idtac
-  end.
-
-Ltac decomp_map H :=
-  match type of H with
-  | map _ ?l = _ => let l' := fresh "l" in
-                    let Heq := fresh H in
-                    remember l as l' eqn:Heq in H;
-                    decomp_map_eq H Heq;
-                    let H' := fresh H in
-                    clear l'; rename Heq into H'
-  | _ = map _ _ => symmetry in H; decomp_map H; symmetry in H
-  end.
-
-Ltac decomp_map_inf_eq H Heq :=
-  match type of H with
-  | map _ _ = _ ++ _ => apply map_eq_app_inf in H ;
-                          let l1 := fresh "l" in
-                          let l2 := fresh "l" in
-                          let H1 := fresh H in
-                          let H2 := fresh H in
-                          let Heq1 := fresh Heq in
-                          destruct H as ((l1, l2) & Heq1 & H1 & H2) ;
-                          rewrite Heq1 in Heq ; clear Heq1 ;
-                          decomp_map_inf_eq H1 Heq ; decomp_map_inf_eq H2 Heq
-  | map _ _  = _ :: _ => apply map_eq_cons_inf in H ;
-                          let x := fresh "x" in
-                          let l2 := fresh "l" in
-                          let H1 := fresh H in
-                          let H2 := fresh H in
-                          let Heq1 := fresh Heq in
-                          destruct H as ((x, l2) & Heq1 & H1 & H2) ;
-                          rewrite Heq1 in Heq ; clear Heq1 ;
-                          decomp_map_inf_eq H2 Heq
-  | _ => idtac
-  end.
-
-Ltac decomp_map_inf H :=
-  match type of H with
-  | map _ ?l = _ => let l' := fresh "l" in
-                    let Heq := fresh H in
-                    remember l as l' eqn:Heq in H;
-                    decomp_map_inf_eq H Heq;
-                    let H' := fresh H in
-                    clear l'; rename Heq into H'
-  | _ = map _ _ => symmetry in H; decomp_map_inf H; symmetry in H
-  end.
-*)
 
 (** ** [Forall] *)
 
