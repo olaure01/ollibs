@@ -1,5 +1,11 @@
 # Versions 2.0.x
 
+## Version 2.0.7
+
+Ongoing development.
+
+* adapt to Coq v8.20
+
 ## Version 2.0.6
 
 * changes on tactics in `List_more.v`
