@@ -2,9 +2,8 @@
 
 ## Version 2.0.7
 
-Ongoing development.
-
 * adapt to Coq v8.20
+  * rename some `_length` into `length_`
 
 ## Version 2.0.6
 
