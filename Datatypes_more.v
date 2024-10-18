@@ -1,6 +1,8 @@
-Set Mangle Names.
-Set Mangle Names Light.
+Set Mangle Names. Set Mangle Names Light.
+Set Default Goal Selector "!".
+Set Default Proof Using "Type".
 Set Implicit Arguments.
+
 
 Definition iffT (A B : Type) := ((A -> B) * (B -> A))%type.
 

@@ -1,14 +1,15 @@
 (** Order structure on [comparison]
 [Lt] < [Eq] < [Gt] *)
 
-Set Mangle Names.
-Set Mangle Names Light.
+Set Mangle Names. Set Mangle Names Light.
+Set Default Goal Selector "!".
+Set Default Proof Using "Type".
 Set Implicit Arguments.
 
 From Coq Require Import Orders.
 
-Ltac destr_comparison :=
-  intros; destruct_all comparison; simpl in *; trivial; try discriminate.
+
+Ltac destr_comparison := intros; destruct_all comparison; simpl in *; trivial; try discriminate.
 
 Lemma comparison_dec (c1 c2 : comparison) : {c1 = c2} + {c1 <> c2}.
 Proof. decide equality. Defined.

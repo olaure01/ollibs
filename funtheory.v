@@ -1,19 +1,22 @@
 (** Properties of functions *)
 
+Set Mangle Names. Set Mangle Names Light.
+Set Default Goal Selector "!".
+Set Default Proof Using "Type".
+Set Implicit Arguments.
+
 From Coq Require Import Program.Basics Relation_Definitions RelationClasses List.
 From OLlibs Require Import inhabited_Type.
 
-Set Implicit Arguments.
-Set Default Proof Using "Type".
 
 (** * Functions on constructors *)
 Definition Empty_fun {A} : Empty_set -> A := fun o => match o with end.
 
 Definition option_eval_default A B default (f : A -> B) o :=
-match o with
-| Some a => f a
-| None => default
-end.
+  match o with
+  | Some a => f a
+  | None => default
+  end.
 
 Definition option_test A := @option_eval_default A Prop True.
 
@@ -155,7 +158,8 @@ induction l1 as [|a l1 IHl1]; intros [|b l2] Hmap; inversion Hmap as [[Hhd Htl]]
   reflexivity.
 Qed.
 
-Lemma map_injective_in A B (f : A -> B) l1 l2 : (forall x y, In x l1 -> In y l2 -> f x = f y -> x = y) ->
+Lemma map_injective_in A B (f : A -> B) l1 l2 :
+  (forall x y, In x l1 -> In y l2 -> f x = f y -> x = y) ->
   map f l1 = map f l2 -> l1 = l2.
 Proof.
 induction l1 as [|a l1 IHl1] in l2 |-*; intros Hi Hmap; destruct l2; inversion Hmap as [ [Hhd Htl] ].
@@ -228,7 +232,8 @@ Lemma id_bijective A : bijective (@id A).
 Proof. intros x. exists x; trivial. Qed.
 Arguments id_bijective {_}.
 
-Lemma compose_bijective A B C (f : A -> B) (g : B -> C) : bijective f -> bijective g -> bijective (compose g f).
+Lemma compose_bijective A B C (f : A -> B) (g : B -> C) : bijective f -> bijective g ->
+  bijective (compose g f).
 Proof.
 intros Hf Hg z.
 destruct (Hg z) as [y -> Hinjf], (Hf y) as [x -> Hinjg].
@@ -240,6 +245,7 @@ Qed.
 (** * Additional definitions *)
 
 (* Binary functions *)
-Definition injective2 A B C (f : A -> B -> C) := forall x y x' y', f x y = f x' y' -> x = x' /\ y = y'.
+Definition injective2 A B C (f : A -> B -> C) :=
+  forall x y x' y', f x y = f x' y' -> x = x' /\ y = y'.
 
 Definition surjective2 A B C (f : A -> B -> C) := forall z, {'(x, y) | z = f x y }.

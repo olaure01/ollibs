@@ -3,8 +3,9 @@ Usefull tactics and properties apparently missing in the [List] library. *)
 
 (* TODO rename di/trichot_... into decomp_xxx_eq_yyyy  and [vs] into [eq] for equality *)
 
-Set Mangle Names.
-Set Mangle Names Light.
+Set Mangle Names. Set Mangle Names Light.
+Set Default Goal Selector "!".
+Set Default Proof Using "Type".
 Set Implicit Arguments.
 
 From Coq Require Import PeanoNat.

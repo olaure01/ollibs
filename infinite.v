@@ -1,11 +1,13 @@
 (** Infinite Types *)
 
+Set Mangle Names. Set Mangle Names Light.
+Set Default Goal Selector "!".
+Set Default Proof Using "Type".
+Set Implicit Arguments.
+
 From Coq Require Import Bool PeanoNat Lia List.
 From OLlibs Require Import funtheory List_Type.
 From OLlibs Require Export inhabited_Type dectype.
-
-Set Implicit Arguments.
-Set Default Proof Using "Type".
 
 
 (** a pigeonhole principle *)
@@ -54,12 +56,12 @@ Section Infinite.
     match l with
     | nil => i 0
     | x :: tl => i (S (max (s x) (s (h tl))))
-    end) as c.
+    end) as c eqn:Heqc.
   exists c.
   enough (forall l, Forall (fun x => s x < s (c l)) l) as Hlt.
   { intros l Hin. specialize Hlt with l.
     apply (proj1 (Forall_forall _ _) Hlt (c l)) in Hin. lia. }
-  induction l; cbn; constructor.
+  intro l. induction l as [|a l IHl]; cbn; constructor.
   - rewrite Heqc, Hsec. lia.
   - apply Forall_forall. intros b Hb. apply Forall_forall with (x:= b) in IHl; [ | assumption ].
     subst c. rewrite Hsec. lia.
@@ -125,34 +127,30 @@ Section InfiniteDec.
     by (now intros x z Heq; rewrite Heq at 2; rewrite Hs). clear Hs.
   exists (fun x => if eqb x (i (s x)) then i (S (s x)) else x).
   - intros x y.
-    repeat case_analysis; intros Heqh; [ | | | exact Heqh ].
-    + rewrite Heq, Heq0. f_equal.
-      apply Hinj in Heqh.
-      injection Heqh as [= ->]. reflexivity.
-    + exfalso. symmetry in Heqh.
-      apply Heq0, (Hsi _ _ Heqh).
-    + exfalso.
-      apply Heq, (Hsi _ _ Heqh).
-  - exists (i 0). intros x.
-    case_analysis; intros Heqi.
+    case_analysis eqn:Heq1; case_analysis eqn:Heq2; intro Heqh; [ | | | exact Heqh ].
+    + rewrite Heq1, Heq2.
+      apply Hinj in Heqh as [= ->]. reflexivity.
+    + exfalso. symmetry in Heqh. apply Heq2, (Hsi _ _ Heqh).
+    + exfalso. apply Heq1, (Hsi _ _ Heqh).
+  - exists (i 0). intro x.
+    case_analysis eqn:Heq; intro Heqi.
     + apply Hinj in Heqi. discriminate Heqi.
-    + symmetry in Heqi.
-      apply Heq, (Hsi _ _ Heqi).
+    + symmetry in Heqi. apply Heq, (Hsi _ _ Heqi).
   Qed.
 
   Lemma pigeon_dectype : pigeon X.
   Proof.
-  intros l1. induction l1; cbn; intros l2 Hnd Hl; [ exfalso; lia | ].
-  destruct (in_dec eq_dt_dec a l2).
+  intro l1. induction l1 as [|a l1 IHl1]; cbn; intros l2 Hnd Hl; [ exfalso; lia | ].
+  destruct (in_dec eq_dt_dec a l2) as [Hin|].
   - apply NoDup_NoDup_inf in Hnd.
     inversion_clear Hnd as [ | ? ? Hnin%notin_inf_notin Hnd2%NoDup_inf_NoDup ].
     apply IHl1 with (remove eq_dt_dec a l2) in Hnd2 as [b Hb Hnb].
     + exists b.
       * right. assumption.
-      * intros Hin. apply Hnb.
+      * intro Hin'. apply Hnb.
         apply in_in_remove; [ | assumption ].
         intros ->. exact (Hnin Hb).
-    + apply remove_length_lt with (eq_dec:= eq_dt_dec) in i. lia.
+    + apply remove_length_lt with (eq_dec:= eq_dt_dec) in Hin. lia.
   - now exists a; [ left | ].
   Qed.
 
@@ -162,9 +160,9 @@ Section InfiniteDec.
   destruct pigeon_dectype with (map f (seq 0 (S (length l)))) l as [x Hin Hnin].
   - apply injective_NoDup, seq_NoDup. assumption.
   - rewrite length_map, length_seq. lia.
-  - remember (S (length l)) as k. clear Heqk.
-    remember 0 as s. clear Heqs.
-    induction k in s, Hin, Hnin |-*; cbn; [ easy | ].
+  - remember (S (length l)) as k eqn:Heqk. clear Heqk.
+    remember 0 as s eqn:Heqs. clear Heqs.
+    induction k as [|k IHk] in s, Hin, Hnin |-*; cbn; [ easy | ].
     case (eq_dt_reflect (f s) x); intros Heq; subst.
     + exists s. assumption.
     + apply IHk with (S s); [ | assumption ].
@@ -178,7 +176,8 @@ Section InfiniteDec.
   intros l Hin. destruct (injective_enum Hi l) as [n Hnin]. exact (Hnin Hin).
   Qed.
 
-  Lemma self_injective_minus (pi : self_injective X) : self_injective (minus (proj1_sig (projT3 pi))).
+  Lemma self_injective_minus (pi : self_injective X) :
+    self_injective (minus (proj1_sig (projT3 pi))).
   Proof.
   destruct pi as [f Hinj [i Hi]]. cbn.
   assert (forall x, eqb i x = false -> eqb i (f x) = false) as Hif
@@ -228,9 +227,9 @@ enough (forall x y, x < y -> Nat.iter x f i = Nat.iter y f i -> x = y) as Hlt.
   - apply Hlt; assumption.
   - symmetry. symmetry in Heq. apply Hlt; assumption. }
 clear - Hinj Hi. intros x y Hlt Heq. exfalso.
-remember (pred (y - x)) as n.
+remember (pred (y - x)) as n eqn:Heqn.
 replace y with (S n + x) in Heq by lia. clear Heqn.
-induction x in Hlt, Heq |- *.
+induction x as [|x IHx] in Hlt, Heq |- *.
 - apply Hi in Heq as [].
 - replace (S n + x) with (n + S x) in IHx by lia.
   apply IHx, Hinj; [ lia | assumption ].
@@ -265,7 +264,7 @@ Section InfDecTypes.
 
   Lemma freshlist_of_list_fresh l n x : In x (freshlist_of_list l n) -> ~ In x l.
   Proof.
-  induction n; cbn; intros [Hin1 | Hin2] Hinl; subst.
+  induction n as [|n IHn]; cbn; intros [Hin1 | Hin2] Hinl; subst.
   - exact (fresh_spec _ Hinl).
   - assumption.
   - apply fresh_spec with (freshlist_of_list l n ++ l).
@@ -287,7 +286,7 @@ Section InfDecTypes.
 
   Lemma freshlist_of_list_NoDup l n : NoDup (freshlist_of_list l n).
   Proof.
-  induction n; cbn; constructor; [ intros [] | constructor | | assumption ].
+  induction n as [|n IHn]; cbn; constructor; [ intros [] | constructor | | assumption ].
   intros Hin. apply fresh_spec with (freshlist_of_list l n ++ l).
   apply in_or_app. left. assumption.
   Qed.
@@ -309,8 +308,8 @@ Section InfDecTypes.
   clear. intros n m Hlt Heq. exfalso.
   apply freshlist_of_list_prefix with (l:= l) in Hlt as [ l' [Hnil Hprf] ].
   unfold freshlist in Heq. rewrite Hprf in Heq.
-  destruct l'; [ apply Hnil; reflexivity | ]. cbn in Heq.
-  destruct n; cbn in Heq, Hprf; rewrite Heq in Hprf.
+  destruct l' as [|c l']; [ apply Hnil; reflexivity | ]. cbn in Heq.
+  destruct n as [|n]; cbn in Heq, Hprf; rewrite Heq in Hprf.
   - assert (In c ((c :: l') ++ nil)) as Hin by apply in_eq.
     revert Hin. apply NoDup_remove_2. rewrite <- app_comm_cons, <- Hprf.
     apply (freshlist_of_list_NoDup l m).
@@ -410,7 +409,8 @@ Section Prod.
 
   Variable (ID : InfDecType) (D : InhDecType).
 
-  Definition prodl_fresh (l : list (prod ID D)) : prod ID D := (fresh (map fst l), inhabitant_inf inh_dt).
+  Definition prodl_fresh (l : list (prod ID D)) : prod ID D :=
+    (fresh (map fst l), inhabitant_inf inh_dt).
 
   Lemma notin_prodl_fresh l : ~ In (prodl_fresh l) l.
   Proof. intros Hin%(in_map fst). apply (fresh_spec _ Hin). Qed.
@@ -420,7 +420,8 @@ Section Prod.
     fresh := prodl_fresh;
     fresh_spec := notin_prodl_fresh |}.
 
-  Definition prodr_fresh (l : list (prod D ID)) : prod D ID := (inhabitant_inf inh_dt, fresh (map snd l)).
+  Definition prodr_fresh (l : list (prod D ID)) : prod D ID :=
+    (inhabitant_inf inh_dt, fresh (map snd l)).
 
   Lemma notin_prodr_fresh l : ~ In (prodr_fresh l) l.
   Proof. intros Hin%(in_map snd). apply (fresh_spec _ Hin). Qed.

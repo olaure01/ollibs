@@ -4,12 +4,14 @@
    and https://caml.inria.fr/pub/docs/manual-ocaml/libref/List.html#1_Associationlists
    for more global approaches *)
 
+Set Mangle Names. Set Mangle Names Light.
+Set Default Goal Selector "!".
+Set Default Proof Using "Type".
+Set Implicit Arguments.
+
 From Coq Require Import Bool.
 From Coq Require Export List.
 From OLlibs Require Export dectype.
-
-Set Implicit Arguments.
-Set Default Proof Using "Type".
 
 
 (** [remove_assoc] *)
@@ -47,9 +49,8 @@ Section RemoveAssoc.
   induction L as [|a L IHL]; simpl; intros Hnd; [ constructor | destruct a ].
   inversion_clear Hnd as [| ? ? Hnin Hnd2 ].
   case_analysis; [ auto | ].
-  constructor; try intros Hin; [ | auto ].
-  apply snd_remove_assoc in Hin.
-  apply Hnin, Hin.
+  constructor; try intro Hin; [ | auto ].
+  apply Hnin, snd_remove_assoc, Hin.
   Qed.
 
   Lemma NoDup_remove_assoc_in L y i :
@@ -60,17 +61,17 @@ Section RemoveAssoc.
   apply remove_assoc_notin; [ | apply snd_remove_assoc in Hin2; exact Hin1 ].
   intros <-.
   revert Hnd Hin1 Hin2. clear. induction L as [|(t1, t2) L IHL]; simpl; [ trivial | ].
-  intros Hnd Hin1. inversion Hnd as [| ? ? Hnin Hnd2]; case_analysis; intros Hin2.
+  intros Hnd Hin1. inversion Hnd as [| ? ? Hnin Hnd2]; case_analysis; intro Hin2.
   - subst.
     apply IHL; [ assumption | | assumption ].
     destruct Hin1 as [[= ->]|]; [ | assumption ].
     contradiction Hnin.
-    apply snd_remove_assoc in Hin2. exact Hin2.
+    exact (snd_remove_assoc _ _ Hin2).
   - destruct Hin2 as [ Heq' | Hin2 ]; subst.
     + destruct Hin1 as [ [= ->] | Hin1 ].
       * contradiction.
       * apply Hnin. apply in_map with (f:= snd) in Hin1. exact Hin1.
-    + apply IHL in Hin2; destruct Hin1 as [[= ->]|Hin1]; auto; exfalso; auto.
+    + apply IHL in Hin2; destruct Hin1 as [[= ->]|Hin1]; exfalso; auto.
   Qed.
 
 End RemoveAssoc.

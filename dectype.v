@@ -1,13 +1,16 @@
 (** Types with decidable equality formalized as types with Boolean valued equality
 this is based on records rather than modules (as opposed to stdlib) *)
 
+Set Mangle Names. Set Mangle Names Light.
+Set Default Goal Selector "!".
+Set Default Proof Using "Type".
+Set Implicit Arguments.
+
 From Coq Require Import Bool PeanoNat Equalities.
 From Coq Require Eqdep_dec.
 From OLlibs Require Export inhabited_Type.
 From OLlibs Require Import funtheory.
 
-Set Implicit Arguments.
-Set Default Proof Using "Type".
 
 (** * Decidable Types *)
 (** types with a boolean binary predicate equivalent to equality *)
@@ -112,46 +115,93 @@ Definition nat_dectype := {|
 (** the [option] construction *)
 Scheme Equality for option.
 
+(* TODO workaround for naming problem in https://github.com/coq/coq/issues/4178 *)
+Lemma option_dec_bl A (eq_A : A -> A -> bool) : (forall x y, eq_A x y = true -> x = y) ->
+  forall x y, option_beq eq_A x y = true -> x = y.
+Proof. intros Heq [x|] [y|]; cbn; [ intros ->%Heq | intros [=] .. | ]; reflexivity. Qed.
+Lemma option_dec_lb A (eq_A : A -> A -> bool) : (forall x y, x = y -> eq_A x y = true) ->
+  forall x y, x = y -> option_beq eq_A x y = true.
+Proof. intros Heq [x|] [y|]; cbn; [ intros [= ->%Heq] | intros [=] .. | ]; reflexivity. Qed.
+
 Definition option_dectype (D : DecType) := {|
   car := option D.(car);
   eqb := option_beq D.(@eqb);
   eqb_eq := fun a b => conj
-                      (internal_option_dec_bl _ (fun x y => proj1 (D.(@eqb_eq) x y)) a b)
-                      (@internal_option_dec_lb _ _ (fun x y => proj2 (D.(@eqb_eq) x y)) a b) |}.
+                      (option_dec_bl _ (fun x y => proj1 (D.(@eqb_eq) x y)) a b)
+                      (@option_dec_lb _ _ (fun x y => proj2 (D.(@eqb_eq) x y)) a b) |}.
 
 (** the [sum] construction *)
 Scheme Equality for sum.
+
+(* TODO workaround for naming problem in https://github.com/coq/coq/issues/4178 *)
+Lemma sum_dec_bl A B (eq_A : A -> A -> bool) (eq_B : B -> B -> bool) :
+  (forall x y, eq_A x y = true -> x = y) -> (forall x y, eq_B x y = true -> x = y) ->
+  forall x y, sum_beq eq_A eq_B x y = true -> x = y.
+Proof.
+intros HeqA HeqB [x|x] [y|y]; cbn; [ intros ->%HeqA | intros [=] .. | intros ->%HeqB ]; reflexivity.
+Qed.
+Lemma sum_dec_lb A B (eq_A : A -> A -> bool) (eq_B : B -> B -> bool) :
+  (forall x y, x = y -> eq_A x y = true) -> (forall x y, x = y -> eq_B x y = true) ->
+  forall x y, x = y -> sum_beq eq_A eq_B x y = true.
+Proof.
+intros HeqA HeqB [x|x] [y|y]; cbn;
+  [ intros [= ->%HeqA] | intros [=] .. | intros [= ->%HeqB] ]; reflexivity.
+Qed.
 
 Definition sum_dectype (D1 D2 : DecType) := {|
   car := sum D1 D2;
   eqb := sum_beq D1.(@eqb) D2.(@eqb);
   eqb_eq := fun a b => conj
-                       (internal_sum_dec_bl _ _ (fun x y => proj1 (D1.(@eqb_eq) x y))
-                                                (fun x y => proj1 (D2.(@eqb_eq) x y)) a b)
-                       (@internal_sum_dec_lb _ _ _ _ (fun x y => proj2 (D1.(@eqb_eq) x y))
-                                                     (fun x y => proj2 (D2.(@eqb_eq) x y)) a b) |}.
+                       (sum_dec_bl _ _ (fun x y => proj1 (D1.(@eqb_eq) x y))
+                                       (fun x y => proj1 (D2.(@eqb_eq) x y)) a b)
+                       (@sum_dec_lb _ _ _ _ (fun x y => proj2 (D1.(@eqb_eq) x y))
+                                            (fun x y => proj2 (D2.(@eqb_eq) x y)) a b) |}.
 
 (** the [prod] construction *)
 Scheme Equality for prod.
+
+(* TODO workaround for naming problem in https://github.com/coq/coq/issues/4178 *)
+Lemma prod_dec_bl A B (eq_A : A -> A -> bool) (eq_B : B -> B -> bool) :
+  (forall x y, eq_A x y = true -> x = y) -> (forall x y, eq_B x y = true -> x = y) ->
+  forall x y, prod_beq eq_A eq_B x y = true -> x = y.
+Proof. intros HeqA HeqB [x x'] [y y']. cbn. intros [->%HeqA ->%HeqB]%andb_prop. reflexivity. Qed.
+Lemma prod_dec_lb A B (eq_A : A -> A -> bool) (eq_B : B -> B -> bool) :
+  (forall x y, x = y -> eq_A x y = true) -> (forall x y, x = y -> eq_B x y = true) ->
+  forall x y, x = y -> prod_beq eq_A eq_B x y = true.
+Proof. intros HeqA HeqB [x x'] [y y']. cbn. intros [= -> ->]. rewrite HeqA, HeqB; reflexivity. Qed.
 
 Definition prod_dectype (D1 D2 : DecType) := {|
   car := prod D1 D2;
   eqb := prod_beq D1.(@eqb) D2.(@eqb);
   eqb_eq := fun a b => conj
-                       (internal_prod_dec_bl _ _ (fun x y => proj1 (D1.(@eqb_eq) x y))
-                                                 (fun x y => proj1 (D2.(@eqb_eq) x y)) a b)
-                       (@internal_prod_dec_lb _ _ _ _ (fun x y => proj2 (D1.(@eqb_eq) x y))
-                                                      (fun x y => proj2 (D2.(@eqb_eq) x y)) a b) |}.
+                       (prod_dec_bl _ _ (fun x y => proj1 (D1.(@eqb_eq) x y))
+                                        (fun x y => proj1 (D2.(@eqb_eq) x y)) a b)
+                       (@prod_dec_lb _ _ _ _ (fun x y => proj2 (D1.(@eqb_eq) x y))
+                                             (fun x y => proj2 (D2.(@eqb_eq) x y)) a b) |}.
 
 (** the [list] construction *)
 Scheme Equality for list.
+
+(* TODO workaround for naming problem in https://github.com/coq/coq/issues/4178 *)
+Lemma list_dec_bl A (eq_A : A -> A -> bool) : (forall x y, eq_A x y = true -> x = y) ->
+  forall x y, list_beq eq_A x y = true -> x = y.
+Proof.
+intros Heq lx. induction lx as [|x lx IHx]; intros [|y ly]; cbn;
+  [ | intros [=] .. | intros [->%Heq ->%IHx]%andb_prop ]; reflexivity.
+Qed.
+Lemma list_dec_lb A (eq_A : A -> A -> bool) : (forall x y, x = y -> eq_A x y = true) ->
+  forall x y, x = y -> list_beq eq_A x y = true.
+Proof.
+intros Heq lx. induction lx as [|x lx IHx]; intros [|y ly]; cbn;
+  [ | intros [=] .. | intros [= -> ->];rewrite Heq, IHx ]; reflexivity.
+Qed.
 
 Definition list_dectype (D : DecType) := {|
   car := list D;
   eqb := list_beq D.(@eqb);
   eqb_eq := fun a b => conj
-                       (internal_list_dec_bl _ (fun x y => proj1 (D.(@eqb_eq) x y)) a b)
-                       (@internal_list_dec_lb _ _ (fun x y => proj2 (D.(@eqb_eq) x y)) a b) |}.
+                       (list_dec_bl _ (fun x y => proj1 (D.(@eqb_eq) x y)) a b)
+                       (@list_dec_lb _ _ (fun x y => proj2 (D.(@eqb_eq) x y)) a b) |}.
 
 (** the [minus] construction *)
 (**   remove an element from a DecType *)
@@ -181,23 +231,24 @@ Arguments minus {_} _.
 (** * Tactics *)
 
 (** a tactic for automatic case analysis on equalities on a [DecType] *)
-Ltac case_analysis :=
-let Heq := fresh "Heq" in
+Ltac case_analysis_eq Heq :=
 match goal with
 | |- context f [?x =? ?y] => destruct (x =? y) eqn:Heq
 | |- context f [?x <? ?y] => destruct (x <? y) eqn:Heq
 | |- context f [?x ?= ?y] => destruct (x ?= y) eqn:Heq
 | |- context f [eqb ?x ?x] => rewrite (eqb_refl x)
-| |- context f [eqb ?x ?y] => case eq_dt_reflect; intros Heq; [ try subst x | ]
+| |- context f [eqb ?x ?y] => case eq_dt_reflect; intro Heq; [ try subst x | ]
 | |- context f [eq_dt_dec ?x ?x] => rewrite (if_eq_dt_dec_refl _ x)
 | H : ?x <> ?y |- context f [eq_dt_dec ?x ?y] => rewrite (if_eq_dt_dec_neq _ H)
 | H : ?y <> ?x |- context f [eq_dt_dec ?x ?y] => rewrite (if_eq_dt_dec_neq _ (not_eq_sym H))
 | |- context f [eq_dt_dec ?x ?y] => destruct (eq_dt_dec x y) eqn:Heq; [ try subst x | ]
 end; cbn.
+Tactic Notation "case_analysis" := let Heq := fresh "Heq" in case_analysis_eq Heq.
+Tactic Notation "case_analysis" "eqn" ":" ident(Heq) := case_analysis_eq Heq.
 
 
 (** * Inhabited Decidable Types *)
-(** types with a boolean binary predicate equivalent to equality *)
+(** types with a boolean binary predicate equivalent to equality and an inhabitant *)
 
 Record InhDecType := {
   inhcar :> DecType;

@@ -1,10 +1,12 @@
 (** Axiom(s) of Finite Choice *)
 
-Set Mangle Names.
-Set Mangle Names Light.
+Set Mangle Names. Set Mangle Names Light.
+Set Default Goal Selector "!".
+Set Default Proof Using "Type".
 Set Implicit Arguments.
 
 From Coq Require Import PeanoNat Lia List.
+
 
 (** * Functional Axiom of Choice for finite functions *)
 Lemma AFC A (a : A) k (R : nat -> A -> Prop):

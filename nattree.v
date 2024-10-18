@@ -1,9 +1,13 @@
 (** [nat]-labelled binary trees and embedding into [nat] *)
 
+Set Mangle Names. Set Mangle Names Light.
+Set Default Goal Selector "!".
+Set Default Proof Using "Type".
+Set Implicit Arguments.
+
 From Coq Require Import PeanoNat Lia.
 From OLlibs Require Import funtheory.
 
-Set Implicit Arguments.
 
 (* TODO use Cantor pairing from stdlib? *)
 
@@ -18,10 +22,10 @@ Proof. unfold cpair. enough (2 ^ n <> 0) by nia. apply Nat.pow_nonzero. intros [
 
 Lemma cpair_inj : injective2 cpair.
 Proof.
-intros n. induction n as [|n IHn]; unfold cpair; cbn; intros m n' m' Hc.
+intro n. induction n as [|n IHn]; unfold cpair; cbn; intros m n' m' Hc.
 - assert (0 = n') as <- by (destruct n'; cbn in Hc; lia).
   cbn in Hc. split; lia.
-- destruct n'; cbn in Hc.
+- destruct n' as [|n']; cbn in Hc.
   + exfalso. lia.
   + assert (n = n' /\ m = m') as [-> ->] by (apply IHn; unfold cpair; lia). repeat split.
 Qed.

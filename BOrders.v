@@ -1,9 +1,13 @@
 (** Boolean-valued total orders as a [Class] *)
 
+Set Mangle Names. Set Mangle Names Light.
+Set Default Goal Selector "!".
+Set Default Proof Using "Type".
+Set Implicit Arguments.
+
 From Coq Require Import Bool PeanoNat Wf_nat Lia List Orders.
 From OLlibs Require Import funtheory.
 
-Set Implicit Arguments.
 
 (** * Class of Boolean-valued total orders *)
 
@@ -15,7 +19,7 @@ Class BOrder := {
   total a b : leb a b = false -> leb b a = true;
   asym a b : leb a b = true -> leb b a = true -> a = b;
   trans a b c : leb a b = true -> leb b c = true -> leb a c = true }.
-Coercion car : BOrder >-> Sortclass. (* TODO integrate as [car :> Type] when available for coercion *)
+Coercion car : BOrder >-> Sortclass. (* TODO integrate as [car :> Type] when it defines coercion *)
 
 (** ** Equivalence with [UsualOrderedTypeFull] *)
 Module Type ModBOrder.
@@ -63,7 +67,7 @@ Module ModBOrder_as_UsualOrderedTypeFull (B : ModBOrder) : UsualOrderedTypeFull.
     rewrite Ht in Hlebx. discriminate Hlebx.
   Qed.
 
-  Lemma eq_dec x y : {eq x y} + {eq x y -> False}.
+  Lemma eq_dec x y : {eq x y} + {~ eq x y}.
   Proof.
   destruct (leb x y) eqn:Heq1, (leb y x) eqn:Heq2.
   - destruct (asym _ _ Heq1 Heq2). left. reflexivity.
@@ -124,7 +128,8 @@ Module UsualOrderedTypeFull_as_BOrder (T : UsualOrderedTypeFull).
   Lemma nleb_lt x y : leb x y = false -> T.lt y x.
   Proof.
   unfold leb. intro Hleb.
-  destruct (T.compare_spec x y) as [ Heq | Hlt | Hgt]; [ discriminate Hleb | discriminate Hleb | assumption ].
+  destruct (T.compare_spec x y) as [ Heq | Hlt | Hgt];
+    [ discriminate Hleb | discriminate Hleb | assumption ].
   Qed.
 
   Lemma lt_nleb x y : T.lt y x -> leb x y = false.
@@ -174,7 +179,7 @@ Defined.
 
 Lemma border_inj A B (f : A -> @car B) (Hi : injective f) : BOrder.
 Proof.
-split with A (fun x y => leb (f x) (f y)); intros.
+split with A (fun x y => leb (f x) (f y)); intros a b; intros.
 - apply total. assumption.
 - apply Hi, asym; assumption.
 - apply trans with (f b); assumption.
@@ -186,14 +191,14 @@ Defined.
 (** ** Insertion sort *)
 
 Fixpoint insert B (a : @car B) l :=
-match l with
-| nil => a :: nil
-| b :: t => if (leb a b) then a :: b :: t
-                         else b :: (insert B a t)
-end.
+  match l with
+  | nil => a :: nil
+  | b :: t => if (leb a b) then a :: b :: t
+                           else b :: (insert B a t)
+  end.
 Arguments insert {_} _ _.
 
-Lemma insert_insert B : forall (x y : @car B) l,
+Lemma insert_insert B (x y : @car B) l :
   insert y (insert x l) = insert x (insert y l).
 Proof.
 induction l as [|a l IHl]; cbn.
@@ -214,11 +219,11 @@ Qed.
 (** ** Sorted lists *)
 
 Fixpoint is_sorted B (l : list (@car B)) :=
-match l with
-| nil => true
-| a :: nil => true
-| a :: (b :: _) as r => leb a b && is_sorted B r
-end.
+  match l with
+  | nil => true
+  | a :: nil => true
+  | a :: (b :: _) as r => leb a b && is_sorted B r
+  end.
 Arguments is_sorted {_} _.
 
 Lemma is_sorted_tail B a l : @is_sorted B (a :: l) = true -> is_sorted l = true.
@@ -232,8 +237,7 @@ destruct m1 as [m1' B1], m2 as [m2' B2]. cbn. intros ->.
 f_equal. apply (Eqdep_dec.UIP_dec bool_dec).
 Qed.
 
-Lemma insert_sorted B a (m : SortedList B) :
-  let l := insert a (proj1_sig m) in
+Lemma insert_sorted B a (m : SortedList B) : let l := insert a (proj1_sig m) in
     is_sorted l = true /\ l <> nil
  /\ forall c, In c l -> In c (proj1_sig m) \/ c = a.
 Proof.
@@ -243,35 +247,28 @@ enough (forall s a (m : SortedList B),
     is_sorted l = true /\ l <> nil
  /\ forall c, In c l -> In c (proj1_sig m) \/ c = a) as Hlen
   by now intros; apply Hlen with (length (proj1_sig m)).
-induction s as [s IH] using (well_founded_induction lt_wf).
-clear a m; intros a m Hlen l.
-destruct m as [l0 Hsort].
-destruct l0; repeat split; auto.
+intro s. induction s as [s IH] using (well_founded_induction lt_wf).
+clear a m. intros a [[|b l'] Hsort] Hlen l; repeat split; auto.
 - intros [=].
-- intros c Hc.
-  inversion Hc as [ -> | [] ].
-  right. reflexivity.
-- unfold l. cbn.
-  destruct (leb a c) eqn:Heqbb.
+- intros c [ -> | [] ]. right. reflexivity.
+- unfold l. clear l. cbn.
+  destruct (leb a b) eqn:Heqbb.
   + now apply andb_true_iff; split.
-  + destruct s; inversion Hlen.
-    destruct (IH s (le_n _) a (exist _ l0 (is_sorted_tail _ _ _ Hsort)) H0)
+  + destruct s as [|s]; destr_eq Hlen.
+    destruct (IH s (le_n _) a (exist _ l' (is_sorted_tail _ _ _ Hsort)) Hlen)
       as [Hsort' _].
     apply total in Heqbb.
-    destruct l0 ; try (apply andb_true_iff ; split); auto.
-    simpl; simpl in Hsort'.
-    destruct (leb a c0); apply andb_true_iff; split; auto.
-    clear Hlen l. simpl in Hsort.
+    destruct l' as [|c l']; [ (apply andb_true_iff; split); auto | ].
+    cbn in Hsort', Hsort. cbn. destruct (leb a c); apply andb_true_iff; split; auto.
     apply andb_true_iff in Hsort. apply Hsort.
 - intro Heq. unfold l in Heq. cbn in Heq.
-  destruct (leb a c); discriminate Heq.
+  destruct (leb a b); discriminate Heq.
 - intros d Hd. unfold l in Hd. cbn in Hd.
-  destruct (leb a c).
-  + inversion Hd as [ -> | ]; [ right | left ]; trivial.
-  + inversion Hd as [ -> | Hin ].
+  destruct (leb a b).
+  + destruct Hd as [ -> | ]; [ right | left ]; trivial.
+  + destruct Hd as [ -> | Hin ].
     * left. apply in_eq.
-    * destruct s; inversion Hlen as [ Hlen' ].
-      destruct (IH s (le_n _) a (exist _ l0 (is_sorted_tail _ _ _ Hsort)) Hlen') as [_ Hin'].
-      apply Hin' in Hin.
-      destruct Hin; [ left; apply in_cons | right ]; assumption.
+    * destruct s as [|s]; destr_eq Hlen.
+      destruct (IH s (le_n _) a (exist _ l' (is_sorted_tail _ _ _ Hsort)) Hlen) as [_ Hin'].
+      apply Hin' in Hin as [|]; [ left; apply in_cons | right ]; assumption.
 Qed.

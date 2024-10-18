@@ -1,10 +1,14 @@
 (** Types with inhabitant declared in Type *)
 
+Set Mangle Names. Set Mangle Names Light.
+Set Default Goal Selector "!".
+Set Default Proof Using "Type".
 Set Implicit Arguments.
+
 
 (** * Inhabitation *)
 
-Variant inhabited_inf A : Type := | inhabits_inf : A -> inhabited_inf A.
+Variant inhabited_inf A : Type := inhabits_inf : A -> inhabited_inf A.
 
 Definition inhabitant_inf A (Hinh : inhabited_inf A) := match Hinh with inhabits_inf a => a end.
 

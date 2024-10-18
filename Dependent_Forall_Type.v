@@ -1,11 +1,13 @@
 (** Generalization of [Forall_inf] to dependent product *)
 
+Set Mangle Names. Set Mangle Names Light.
+Set Default Goal Selector "!".
+Set Default Proof Using "Type".
+Set Implicit Arguments.
+
 From Coq Require Export Eqdep_dec.
 From Coq Require Import PeanoNat List.
 From OLlibs Require Import List_Type.
-
-Set Implicit Arguments.
-Set Default Proof Using "Type".
 
 
 (** * [In_Forall_inf] *)

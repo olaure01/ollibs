@@ -1,9 +1,12 @@
 (** Well-founded order on products of [nat] *)
 
+Set Mangle Names. Set Mangle Names Light.
+Set Default Goal Selector "!".
+Set Default Proof Using "Type".
+Set Implicit Arguments.
+
 From Coq Require Import Relation_Operators Lexicographic_Product Lia.
 From Coq Require Export Wf_nat.
-
-Set Implicit Arguments.
 
 
 (** * Well founded order on pairs of [nat] *)
