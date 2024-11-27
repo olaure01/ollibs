@@ -4,9 +4,12 @@ Properties of [flat_map]. *)
 (* TODO add [as p] to tactics cf List_more *)
 (* TODO remove some prod in sigT *)
 
+Set Default Goal Selector "!".
+Set Default Proof Using "Type".
 Set Implicit Arguments.
 
-From OLlibs Require Import funtheory List_more Permutation_Type_more CPermutation_Type GPermutation_Type.
+From OLlibs Require Import funtheory List_more
+                           Permutation_Type_more CPermutation_Type GPermutation_Type.
 
 
 Lemma flat_map_elt A B (f : A -> list B) a L l1 l2 :
@@ -30,7 +33,7 @@ Lemma app_vs_flat_map B T (f : B -> T) L l1 l2 :
           /\ l1 = flat_map (fun '(p1,p2) => f p1 :: p2) L1
           /\ l2 = flat_map (fun '(p1,p2) => f p1 :: p2) L2 }.
 Proof.
-revert l1 l2; induction L as [|[b l] L IHL]; simpl; intros l1 l2 Heq.
+induction L as [|[b l] L IHL] in l1, l2 |- *; cbn; intros Heq.
 - apply app_eq_nil in Heq; destruct Heq; subst.
   now right; exists (nil, nil).
 - rewrite app_comm_cons in Heq.
@@ -134,7 +137,8 @@ induction L as [|[n l'] L IHL] in l, l2, Heq1 |- *; cbn in Heq1.
     * exfalso.
       rewrite <- (app_nil_r l0), <- 2 app_assoc in Heqa. apply app_inv_head in Heqa.
       cbn in Heqa. nil_vs_elt_inv Heqa.
-    * left. right. exists ((n, l') :: L', L'', n', l'', l'''). cbn. rewrite ? app_assoc. repeat split.
+    * left. right. exists ((n, l') :: L', L'', n', l'', l'''). cbn.
+      rewrite ? app_assoc. repeat split.
     * right. exists ((n, l') :: L', L'', n' , l''). repeat split.
 Qed.
 
@@ -172,18 +176,18 @@ Qed.
 
 Lemma Permutation_Type_app_flat_map B T (f : B -> T) lw0 L lw l :
   Permutation_Type lw (l ++ flat_map (fun '(p1, p2) => f p1 :: p2) L) ->
-  {'(L', lw') & prod (L <> nil -> L' <> nil)
-      (prod (lw = lw' ++ flat_map (fun '(p1,p2) => f p1 :: p2) L')
-            (Permutation_Type (lw' ++ flat_map (fun '(p1,p2) => app lw0 p2) L')
-                              (l ++ flat_map (fun '(p1,p2) => app lw0 p2) L))) }.
+  {'(L', lw') & L <> nil -> L' <> nil &
+           prod (lw = lw' ++ flat_map (fun '(p1,p2) => f p1 :: p2) L')
+                (Permutation_Type (lw' ++ flat_map (fun '(p1,p2) => app lw0 p2) L')
+                                  (l ++ flat_map (fun '(p1,p2) => app lw0 p2) L)) }.
 Proof.
-revert lw l; induction L as [|[n a] l0 IHL]; simpl; intros lw l HP.
+induction L as [|[n a] l0 IHL] in lw, l |- *; cbn; intros HP.
 - rewrite app_nil_r in HP.
   now exists (nil, lw); rewrite ? app_nil_r.
 - destruct (Permutation_Type_vs_elt_inv _ _ _ HP) as ([lw1 lw2] & HP2); subst; simpl in HP.
   apply Permutation_Type_app_inv in HP.
   rewrite app_assoc in HP; apply IHL in HP.
-  destruct HP as [[L' l'] (Hnil' & HeqL' & HP')].
+  destruct HP as [[L' l'] Hnil' [HeqL' HP']].
   app_vs_app_flat_map_inv HeqL'.
   + exists ((n, l1) :: L', lw1); simpl; repeat split.
     * intros _ Heqnil; inversion Heqnil.
@@ -208,14 +212,14 @@ Qed.
 
 Lemma Permutation_Type_f_app_flat_map T T1 T2 (g : T -> T2) (f : T1 -> T2) lw0 L lw lw' l :
   Permutation_Type lw lw' -> map f lw' = l ++ flat_map (fun '(p1, p2) => g p1 :: p2) L ->
-  {'(L', lw') & prod (L <> nil -> L' <> nil)
-      (prod (map f lw = lw' ++ flat_map (fun '(p1, p2) => g p1 :: p2) L')
-            (Permutation_Type (lw' ++ flat_map (fun '(_, p2) => app (map f lw0) p2) L')
-                              (l ++ flat_map (fun '(_, p2) => app (map f lw0) p2) L))) }.
+  {'(L', lw') & L <> nil -> L' <> nil &
+           prod (map f lw = lw' ++ flat_map (fun '(p1, p2) => g p1 :: p2) L')
+                (Permutation_Type (lw' ++ flat_map (fun '(_, p2) => app (map f lw0) p2) L')
+                                  (l ++ flat_map (fun '(_, p2) => app (map f lw0) p2) L)) }.
 Proof.
-intros HP Heq.
-apply (Permutation_Type_map f) in HP. rewrite Heq in HP.
-apply Permutation_Type_app_flat_map; assumption.
+intros HP%(Permutation_Type_map f) Heq.
+apply Permutation_Type_app_flat_map.
+rewrite <- Heq. assumption.
 Qed.
 
 Lemma Permutation_Type_flat_map_cons_flat_map_app T T1 T2 (g : T -> T2) (f : T1 -> T2)
@@ -237,7 +241,7 @@ app_vs_app_flat_map_inv Heq.
                 l ++ flat_map (fun '(p1,p2) => (app (map f l0) p2)) L,
                 l1 ++ map f lp1 ++ l, L); list_simpl; repeat split; try reflexivity.
   + destruct (Permutation_Type_f_app_flat_map _ f l0 _ _ HP Heq2)
-      as [[L' l'] (Hnil' & HeqL' & HPL')].
+      as [[L' l'] Hnil' [HeqL' HPL']].
     destruct (map_f_flat_map _ f l0 _ _ _ Heq2) as [Lp HeqLp].
     destruct (map_f_flat_map _ f l0 _ _ _ HeqL') as [Lp' HeqLp'].
     assert (Permutation_Type Lp' Lp) as HPp
@@ -253,7 +257,7 @@ app_vs_app_flat_map_inv Heq.
     * rewrite <- HeqLp'; list_simpl; reflexivity.
     * rewrite <- HeqLp; list_simpl; reflexivity.
   + destruct (Permutation_Type_f_app_flat_map _ f l0 _ _ HP Heq2)
-      as [[L' l'] (Hnil' & HeqL' & HPL')]; simpl in Hnil', HeqL', HPL'.
+      as [[L' l'] Hnil' [HeqL' HPL']]; simpl in Hnil', HeqL', HPL'.
     destruct (map_f_flat_map _ f l0 _ _ _ Heq2) as [Lp HeqLp].
     destruct (map_f_flat_map _ f l0 _ _ _ HeqL') as [Lp' HeqLp'].
     assert (Permutation_Type Lp' Lp) as HPp
@@ -270,7 +274,7 @@ app_vs_app_flat_map_inv Heq.
             l1 ++ flat_map (fun '(p1,p2) => app (map f l0) p2) L1,
             l, L0 ++ (n , l3 ++ map f lp1 ++ l1) :: L1); repeat split; list_simpl.
   + destruct (Permutation_Type_f_app_flat_map _ f l0 _ _ HP Heq1)
-      as [[L' l''] (Hnil' & HeqL' & HPL')].
+      as [[L' l''] Hnil' [HeqL' HPL']].
     destruct (map_f_flat_map _ f l0 _ _ _ Heq1) as [Lp HeqLp].
     destruct (map_f_flat_map _ f l0 _ _ _ HeqL') as [Lp' HeqLp'].
     assert (Permutation_Type Lp' Lp) as HPp
@@ -289,7 +293,7 @@ app_vs_app_flat_map_inv Heq.
     * rewrite <- HeqLp'; list_simpl; reflexivity.
     * rewrite <- HeqLp; list_simpl; reflexivity.
   + destruct (Permutation_Type_f_app_flat_map _ f l0 _ _ HP Heq1)
-      as [[L' l''] (Hnil' & HeqL' & HPL')].
+      as [[L' l''] Hnil' [HeqL' HPL']].
     destruct (map_f_flat_map _ f l0 _ _ _ Heq1) as [Lp HeqLp].
     destruct (map_f_flat_map _ f l0 _ _ _ HeqL') as [Lp' HeqLp'].
     assert (Permutation_Type Lp' Lp) as HPp
@@ -305,7 +309,7 @@ app_vs_app_flat_map_inv Heq.
 - app_vs_flat_map_inv Heq2.
   + rewrite <- (app_nil_l (flat_map _ _)) in Heq1.
     destruct (Permutation_Type_f_app_flat_map _ f l0 _ _ HP Heq1)
-      as [[L' l''] (Hnil' & HeqL' & HPL')]; list_simpl in HPL'.
+      as [[L' l''] Hnil' [HeqL' HPL']]; list_simpl in HPL'.
     destruct (map_f_flat_map _ f l0 _ _ _ Heq1) as [Lp HeqLp]; list_simpl in HeqLp.
     destruct (map_f_flat_map _ f l0 _ _ _ HeqL') as [Lp' HeqLp'].
     assert (Permutation_Type Lp' Lp) as HPp
@@ -332,7 +336,7 @@ app_vs_app_flat_map_inv Heq.
       -- rewrite <- HeqLp; list_simpl; reflexivity.
   + rewrite <- (app_nil_l (flat_map _ _)) in Heq1.
     destruct (Permutation_Type_f_app_flat_map _ f l0 _ _ HP Heq1)
-      as [[L' l''] (Hnil' & HeqL' & HPL')].
+      as [[L' l''] Hnil' [HeqL' HPL']].
     destruct (map_f_flat_map _ f l0 _ _ _ Heq1) as [Lp HeqLp] ; list_simpl in HeqLp.
     destruct (map_f_flat_map _ f l0 _ _ _ HeqL') as [Lp' HeqLp'].
     assert (Permutation_Type Lp' Lp) as HPp
@@ -357,10 +361,10 @@ Qed.
 
 Lemma CPermutation_Type_app_flat_map B T (f : B -> T) lw0 L lw l :
   CPermutation_Type lw (l ++ flat_map (fun '(p1,p2) => f p1 :: p2) L) ->
-  {'(L', lw') & prod (L <> nil -> L' <> nil)
-      (prod (lw = lw' ++ flat_map (fun '(p1,p2) => f p1 :: p2) L')
-            (CPermutation_Type (lw' ++ flat_map (fun '(p1,p2) => app lw0 p2) L')
-                               (l ++ flat_map (fun '(p1,p2) => app lw0 p2) L))) }.
+  {'(L', lw') & L <> nil -> L' <> nil &
+           prod (lw = lw' ++ flat_map (fun '(p1,p2) => f p1 :: p2) L')
+                (CPermutation_Type (lw' ++ flat_map (fun '(p1,p2) => app lw0 p2) L')
+                                   (l ++ flat_map (fun '(p1,p2) => app lw0 p2) L)) }.
 Proof.
 intros HC; inversion HC as [l1 l2 Heq1 Heq2]; subst.
 dichot_app_inf_exec Heq2; subst.
@@ -399,11 +403,13 @@ Qed.
 
 Lemma PCPermutation_Type_app_flat_map b B T (f : B -> T) lw0 L lw l :
   PCPermutation_Type b lw (l ++ flat_map (fun '(p1,p2) => f p1 :: p2) L) ->
-  {'(L', lw') & prod (L <> nil -> L' <> nil)
-      (prod (lw = lw' ++ flat_map (fun '(p1,p2) => f p1 :: p2) L')
-            (PCPermutation_Type b (lw' ++ flat_map (fun '(p1,p2) => app lw0 p2) L')
-                               (l ++ flat_map (fun '(p1,p2) => app lw0 p2) L))) }.
-Proof. destruct b; [ apply Permutation_Type_app_flat_map | apply CPermutation_Type_app_flat_map ]. Qed.
+  {'(L', lw') & L <> nil -> L' <> nil &
+           prod (lw = lw' ++ flat_map (fun '(p1,p2) => f p1 :: p2) L')
+                (PCPermutation_Type b (lw' ++ flat_map (fun '(p1,p2) => app lw0 p2) L')
+                                      (l ++ flat_map (fun '(p1,p2) => app lw0 p2) L)) }.
+Proof.
+destruct b; [ apply Permutation_Type_app_flat_map | apply CPermutation_Type_app_flat_map ].
+Qed.
 
 
 Lemma app_vs_flat_map_cst T (A : T) L l1 l2 :
@@ -424,7 +430,7 @@ intros Heq; destruct (@app_vs_flat_map _ _ (fun (p : nat) => A) (map (fun x => (
   left; exists (map snd L1, map snd L2, l3, l4).
   destruct H as (H1 & H2 & H3 & H4).
   repeat split; auto.
-  + clear - H2; revert L H2; induction L1; intros L H2; simpl; destruct L; inversion H2; simpl.
+  + clear - H2. induction L1 in L, H2 |- *; cbn; destruct L; inversion H2; simpl.
     * replace (map snd (map (fun x => (1, x)) L)) with L; auto.
       clear; induction L; auto.
       now simpl; rewrite <- IHL.
@@ -439,7 +445,7 @@ intros Heq; destruct (@app_vs_flat_map _ _ (fun (p : nat) => A) (map (fun x => (
 - right.
   destruct s as ((L1 & L2) & (H1 & H2 & H3)).
   exists (map snd L1, map snd L2); repeat split.
-  + clear - H1; revert L H1; induction L1; intros L H1.
+  + clear - H1. induction L1 in L, H1 |- *.
     * simpl; simpl in H1; rewrite <- H1.
       clear; induction L; auto.
       now simpl; rewrite<- IHL.
@@ -576,18 +582,18 @@ Qed.
 
 Lemma Permutation_Type_app_flat_map_cst T (A : T) lw0 L lw l :
   Permutation_Type lw (l ++ flat_map (cons A) L) ->
-  {'(L', lw') & prod (L <> nil -> L' <> nil)
-      (prod (lw = lw' ++ flat_map (cons A) L')
-            (Permutation_Type (lw' ++ flat_map (app lw0) L')
-                              (l ++ flat_map (app lw0) L))) }.
+  {'(L', lw') & L <> nil -> L' <> nil &
+          prod (lw = lw' ++ flat_map (cons A) L')
+               (Permutation_Type (lw' ++ flat_map (app lw0) L')
+                                 (l ++ flat_map (app lw0) L)) }.
 Proof.
 intro HP.
-destruct (@Permutation_Type_app_flat_map _ _ (fun _ => A) lw0 (map (fun p => (1, p)) L) lw l).
+destruct (@Permutation_Type_app_flat_map _ _ (fun _ => A) lw0 (map (fun p => (1, p)) L) lw l)
+  as [(L', lw') H1 [H2 H3]].
 { replace (flat_map (fun '(p1,p2) => A :: p2)
                     (map (fun p => (1,p)) L)) with (flat_map (cons A) L)
     by (clear; induction L as [|? ? IHL]; [ | cbn; rewrite IHL ]; reflexivity).
   assumption. }
-destruct x as (L', lw'), y as [H1 [H2 H3]].
 split with (map snd L', lw'); repeat split.
 - intros Hneq ->%map_eq_nil.
   apply H1; [ | reflexivity ].
@@ -605,13 +611,14 @@ Qed.
 
 Lemma Permutation_Type_f_app_flat_map_cst T T1 (A : T1) (f : T -> T1) lw0 L lw lw' l :
   Permutation_Type lw lw' -> map f lw' = l ++ flat_map (cons A) L ->
-  {'(L' , lw') & prod (L <> nil -> L' <> nil)
-      (prod (map f lw = lw' ++ flat_map (cons A) L')
-            (Permutation_Type (lw' ++ flat_map (app (map f lw0)) L')
-                              (l ++ flat_map (app (map f lw0)) L))) }.
+  {'(L' , lw') & L <> nil -> L' <> nil &
+            prod (map f lw = lw' ++ flat_map (cons A) L')
+                 (Permutation_Type (lw' ++ flat_map (app (map f lw0)) L')
+                                   (l ++ flat_map (app (map f lw0)) L)) }.
 Proof.
-intros HP%(Permutation_Type_map f) Heq. rewrite Heq in HP.
-apply Permutation_Type_app_flat_map_cst. assumption.
+intros HP%(Permutation_Type_map f) Heq.
+apply Permutation_Type_app_flat_map_cst.
+rewrite <- Heq. assumption.
 Qed.
 
 Lemma Permutation_Type_flat_map_cons_flat_map_app_cst T T1 (A : T1) (f : T -> T1)
@@ -629,7 +636,8 @@ intros HP Heq.
 destruct (@Permutation_Type_flat_map_cons_flat_map_app _ _ _ (fun _ => A)
             f Hinj l0 l1 l2 lp1 lp2 l (map (fun p => (1 , p)) L)); auto.
 { replace (flat_map (fun '(p1, p2) => A :: p2) (map (fun p => (1, p)) L))
-     with (flat_map (cons A) L) by (clear; induction L as [|? ? IHL]; [ | cbn; rewrite IHL]; reflexivity).
+     with (flat_map (cons A) L)
+  by (clear; induction L as [|? ? IHL]; [ | cbn; rewrite IHL]; reflexivity).
   assumption. }
 destruct x as [[[[[l1' l2'] l3'] l4'] l'] L'], y as [H1 [H2 [H3 H4]]].
 split with (l1', l2', l3', l4', l', map snd L'); repeat split; auto.
@@ -649,14 +657,14 @@ Qed.
 
 Lemma CPermutation_Type_app_flat_map_cst T (A : T) lw0 L lw l :
   CPermutation_Type lw (l ++ flat_map (cons A) L) ->
-  {'(L', lw') & prod (L <> nil -> L' <> nil)
-      (prod (lw = lw' ++ flat_map (cons A) L')
-            (CPermutation_Type (lw' ++ flat_map (app lw0) L')
-                               (l ++ flat_map (app lw0) L))) }.
+  {'(L', lw') & L <> nil -> L' <> nil &
+          prod (lw = lw' ++ flat_map (cons A) L')
+               (CPermutation_Type (lw' ++ flat_map (app lw0) L')
+                                  (l ++ flat_map (app lw0) L)) }.
 Proof.
 intro HC.
 destruct (@CPermutation_Type_app_flat_map _ _ (fun p => A) lw0 (map (fun x => (1 , x)) L) lw l)
-  as [[L' lw'] [H1 [H2 H3]]].
+  as [[L' lw'] H1 [H2 H3]].
 { replace (flat_map (fun '(_, p2) => A :: p2) (map (fun x => (1, x)) L))
      with (flat_map (cons A) L)
     by (clear; induction L as [|[] L IHL]; [ | cbn; rewrite IHL .. ]; reflexivity).
