@@ -5,11 +5,13 @@ Equality is an equivalence relation.
 An implementation of the axioms is provided for every type
 by lists up to permutation (with output in [Type]. *)
 
+Set Mangle Names. Set Mangle Names Light.
+Set Default Goal Selector "!".
+Set Default Proof Using "Type".
+Set Implicit Arguments.
+
 From Coq Require Import CMorphisms List.
 From OLlibs Require Import Permutation_Type.
-
-Set Implicit Arguments.
-Set Default Proof Using "Type".
 
 
 (** * Axiomatization *)

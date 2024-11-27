@@ -6,11 +6,13 @@ Permutation are with output in [Type].
 An implementation of the axioms is provided by sorted lists
 for every type equiped with a Boolean-valued total order relation. *)
 
+Set Mangle Names. Set Mangle Names Light.
+Set Default Goal Selector "!".
+Set Default Proof Using "Type".
+Set Implicit Arguments.
+
 From Coq Require Import Bool List CMorphisms.
 From OLlibs Require Import BOrders Permutation_Type_more.
-
-Set Implicit Arguments.
-Set Default Proof Using "Type".
 
 
 (** * Axiomatization *)

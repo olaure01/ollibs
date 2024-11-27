@@ -1,9 +1,12 @@
 (** Transposition function on elements of a list *)
 
+Set Mangle Names. Set Mangle Names Light.
+Set Default Goal Selector "!".
+Set Default Proof Using "Type".
+Set Implicit Arguments.
+
 From Coq Require Import List Lia.
 From OLlibs Require Import funtheory Permutation_Type.
-
-Set Implicit Arguments.
 
 
 (** Transpose elements of index [n] and [n + 1] in [l] *)
@@ -39,9 +42,9 @@ Qed.
 
 Lemma transp_idem A n : retract (@transp A n) (@transp A n).
 Proof.
-induction n as [|n IHn]; intros l; (destruct l; [ | destruct l ]); auto.
-- now simpl; f_equal; rewrite ? transp_nil.
-- now simpl; f_equal; rewrite ? IHn.
+induction n as [|n IHn]; intros [|? [|? l]]; trivial.
+- cbn. rewrite ! transp_nil. reflexivity.
+- cbn. rewrite ! IHn. reflexivity.
 Qed.
 
 Lemma transp_inj A n : injective (@transp A n).
@@ -49,52 +52,52 @@ Proof. apply section_injective with (transp n); apply transp_idem. Qed.
 
 Lemma transp_refl A n (l : list A) : length l < n + 2 -> transp n l = l.
 Proof.
-revert l; induction n as [|n IHn]; intros l Hlt.
-- destruct l; [ | destruct l]; auto.
-  exfalso; simpl in Hlt; lia.
-- destruct l; auto.
-  simpl in Hlt; simpl; f_equal.
-  apply IHn; lia.
+revert l. induction n as [|n IHn]; intros [|? [|? l]] Hlt; cbn; trivial.
+- exfalso. cbn in Hlt. lia.
+- destruct n as [|n]; cbn; reflexivity.
+- f_equal. apply IHn. cbn in *. lia.
 Qed.
 
 Lemma transp_decomp A n (l : list A) : n + 1 < length l ->
-  {'(l1, l2, a, b) & length l1 = n & prod (l = l1 ++ a :: b :: l2)
-                                          (transp n l = l1 ++ b :: a :: l2) }.
+  {'(l', a, b) | l = firstn n l ++ a :: b :: l' & transp n l = firstn n l ++ b :: a :: l' }.
 Proof.
-revert l; induction n as [|n IHn]; intros l Hlt; destruct l ; try (exfalso; inversion Hlt; fail).
-- destruct l ; try (exfalso; simpl in Hlt ; lia; fail).
-  exists (nil, l, a, a0); try split; try reflexivity.
-- assert (n + 1 < length l) as Hlt2 by (simpl in Hlt; lia).
-  destruct (IHn _ Hlt2) as [(((l1, l2), a'), b') Hl [Heq1 Heq2]]; subst.
-  exists (a :: l1, l2, a', b'); try split; try reflexivity.
-  simpl; f_equal; assumption.
+revert l. induction n as [|n IHn]; intros [|c l] Hlt; cbn; try (exfalso; inversion Hlt; fail).
+- destruct l as [|d l]; try (exfalso; cbn in Hlt; lia; fail).
+  exists (l, c, d); [ | split ]; reflexivity.
+- assert (n + 1 < length l) as Hlt2 by (cbn in Hlt; lia).
+  destruct (IHn _ Hlt2) as [((l2, a'), b') Heq1 Heq2]; subst.
+  exists (l2, a', b'); f_equal; assumption.
+Qed.
+
+Lemma transp_length A n (l : list A) : length (transp n l) = length l.
+Proof.
+revert l. induction n as [|n IHn]; intros [|? l]; cbn; try reflexivity.
+- destruct l; cbn; reflexivity.
+- rewrite IHn. reflexivity.
 Qed.
 
 Lemma transp_map A B (f : A -> B) n l : transp n (map f l) = map f (transp n l).
 Proof.
-revert l; induction n as [|n IHn]; intros l; destruct l; auto.
-- now destruct l; simpl.
-- simpl; f_equal; apply IHn.
+revert l. induction n as [|n IHn]; intros [|? l]; auto.
+- destruct l; cbn; reflexivity.
+- cbn. f_equal. apply IHn.
 Qed.
 
 Lemma transp_perm A n (l : list A) : Permutation_Type l (transp n l).
 Proof.
-revert l; induction n; intros l; simpl; destruct l; auto.
-destruct l; auto.
-apply Permutation_Type_swap.
+revert l. induction n; intros [|? l]; cbn; auto.
+destruct l; repeat constructor.
 Qed.
 
-Lemma perm_transp A (l1 l2 : list A) :
-  Permutation_Type l1 l2 -> { l & l2 = fold_right transp l1 l }.
+Lemma perm_transp A (l1 l2 : list A) : Permutation_Type l1 l2 ->
+  { l | l2 = fold_right transp l1 l }.
 Proof.
-intros HP; induction HP as [ | a l1 l2 HP IHHP | | l1 l2 l3 HP1 IHHP1 HP2 IHHP2].
-- now exists nil.
-- destruct IHHP as [l0 Heq]; subst.
-  exists (map S l0).
-  clear HP; induction l0; auto.
-  now simpl; rewrite <- IHl0.
-- now exists (0 :: nil).
-- destruct IHHP1 as [l1' ->]; destruct IHHP2 as [l2' ->].
+intro HP. induction HP as [ | a l1 l2 _ [l0 ->] | | l1 l2 l3 HP1 IHHP1 HP2 [l2' ->]].
+- exists nil. reflexivity.
+- exists (map S l0).
+  induction l0 as [|? ? IHl0]; [ | cbn; rewrite <- IHl0 ]; reflexivity.
+- exists (0 :: nil). reflexivity.
+- destruct IHHP1 as [l1' ->].
   exists (l2' ++ l1').
-  now rewrite fold_right_app.
+  rewrite fold_right_app. reflexivity.
 Qed.

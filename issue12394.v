@@ -13,7 +13,7 @@ Lemma injection_list_Forall_inf_cons A P :
   forall (a : A) l p p' (F F' : Forall_inf P l),
   Forall_inf_cons a p F = Forall_inf_cons a p' F' -> p = p' /\ F = F'.
 Proof.
-intros Hdec a l p p' F F' [= Heq Heql]; split.
-- apply (inj_pair2_eq_dec _ Hdec _ _ _ _ Heq).
-- apply (inj_pair2_eq_dec _ (list_eq_dec Hdec) _ _ _ _ Heql).
+intros Hdec a l p p' F F'
+  [= ->%(inj_pair2_eq_dec _ Hdec) ->%(inj_pair2_eq_dec _ (list_eq_dec Hdec))];
+  split; reflexivity.
 Qed.
