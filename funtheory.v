@@ -6,6 +6,7 @@ Set Default Proof Using "Type".
 Set Implicit Arguments.
 
 From Coq Require Import Program.Basics Relation_Definitions RelationClasses List.
+  (* do not export Program.Basics to avoid impact on [flip] and [arrow] for setoid_rewriting *)
 From OLlibs Require Import inhabited_Type.
 
 
@@ -240,6 +241,21 @@ destruct (Hg z) as [y -> Hinjf], (Hf y) as [x -> Hinjg].
 exists x; [ reflexivity | ].
 intros x' Heq. apply Hinjg, Hinjf, Heq.
 Qed.
+
+
+(** * Extensional equality of functions *)
+
+Definition ext_eq A B (f g : A -> B) := forall a, f a = g a.
+Notation " f ~ g " := (ext_eq f g) (at level 60).
+
+Lemma compose_ext_eq  A B C (f1 g1 : A -> B) (f2 g2 : B -> C) :
+  f1 ~ g1 -> f2 ~ g2 -> compose f2 f1 ~ compose g2 g1.
+Proof.
+intros Hext1 Hext2 x.
+unfold compose. rewrite (Hext1 x), (Hext2 (g1 x)). reflexivity.
+Qed.
+
+(* TODO develop this section with properties: equivalence relation, compatibility, etc. *)
 
 
 (** * Additional definitions *)
