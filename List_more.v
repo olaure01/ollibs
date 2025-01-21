@@ -673,6 +673,11 @@ Lemma fold_right_app_assoc A f (e : A) l1 l2 :
   fold_right f e (l1 ++ l2) = f (fold_right f e l1) (fold_right f e l2).
 Proof. intros Hassoc Hunit. apply fold_right_app_assoc2, Hunit. assumption. Qed.
 
+(** ** [list_sum] and [repeat] *)
+
+Lemma list_sum_repeat k n : list_sum (repeat k n) = n * k.
+Proof. induction n as [|n IHn]; [ | simpl repeat; simpl list_sum; rewrite IHn ]; reflexivity. Qed.
+
 
 (** ** Tactics for automatic solving *)
 
