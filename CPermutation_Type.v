@@ -311,3 +311,11 @@ apply map_injective_in in Heq1 as ->; [ apply map_injective_in in Heq2 as -> | ]
 - intros x y Hin1 Hin2 Heq. apply Hi; [ apply in_or_app .. | ]; [left | right | ]; assumption.
 - intros x y Hin1 Hin2 Hf. apply Hi; [ apply in_or_app .. | ]; [right | left | ]; assumption.
 Qed.
+
+Lemma CPermutation_Type_concat A (l1 l2 : list (list A)):
+  CPermutation_Type l1 l2 -> CPermutation_Type (concat l1) (concat l2).
+Proof. intro HC. induction HC. rewrite ! concat_app. constructor. Qed.
+
+Lemma CPermutation_Type_flat_map A B (f : A -> list B) l1 l2:
+  CPermutation_Type l1 l2 -> CPermutation_Type (flat_map f l1) (flat_map f l2).
+Proof. intro HC. induction HC. rewrite ! flat_map_app. constructor. Qed.

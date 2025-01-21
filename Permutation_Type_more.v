@@ -293,28 +293,20 @@ dichot_elt_app_inf_exec Heq; subst.
   exact (Hf a eq_refl).
 Qed.
 
+#[export] Instance Permutation_Type_concat A :
+  Proper ((@Permutation_Type (list A)) ==> (@Permutation_Type A)) (@concat A).
+Proof.
+intros l1 l2 HP. induction HP; cbn.
+- reflexivity.
+- apply Permutation_Type_app_head. assumption.
+- rewrite ! app_assoc. apply Permutation_Type_app_tail, Permutation_Type_app_swap.
+- etransitivity; eassumption.
+Qed.
+
 #[export] Instance Permutation_Type_flat_map A B f :
   Proper ((@Permutation_Type A) ==> (@Permutation_Type B)) (flat_map f).
 Proof.
-intros l1; induction l1 as [|a l1 IHl1]; intros l2 HP.
-- destruct l2; auto.
-  apply Permutation_Type_nil in HP; inversion HP.
-- apply Permutation_Type_sym in HP.
-  destruct (Permutation_Type_vs_cons_inv HP) as [(l', l'') ->].
-  destruct l' as [|a' l']; apply Permutation_Type_sym in HP.
-  + simpl in HP; simpl; apply Permutation_Type_app_head.
-    apply IHl1.
-    now apply Permutation_Type_cons_inv with a.
-  + apply Permutation_Type_cons_app_inv in HP.
-    apply IHl1 in HP.
-    rewrite flat_map_app in HP; simpl in HP.
-    rewrite flat_map_app; simpl.
-    apply (Permutation_Type_app_head (f a)) in HP.
-    apply (Permutation_Type_trans HP).
-    rewrite ? app_assoc.
-    apply Permutation_Type_app_tail.
-    rewrite <- ? app_assoc.
-    apply Permutation_Type_app_rot.
+intros l1 l2 HP. rewrite ! flat_map_concat_map. apply Permutation_Type_concat, Permutation_Type_map, HP.
 Qed.
 
 #[export] Instance list_sum_perm_Type : Proper (@Permutation_Type nat ==> eq) list_sum.

@@ -70,3 +70,11 @@ destruct Heq as [->%map_injective_in ->%map_injective_in]; [ constructor | | ].
 - intros x y Hin1 Hin2 Heq. symmetry. apply Hi; [ apply in_or_app .. | ]; auto.
 - intros x y Hin1 Hin2 Heq. symmetry. apply Hi; [ apply in_or_app .. | ]; auto.
 Qed.
+
+Lemma CPermutation_concat A (l1 l2 : list (list A)):
+  CPermutation l1 l2 -> CPermutation (concat l1) (concat l2).
+Proof. intro HC. induction HC. rewrite ! concat_app. constructor. Qed.
+
+Lemma CPermutation_flat_map A B (f : A -> list B) l1 l2:
+  CPermutation l1 l2 -> CPermutation (flat_map f l1) (flat_map f l2).
+Proof. intro HC. induction HC. rewrite ! flat_map_app. constructor. Qed.

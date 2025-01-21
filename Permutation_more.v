@@ -127,3 +127,16 @@ intros HP; induction HP as [ | x l l' HP IHHP | x y l
      destruct (IHHP1 l3 l4 l3' l4' eq_refl eq_refl);
      destruct (IHHP2 l3' l4' l3'' l4'' eq_refl eq_refl); split; etransitivity; eassumption.
 Qed.
+
+Lemma Permutation_concat A (l1 l2 : list (list A)):
+  Permutation l1 l2 -> Permutation (concat l1) (concat l2).
+Proof.
+intro HP. induction HP; cbn.
+- reflexivity.
+- apply Permutation_app_head. assumption.
+- rewrite ! app_assoc. apply Permutation_app_tail, Permutation_app_swap.
+- etransitivity; eassumption.
+Qed.
+(* simpler proof of [Permutation_flat_map] using [Permutation_concat]:
+Proof. intros l1 l2 HP. rewrite ! flat_map_concat_map. apply Permutation_concat, Permutation_map, HP. Qed.
+*)
