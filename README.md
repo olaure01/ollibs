@@ -52,7 +52,6 @@ Manual installation procedure:
 * `Permutation_Type_more`   : `Permutation_more` with output in `Type`
 * `CPermutation_Type`       : `CyclicPerm` with output in `Type`
 * `GPermutation_Type`       : `genperm` with output in `Type`
-* `PermutationPropify`      : turn `Permutation_Type` into `Permutation` for types with decidable equality
 * `Permutation_solve`       : automatic tactic for permutation goals
 * `CPermutation_solve`      : automatic tactic for cyclic permutation goals
 * `Permutation_Type_solve`  : `Permutation_solve` with output in `Type`
