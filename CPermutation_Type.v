@@ -9,7 +9,7 @@ From OLlibs Require Import List_more Permutation_Type_more funtheory.
 
 
 (** * Definition *)
-Inductive CPermutation_Type A : list A -> list A -> Type :=
+Inductive CPermutation_Type A : crelation (list A) :=
 | cperm_Type : forall l1 l2, CPermutation_Type (l1 ++ l2) (l2 ++ l1).
 
 #[export] Instance CPermutation_Permutation_Type A :

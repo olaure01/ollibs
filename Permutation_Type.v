@@ -13,7 +13,7 @@ Section Permutation.
 
 Variable A:Type.
 
-Inductive Permutation_Type : list A -> list A -> Type :=
+Inductive Permutation_Type : crelation (list A) :=
 | Permutation_Type_nil_nil : Permutation_Type [] []
 | Permutation_Type_skip x l l' : Permutation_Type l l' -> Permutation_Type (x::l) (x::l')
 | Permutation_Type_swap x y l : Permutation_Type (y::x::l) (x::y::l)
@@ -235,7 +235,7 @@ Proof.
 Qed.
 
 Theorem Permutation_Type_rect_bis :
- forall P : list A -> list A -> Type,
+ forall P : crelation (list A),
    P [] [] ->
    (forall x l l', Permutation_Type l l' -> P l l' -> P (x :: l) (x :: l')) ->
    (forall x y l l', Permutation_Type l l' -> P l l' -> P (y :: x :: l) (x :: y :: l')) ->

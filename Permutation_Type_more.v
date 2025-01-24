@@ -324,10 +324,9 @@ Qed.
 
 
 (** * Permutation definition based on transpositions for induction with fixed length *)
-Inductive Permutation_Type_transp A : list A -> list A -> Type :=
-| Permutation_Type_t_refl : forall l, Permutation_Type_transp l l
-| Permutation_Type_t_swap : forall x y l1 l2,
-                              Permutation_Type_transp (l1 ++ y :: x :: l2) (l1 ++ x :: y :: l2)
+Inductive Permutation_Type_transp A : crelation (list A) :=
+| Permutation_Type_t_refl l : Permutation_Type_transp l l
+| Permutation_Type_t_swap x y l1 l2 : Permutation_Type_transp (l1 ++ y :: x :: l2) (l1 ++ x :: y :: l2)
 | Permutation_Type_t_trans l l' l'' :
     Permutation_Type_transp l l' -> Permutation_Type_transp l' l'' -> Permutation_Type_transp l l''.
 
@@ -383,7 +382,7 @@ revert Hr Ht Htr; induction HP; intros Hr Ht Htr; auto.
 apply (Htr _ l'); auto; now apply perm_t_perm_Type.
 Qed.
 
-Lemma Permutation_Type_rect_transp A (P : list A -> list A -> Type) :
+Lemma Permutation_Type_rect_transp A (P : crelation (list A)) :
   (forall l, P l l) ->
   (forall x y l1 l2, P (l1 ++ y :: x :: l2) (l1 ++ x :: y :: l2)) ->
   (forall l l' l'',
