@@ -3,8 +3,8 @@ Usefull tactics and properties apparently missing in the [List] library. *)
 
 (* TODO once it is confirmed that deprecated tactics are subsumed by Type versions, remove them *)
 
-From Coq Require Import PeanoNat.
-From Coq Require Export List.
+From Stdlib Require Import PeanoNat.
+From Stdlib Require Export List.
 From OLlibs Require Import Datatypes_more Bool_more.
 From OLlibs Require Export List_Type.
 Import EqNotations.

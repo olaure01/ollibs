@@ -1,7 +1,7 @@
 (** Add-ons for Permutation library
 Usefull properties apparently missing in the Permutation library. *)
 
-From Coq Require Export Permutation List.
+From Stdlib Require Export Permutation List.
 From OLlibs Require Import List_more funtheory.
 
 (* Set Mangle Names. Set Mangle Names Light. *)

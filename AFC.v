@@ -1,6 +1,6 @@
 (** Axiom(s) of Finite Choice *)
 
-From Coq Require Import PeanoNat Lia List.
+From Stdlib Require Import PeanoNat Lia List.
 
 (* Set Mangle Names. Set Mangle Names Light. *)
 Set Default Goal Selector "!".

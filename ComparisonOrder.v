@@ -1,7 +1,7 @@
 (** Order structure on [comparison]
 [Lt] < [Eq] < [Gt] *)
 
-From Coq Require Import Orders.
+From Stdlib Require Import Orders.
 
 (* Set Mangle Names. Set Mangle Names Light. *)
 Set Default Goal Selector "!".

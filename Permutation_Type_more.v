@@ -1,7 +1,7 @@
 (** Add-ons for Permutation_Type library
 Usefull properties apparently missing in the Permutation_Type library. *)
 
-From Coq Require Import PeanoNat Permutation CMorphisms.
+From Stdlib Require Import PeanoNat Permutation CMorphisms.
 From OLlibs Require Import List_more funtheory.
 From OLlibs Require Export Permutation_Type.
 

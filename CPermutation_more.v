@@ -1,6 +1,6 @@
 (** Additional results about [CPermutation] *)
 
-From Coq Require Export CPermutation.
+From Stdlib Require Export CPermutation.
 From OLlibs Require Import List_more funtheory.
 
 (* Set Mangle Names. Set Mangle Names Light. *)

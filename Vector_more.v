@@ -1,7 +1,7 @@
 (** Add-ons for Vector library *)
 
 #[local] Set Warnings "-stdlib-vector".
-From Coq Require Import PeanoNat Lia Vector.
+From Stdlib Require Import PeanoNat Lia Vector.
 
 (* Set Mangle Names. Set Mangle Names Light. *)
 Set Default Goal Selector "!".

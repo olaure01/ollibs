@@ -1,6 +1,6 @@
 (* Adress https://github.com/coq/coq/issues/12394 *)
 
-From Coq Require Import Eqdep_dec.
+From Stdlib Require Import Eqdep_dec.
 From OLlibs Require Import List_more.
 
 (* Set Mangle Names. Set Mangle Names Light. *)

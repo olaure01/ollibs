@@ -1,8 +1,8 @@
 (* TODO submit to stdlib, except part already in ssreflect *)
 
-From Coq Require Import List.
-From Coq Require Export Bool.
-From OLlibs Require Import Datatypes_more List_Type.
+From Stdlib Require Import List.
+From Stdlib Require Export Bool.
+From OLlibs Require Import Datatypes_more.
 
 (* Set Mangle Names. Set Mangle Names Light. *)
 Set Default Goal Selector "!".

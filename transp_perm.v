@@ -1,6 +1,6 @@
 (** Transposition function on elements of a list *)
 
-From Coq Require Import List Lia.
+From Stdlib Require Import List Lia.
 From OLlibs Require Import funtheory Permutation_Type.
 
 (* Set Mangle Names. Set Mangle Names Light. *)

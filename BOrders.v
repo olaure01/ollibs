@@ -1,6 +1,6 @@
 (** Boolean-valued total orders as a [Class] *)
 
-From Coq Require Import Bool PeanoNat Wf_nat Lia List Permutation Orders.
+From Stdlib Require Import Bool PeanoNat Wf_nat Lia List Permutation Orders.
 From OLlibs Require Import funtheory.
 
 (* Set Mangle Names. Set Mangle Names Light. *)
@@ -14,12 +14,11 @@ Set Implicit Arguments.
 Definition brelation A := A -> A -> bool.
 
 Class BOrder := {
-  car : Type;
+  car :> Type;
   leb : brelation car;
   total a b : leb a b = false -> leb b a = true;
   asym a b : leb a b = true -> leb b a = true -> a = b;
   trans a b c : leb a b = true -> leb b c = true -> leb a c = true }.
-Coercion car : BOrder >-> Sortclass. (* TODO from Rocq 9.0: integrate as [car :> Type] *)
 
 (** ** Equivalence with [UsualOrderedTypeFull] *)
 Module Type ModBOrder.

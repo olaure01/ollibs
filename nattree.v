@@ -1,6 +1,6 @@
 (** [nat]-labelled binary trees and embedding into [nat] *)
 
-From Coq Require Import PeanoNat Lia.
+From Stdlib Require Import PeanoNat Lia.
 From OLlibs Require Import funtheory.
 
 (* Set Mangle Names. Set Mangle Names Light. *)
