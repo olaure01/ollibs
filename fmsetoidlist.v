@@ -26,11 +26,10 @@ Class FinMultisetoid M A := {
   add_meq : Proper (eq ==> meq ==> meq) add;
   elts : M -> list A;
   elts_empty : elts empty = @nil A;
-  elts_add : forall a m, Permutation (elts (add a m)) (a :: elts m);
-  perm_meq : forall l1 l2, Permutation l1 l2 ->
-               meq (fold_right add empty l1) (fold_right add empty l2);
-  meq_perm : forall m1 m2, meq m1 m2 -> Permutation (elts m1) (elts m2);
-  retract_meq : forall m, meq (fold_right add empty (elts m)) m }.
+  elts_add a m : Permutation (elts (add a m)) (a :: elts m);
+  perm_meq l1 l2 : Permutation l1 l2 -> meq (fold_right add empty l1) (fold_right add empty l2);
+  meq_perm m1 m2 : meq m1 m2 -> Permutation (elts m1) (elts m2);
+  retract_meq m : meq (fold_right add empty (elts m)) m }.
 
 (** [Mst] and [Elt] define a finite multiset construction over a type [K]
     if for any [A] in [K], [Mst A] is a finite multiset with elements [Elt A]. *)
@@ -46,14 +45,14 @@ Section FMSet2List.
 
   #[export] Instance mequivalence : Equivalence meq := mequiv.
 
-  Definition list2fm l := fold_right add empty l.
+  Definition list2fm := fold_right add empty.
 
   #[export] Instance list2fm_perm : Proper (@Permutation A ==> meq) list2fm := perm_meq.
 
   #[export] Instance elts_perm' : Proper (meq ==> @Permutation A) elts := meq_perm.
 
   Lemma list2fm_retract m : meq (list2fm (elts m)) m.
-  Proof. apply retract_meq. Qed.
+  Proof. exact (retract_meq m). Qed.
 
   Lemma list2fm_nil : list2fm nil = empty.
   Proof. reflexivity. Qed.

@@ -23,10 +23,9 @@ Class FinMultiset M A := {
   add : A -> M -> M;
   elts : M -> list A;
   elts_empty : elts empty = @nil A;
-  elts_add : forall a m, Permutation (elts (add a m)) (a :: elts m);
-  elts_retract : forall m, fold_right add empty (elts m) = m;
-  perm_eq : forall l1 l2, Permutation l1 l2 ->
-                  fold_right add empty l1 = fold_right add empty l2 }.
+  elts_add a m : Permutation (elts (add a m)) (a :: elts m);
+  elts_retract m : fold_right add empty (elts m) = m;
+  perm_eq l1 l2 : Permutation l1 l2 -> fold_right add empty l1 = fold_right add empty l2 }.
 
 (** [Mst] and [Elt] define a finite multiset construction over a type [K]
     if for any [A] in [K], [Mst A] is a finite multiset with elements [Elt A]. *)
@@ -40,12 +39,12 @@ Section FMSet2List.
   Variable M A : Type.
   Variable fm : FinMultiset M A.
 
-  Definition list2fm l := fold_right add empty l.
+  Definition list2fm := fold_right add empty.
 
   #[export] Instance list2fm_perm : Proper (@Permutation A ==> eq) list2fm := perm_eq.
 
   Lemma list2fm_retract m : list2fm (elts m) = m.
-  Proof. apply elts_retract. Qed.
+  Proof. exact (elts_retract m). Qed.
 
   Lemma list2fm_nil : list2fm nil = empty.
   Proof. reflexivity. Qed.
@@ -208,7 +207,7 @@ split with (@fmslist_empty A) (@fmslist_add A) (fun m => proj1_sig m); auto.
     cbn. cbn in Hsort. apply andb_true_iff in Hsort as [Ha Hsort].
     assert (H' := IHl Hsort).
     apply (f_equal (fun m => proj1_sig m)) in H'.
-    simpl in H'. rewrite H'. cbn.
+    cbn in H'. rewrite H'. cbn.
     destruct (leb a c); [ reflexivity | discriminate Ha ].
 - intros l1 l2 HP. induction HP as [| ? ? ? ? IHP | | ? ? ? ? IHP ]; [ reflexivity | | | ]; cbn.
   + rewrite IHP. reflexivity.
