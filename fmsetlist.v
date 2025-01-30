@@ -5,13 +5,13 @@ Equality is required to be Coq equality.
 An implementation of the axioms is provided by sorted lists
 for every type equiped with a Boolean-valued total order relation. *)
 
+From Coq Require Import Bool List Permutation Morphisms.
+From OLlibs Require Import BOrders.
+
 Set Mangle Names. Set Mangle Names Light.
 Set Default Goal Selector "!".
 Set Default Proof Using "Type".
 Set Implicit Arguments.
-
-From Coq Require Import Bool List Permutation Morphisms.
-From OLlibs Require Import BOrders.
 
 
 (** * Axiomatization *)
@@ -22,7 +22,6 @@ Class FinMultiset M A := {
   empty : M;
   add : A -> M -> M;
   elts : M -> list A;
-  elts_empty : elts empty = @nil A;
   elts_add a m : Permutation (elts (add a m)) (a :: elts m);
   elts_retract m : fold_right add empty (elts m) = m;
   perm_eq l1 l2 : Permutation l1 l2 -> fold_right add empty l1 = fold_right add empty l2 }.
@@ -59,18 +58,27 @@ Section FMSet2List.
   Lemma list2fm_cons l a : list2fm (a :: l) = add a (list2fm l).
   Proof. now rewrite <- (app_nil_l (a :: l)), list2fm_elt. Qed.
 
-  Lemma elts_perm l : Permutation (elts (list2fm l)) l.
+  Lemma elts_perm_empty l : Permutation (elts (list2fm l)) (l ++ elts empty).
+  Proof. induction l as [|a l IHl]; [ | cbn; rewrite elts_add, IHl ]; reflexivity. Qed.
+
+  Lemma elts_empty : elts empty = nil.
   Proof.
-  induction l as [|a l IHl]; cbn.
-  - rewrite elts_empty. reflexivity.
-  - rewrite elts_add, IHl. reflexivity.
+  apply Permutation_nil, (Permutation_app_inv_l (elts empty)).
+  rewrite app_nil_r, <- list2fm_retract at 1.
+  apply elts_perm_empty.
   Qed.
+
+  Lemma elts_perm l : Permutation (elts (list2fm l)) l.
+  Proof. rewrite <- (app_nil_r l) at 2. rewrite <- elts_empty. apply elts_perm_empty. Qed.
 
   #[export] Instance elts_perm' : Proper (eq ==> @Permutation A) elts.
   Proof. intros m1 m2 ->. reflexivity. Qed.
 
   Lemma elts_eq_nil m : elts m = nil -> m = empty.
   Proof. intros Heq. assert (Hr := elts_retract m). rewrite Heq in Hr. simpl in Hr. symmetry. assumption. Qed.
+
+  Lemma Permutation_elts_eq m1 m2 : Permutation (elts m1) (elts m2) -> m1 = m2.
+  Proof. intros HP%perm_eq. rewrite ! elts_retract in HP. assumption. Qed.
 
   Lemma add_swap m a b : add a (add b m) = add b (add a m).
   Proof.
@@ -193,13 +201,8 @@ Proof. reflexivity. Qed.
 Theorem FMConstr_slist : FMConstructor SortedList (@car).
 Proof.
 intros A.
-split with (@fmslist_empty A) (@fmslist_add A) (fun m => proj1_sig m); auto.
-- intros a [l Hsort].
-  induction l as [| a0 l IHl] in Hsort |- *; [ reflexivity | ].
-  cbn. destruct (leb a a0); [ reflexivity | ].
-  change (a :: a0 :: l) with ((a :: nil) ++ a0 :: l).
-  apply is_sorted_tail in Hsort.
-  apply Permutation_cons_app, (IHl Hsort).
+split with (@fmslist_empty A) (@fmslist_add A) (fun m => proj1_sig m).
+- intros ? ?. apply Permutation_insert.
 - intros [l Hsort].
   induction l as [| a l IHl] in Hsort |- *.
   + apply sortedlist_equality. reflexivity.

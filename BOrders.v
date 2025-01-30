@@ -5,7 +5,7 @@ Set Default Goal Selector "!".
 Set Default Proof Using "Type".
 Set Implicit Arguments.
 
-From Coq Require Import Bool PeanoNat Wf_nat Lia List Orders.
+From Coq Require Import Bool PeanoNat Wf_nat Lia List Permutation Orders.
 From OLlibs Require Import funtheory.
 
 
@@ -215,6 +215,15 @@ induction l as [|a l IHl]; cbn.
     apply (trans _ _ _ Heqbb) in Heqbb2. rewrite Heqbb1 in Heqbb2. discriminate Heqbb2.
   + rewrite Heqbb1, Heqbb2, IHl. reflexivity.
 Qed.
+
+Lemma Permutation_insert B (x : @car B) l : Permutation (insert x l) (x :: l).
+Proof.
+induction l as [| y l IHl]; [ reflexivity | ].
+cbn. destruct (leb x y); [ reflexivity | ].
+change (x :: y :: l) with ((x :: nil) ++ y :: l).
+apply Permutation_cons_app, IHl.
+Qed.
+
 
 (** ** Sorted lists *)
 

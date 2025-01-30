@@ -5,13 +5,13 @@ Equality is an equivalence relation.
 An implementation of the axioms is provided for every type
 by lists up to permutation. *)
 
+From Coq Require Import Relation_Definitions Morphisms Permutation.
+From OLlibs Require Import List_more.
+
 Set Mangle Names. Set Mangle Names Light.
 Set Default Goal Selector "!".
 Set Default Proof Using "Type".
 Set Implicit Arguments.
-
-From Coq Require Import Relation_Definitions Morphisms Permutation.
-From OLlibs Require Import List_more.
 
 
 (** * Axiomatization *)
@@ -25,7 +25,6 @@ Class FinMultisetoid M A := {
   add : A -> M -> M;
   add_meq : Proper (eq ==> meq ==> meq) add;
   elts : M -> list A;
-  elts_empty : elts empty = @nil A;
   elts_add a m : Permutation (elts (add a m)) (a :: elts m);
   perm_meq l1 l2 : Permutation l1 l2 -> meq (fold_right add empty l1) (fold_right add empty l2);
   meq_perm m1 m2 : meq m1 m2 -> Permutation (elts m1) (elts m2);
@@ -69,11 +68,24 @@ Section FMSet2List.
   Lemma list2fm_cons l a : meq (list2fm (a :: l)) (add a (list2fm l)).
   Proof. now rewrite <- (app_nil_l (a :: l)), list2fm_elt. Qed.
 
+  Lemma elts_perm_empty l : Permutation (elts (list2fm l)) (l ++ elts empty).
+  Proof. induction l as [|a l IHl]; [ | cbn; rewrite elts_add, IHl ]; reflexivity. Qed.
+
+  Lemma elts_empty : elts empty = nil.
+  Proof.
+  apply Permutation_nil, (Permutation_app_inv_l (elts empty)).
+  rewrite app_nil_r, <- list2fm_retract at 1.
+  apply elts_perm_empty.
+  Qed.
+
   Lemma elts_perm l : Permutation (elts (list2fm l)) l.
-  Proof. induction l as [|a l IHl]; cbn; [ rewrite elts_empty | rewrite elts_add, IHl ]; reflexivity. Qed.
+  Proof. rewrite <- (app_nil_r l) at 2. rewrite <- elts_empty. apply elts_perm_empty. Qed.
 
   Lemma elts_eq_nil m : elts m = nil -> meq m empty.
   Proof. intro Heq. rewrite <- (retract_meq m), Heq. reflexivity. Qed.
+
+  Lemma Permutation_elts_meq m1 m2 : Permutation (elts m1) (elts m2) -> meq m1 m2.
+  Proof. intros HP%perm_meq. rewrite ! retract_meq in HP. assumption. Qed.
 
   Lemma add_swap m a b : meq (add a (add b m)) (add b (add a m)).
   Proof. rewrite <- list2fm_retract, ? elts_add, perm_swap, <- 2 elts_add, list2fm_retract. reflexivity. Qed.
