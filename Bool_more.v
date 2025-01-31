@@ -1,12 +1,12 @@
 (* TODO submit to stdlib, except part already in ssreflect *)
 
+From Coq Require Export Bool.
+From OLlibs Require Import Datatypes_more.
+
 Set Mangle Names. Set Mangle Names Light.
 Set Default Goal Selector "!".
 Set Default Proof Using "Type".
 Set Implicit Arguments.
-
-From Coq Require Export Bool.
-From OLlibs Require Import Datatypes_more.
 
 
 Lemma reflect_neg P b : reflect P b -> reflect (not P) (negb b).

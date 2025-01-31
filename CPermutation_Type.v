@@ -1,11 +1,14 @@
 (** Cyclic Permutations
 Definition and basic properties of cyclic permutations in [Type]. *)
 
-Set Implicit Arguments.
-
 From Coq Require Import CMorphisms PeanoNat.
 From Coq Require CPermutation.
 From OLlibs Require Import List_more Permutation_Type_more funtheory.
+
+Set Mangle Names. Set Mangle Names Light.
+Set Default Goal Selector "!".
+Set Default Proof Using "Type".
+Set Implicit Arguments.
 
 
 (** * Definition *)
@@ -130,7 +133,7 @@ Lemma CPermutation_Type_vs_elt_inv A (a : A) l l1 l2 :
   CPermutation_Type l (l1 ++ a :: l2) -> {'(l1',l2') | l2 ++ l1 = l2' ++ l1' & l = l1' ++ a :: l2' }.
 Proof.
 intro HC. inversion HC as [l3 l4 H1 H2]. subst.
-dichot_elt_app_inf_exec H2; subst.
+dichot_elt_app_inf_exec H2 as [[l <- ->]|[l -> <-]].
 - now exists (l3 ++ l1, l); cbn; rewrite <- app_assoc.
 - now exists (l, l2 ++ l4); cbn; rewrite <- app_assoc.
 Qed.
@@ -178,20 +181,21 @@ Lemma CPermutation_Type_app_app_inv A (l1 l2 l3 l4 : list A) :
         (CPermutation_Type l1' l2') }.
 Proof.
 intro HC. inversion HC as [lx ly Hx Hy].
-dichot_app_inf_exec Hx; dichot_app_inf_exec Hy; subst.
-- left; left; left; right; exists (l ++ l0, l0 ++ l); repeat split;
+dichot_app_inf_exec Hx as [[l <- ->]|[l -> <-]];
+  dichot_app_inf_exec Hy as [[l' <- Hy]|[l' Hy <-]]; subst.
+- left; left; left; right; exists (l ++ l', l' ++ l); repeat split;
     rewrite <- ? app_assoc; apply CPermutation_Type_app_rot.
-- dichot_app_inf_exec Hy0; subst.
-  + left; left; left; left; exists (l, l1, lx, l0); repeat split;
+- dichot_app_inf_exec Hy as [[l'' <- ->]|[l'' -> <-]].
+  + left; left; left; left; exists (l, l'', lx, l'); repeat split;
       apply CPermutation_Type_refl.
-  + left; right; exists (l1 ++ lx , lx ++ l1); repeat split;
+  + left; right; exists (l'' ++ lx , lx ++ l''); repeat split;
       rewrite <- ? app_assoc ; apply CPermutation_Type_app_rot.
-- dichot_app_inf_exec Hy1 ; subst.
-  + left; left; right; exists (ly ++ l2, l2 ++ ly); repeat split;
+- dichot_app_inf_exec Hy as [[l'' <- ->]|[l'' -> <-]].
+  + left; left; right; exists (ly ++ l'', l'' ++ ly); repeat split;
       rewrite <- ? app_assoc; apply CPermutation_Type_app_rot.
-  + left; left; left; left; exists (l0, ly, l2, l); repeat split;
+  + left; left; left; left; exists (l', ly, l'', l); repeat split;
       apply CPermutation_Type_refl.
-- right; exists (l0 ++ l, l ++ l0); repeat split;
+- right; exists (l' ++ l, l ++ l'); repeat split;
     rewrite <- ? app_assoc; apply CPermutation_Type_app_rot.
 Qed.
 
@@ -273,17 +277,17 @@ Qed.
 Lemma CPermutation_Type_Forall2_inf A B (P : A -> B -> Type) l1 l1' l2 :
   CPermutation_Type l1 l1' -> Forall2_inf P l1 l2 -> { l2' & CPermutation_Type l2 l2' & Forall2_inf P l1' l2' }.
 Proof.
-intro HP. induction HP in l2 |- *; intro HF; inversion HF; subst.
+intro HP. induction HP as [lc1 lc1'] in l2 |- *; intro HF; inversion HF as [HF' | a b la lb Hab HF' Ha]; subst.
 - exists nil.
   + reflexivity.
-  + now symmetry in H0; apply app_eq_nil in H0 as [Heq1 Heq2]; subst.
-- destruct l1; inversion H0; subst.
-  + rewrite app_nil_l in H0. subst.
-    exists (y :: l').
+  + now symmetry in HF'; apply app_eq_nil in HF' as [-> ->].
+- destruct lc1; inversion Ha; subst.
+  + rewrite app_nil_l in Ha. subst.
+    exists (b :: lb).
     * reflexivity.
     * rewrite app_nil_r. assumption.
-  + apply Forall2_inf_app_inv_l in X0 as [(la, lb) [HF1 HF2] ->].
-    exists (lb ++ y :: la).
+  + apply Forall2_inf_app_inv_l in HF' as [(la', lb') [HF1 HF2] ->].
+    exists (lb' ++ b :: la').
     * rewrite app_comm_cons. constructor.
     * apply Forall2_inf_app; [ | constructor ]; assumption.
 Qed.

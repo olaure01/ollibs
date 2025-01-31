@@ -1,10 +1,13 @@
 (** Add-ons for Permutation library
 Usefull properties apparently missing in the Permutation library. *)
 
-Set Implicit Arguments.
-
 From Coq Require Export Permutation List.
 From OLlibs Require Import List_more funtheory.
+
+Set Mangle Names. Set Mangle Names Light.
+Set Default Goal Selector "!".
+Set Default Proof Using "Type".
+Set Implicit Arguments.
 
 
 Lemma Permutation_app_app_inv A (l1 l2 l3 l4 : list A) :
@@ -80,7 +83,7 @@ Lemma Permutation_map_inv_inj_local A B (f : A -> B) l1 l2 :
   (forall x y, In x l1 -> In y l2 -> f x = f y -> x = y) ->
     Permutation (map f l1) (map f l2) -> Permutation l1 l2.
 Proof.
-induction l1 in l2 |- *; intros Hi HP.
+induction l1 as [|a l1 IHl1] in l2 |- *; intros Hi HP.
 - apply Permutation_nil, map_eq_nil in HP as ->. constructor.
 - assert (Heq := HP). symmetry in Heq.
   apply Permutation_vs_cons_inv in Heq as [l3 [l4 Heq]].

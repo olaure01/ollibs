@@ -1,12 +1,12 @@
 (** Transposition function on elements of a list *)
 
+From Coq Require Import List Lia.
+From OLlibs Require Import funtheory Permutation_Type.
+
 Set Mangle Names. Set Mangle Names Light.
 Set Default Goal Selector "!".
 Set Default Proof Using "Type".
 Set Implicit Arguments.
-
-From Coq Require Import List Lia.
-From OLlibs Require Import funtheory Permutation_Type.
 
 
 (** Transpose elements of index [n] and [n + 1] in [l] *)

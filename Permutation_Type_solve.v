@@ -5,6 +5,11 @@ The main tactic is [Permutation_Type_solve] which fails is the goal is not solve
 
 From OLlibs Require Import List_more Permutation_Type_more.
 
+Set Mangle Names. Set Mangle Names Light.
+Set Default Goal Selector "!".
+Set Default Proof Using "Type".
+Set Implicit Arguments.
+
 
 Ltac pre_simpl_hyp_perm_Type H :=
   try apply Permutation_Type_cons_inv in H;

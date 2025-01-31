@@ -1,18 +1,16 @@
 (** Add-ons for List library
 Usefull tactics and properties apparently missing in the [List] library. *)
 
-(* TODO rename di/trichot_... into decomp_xxx_eq_yyyy  and [vs] into [eq] for equality *)
-
-Set Mangle Names. Set Mangle Names Light.
-Set Default Goal Selector "!".
-Set Default Proof Using "Type".
-Set Implicit Arguments.
-
 From Coq Require Import PeanoNat.
 From Coq Require Export List.
 From OLlibs Require Import Datatypes_more Bool_more.
 From OLlibs Require Export List_Type.
 Import EqNotations.
+
+Set Mangle Names. Set Mangle Names Light.
+Set Default Goal Selector "!".
+Set Default Proof Using "Type".
+Set Implicit Arguments.
 
 
 (** misc *)
@@ -136,23 +134,35 @@ Ltac unit_vs_elt_inv H :=
       clear Hnil1 Hnil2; (try clear l1); (try clear l2)
   end.
 
-Lemma dichot_app A (l1 l2 l3 l4 : list A) : l1 ++ l2 = l3 ++ l4 ->
+Lemma app_eq_app_trichot A (l1 l2 l3 l4 : list A) : l1 ++ l2 = l3 ++ l4 ->
+     (exists l2', l2' <> nil /\ l1 ++ l2' = l3 /\ l2 = l2' ++ l4)
+  \/ (l1 = l3 /\ l2 = l4)
+  \/ (exists l4', l4' <> nil /\ l1 = l3 ++ l4' /\ l4' ++ l2 = l4).
+Proof.
+intros [l [[-> ->]|[-> ->]]]%app_eq_app; destruct l as [|a l].
+- right. left. list_simpl. repeat split.
+- right. right. exists (a :: l); split; [ intros [=] | repeat split ].
+- right. left. list_simpl. repeat split.
+- left. exists (a :: l); split; [ intros [=] | repeat split ].
+Qed.
+
+Lemma app_eq_app_dichot A (l1 l2 l3 l4 : list A) : l1 ++ l2 = l3 ++ l4 ->
      (exists l2', l1 ++ l2' = l3 /\ l2 = l2' ++ l4)
   \/ (exists l4', l1 = l3 ++ l4' /\ l4' ++ l2 = l4).
 Proof. intros [l [[-> ->]|[-> ->]]]%app_eq_app; [ right | left ]; exists l; repeat split. Qed.
 
-#[local] Ltac dichot_app_exec_core H p :=
+#[local] Ltac decomp_app_eq_app_core H p :=
   match type of H with
-  | _ ++ _ = _ ++ _ => apply dichot_app in H as p
+  | _ ++ _ = _ ++ _ => apply app_eq_app_dichot in H as p
   end.
-Tactic Notation "dichot_app_exec" hyp(H) "as" simple_intropattern(p) := dichot_app_exec_core H p.
-Tactic Notation "dichot_app_exec" hyp(H) :=
+Tactic Notation "decomp_app_eq_app" hyp(H) "as" simple_intropattern(p) := decomp_app_eq_app_core H p.
+Tactic Notation "decomp_app_eq_app" hyp(H) :=
   let l := fresh "l" in
   let H1 := fresh H in
   let H2 := fresh H in
-  dichot_app_exec_core H ipattern:([[l [H1 H2]]|[l [H1 H2]]]).
+  decomp_app_eq_app_core H ipattern:([[l [H1 H2]]|[l [H1 H2]]]).
 
-Lemma dichot_elt_app A l1 (a : A) l2 l3 l4 : l1 ++ a :: l2 = l3 ++ l4 ->
+Lemma elt_eq_app_dichot A l1 (a : A) l2 l3 l4 : l1 ++ a :: l2 = l3 ++ l4 ->
      (exists l2', l1 ++ a :: l2' = l3 /\ l2 = l2' ++ l4)
   \/ (exists l4', l1 = l3 ++ l4' /\ l4' ++ a :: l2 = l4).
 Proof.
@@ -166,20 +176,20 @@ induction l1 as [|b l1 IHl1] in l2, l3, l4 |- *; induction l3 as [|c l3 IHl3] in
   + now right; exists l4'.
 Qed.
 
-#[local] Ltac dichot_elt_app_exec_core H p :=
+#[local] Ltac decomp_elt_eq_app_core H p :=
   match type of H with
-  | _ ++ _ :: _ = _ ++ _ => apply dichot_elt_app in H as p
-  | _ ++ _ = _ ++ _ :: _ => simple apply eq_sym in H;
-                            apply dichot_elt_app in H as p
+  | _ ++ _ :: _ = _ ++ _ => apply elt_eq_app_dichot in H as p
+  | _ ++ _ = _ ++ _ :: _ => simple apply eq_sym in H; (* TODO check why not [symmetry] *)
+                            apply elt_eq_app_dichot in H as p
   end.
-Tactic Notation "dichot_elt_app_exec" hyp(H) "as" simple_intropattern(p) := dichot_elt_app_exec_core H p.
-Tactic Notation "dichot_elt_app_exec" hyp(H) :=
+Tactic Notation "decomp_elt_eq_app" hyp(H) "as" simple_intropattern(p) := decomp_elt_eq_app_core H p.
+Tactic Notation "decomp_elt_eq_app" hyp(H) :=
   let l := fresh "l" in
   let H1 := fresh H in
   let H2 := fresh H in
-  dichot_elt_app_exec_core H ipattern:([[l [H1 H2]]|[l [H1 H2]]]).
+  decomp_elt_eq_app_core H ipattern:([[l [H1 H2]]|[l [H1 H2]]]).
 
-Lemma trichot_elt_app A l1 (a : A) l2 l3 l4 l5 : l1 ++ a :: l2 = l3 ++ l4 ++ l5 ->
+Lemma elt_eq_app_app_trichot A l1 (a : A) l2 l3 l4 l5 : l1 ++ a :: l2 = l3 ++ l4 ++ l5 ->
       (exists l2', l1 ++ a :: l2' = l3 /\ l2 = l2' ++ l4 ++ l5)
    \/ (exists l2' l2'', l1 = l3 ++ l2' /\ l2' ++ a :: l2'' = l4 /\ l2 = l2'' ++ l5)
    \/ (exists l5', l1 = l3 ++ l4 ++ l5' /\ l5' ++ a :: l2 = l5).
@@ -192,7 +202,7 @@ induction l1 as [|b l1 IHl1] in l2, l3, l4, l5 |- *; induction l3 as [|c l3 IHl3
 - now left; exists l3.
 - destruct l4 as [| a' l4]; inversion Heq' as [[Heq1 Heq2]].
   + now right; right; exists (b :: l1).
-  + dichot_elt_app_exec Heq2; subst.
+  + decomp_elt_eq_app Heq2; subst.
     * now right; left; exists (a' :: l1); eexists.
     * now right; right; eexists.
 - destruct (IHl1 _ _ _ _ Heq'')
@@ -202,61 +212,78 @@ induction l1 as [|b l1 IHl1] in l2, l3, l4, l5 |- *; induction l3 as [|c l3 IHl3
   + now right; right; exists l'.
 Qed.
 
-#[local] Ltac trichot_elt_app_exec_core H p :=
+#[local] Ltac decomp_elt_eq_app_app_core H p :=
   match type of H with
-  | _ ++ _ :: _ = _ ++ _ ++ _ => apply trichot_elt_app in H as p
-  | _ ++ _ ++ _ = _ ++ _ :: _ => simple apply eq_sym in H;
-                                 apply trichot_elt_app in H as p
+  | _ ++ _ :: _ = _ ++ _ ++ _ => apply elt_eq_app_app_trichot in H as p
+  | _ ++ _ ++ _ = _ ++ _ :: _ => simple apply eq_sym in H; (* TODO check why not [symmetry] *)
+                                 apply elt_eq_app_app_trichot in H as p
   end.
-Tactic Notation "trichot_elt_app_exec" hyp(H) "as" simple_intropattern(p) := trichot_elt_app_exec_core H p.
-Tactic Notation "trichot_elt_app_exec" hyp(H) :=
+Tactic Notation "decomp_elt_eq_app_app" hyp(H) "as" simple_intropattern(p) := decomp_elt_eq_app_app_core H p.
+Tactic Notation "decomp_elt_eq_app_app" hyp(H) :=
   let l1 := fresh "l" in
   let l2 := fresh "l" in
   let H1 := fresh H in
   let H2 := fresh H in
   let H3 := fresh H in
-  trichot_elt_app_exec_core H ipattern:([[l1 [H1 H2]] | [[l1 [l2 [H1 [H2 H3]]]] | [l2 [H1 H2]]]]).
+  decomp_elt_eq_app_app_core H ipattern:([[l1 [H1 H2]] | [[l1 [l2 [H1 [H2 H3]]]] | [l2 [H1 H2]]]]).
 
-Lemma trichot_elt_elt A l1 (a : A) l2 l3 b l4 : l1 ++ a :: l2 = l3 ++ b :: l4 ->
+Lemma elt_eq_elt_trichot A l1 (a : A) l2 l3 b l4 : l1 ++ a :: l2 = l3 ++ b :: l4 ->
       (exists l2', l1 ++ a :: l2' = l3 /\ l2 = l2' ++ b :: l4)
    \/ (l1 = l3 /\ a = b /\ l2 = l4)
    \/ (exists l4', l1 = l3 ++ b :: l4' /\ l4' ++ a :: l2 = l4).
 Proof.
 intro Heq. change (b :: l4) with ((b :: nil) ++ l4) in Heq.
-trichot_elt_app_exec Heq as [ | [[[|a' l2'] [l2'' [-> [[= -> H] ->]]]] | ]];
+decomp_elt_eq_app_app Heq as [ | [[[|a' l2'] [l2'' [-> [[= -> H] ->]]]] | ]];
   [ now left | right; left .. | now right; right ].
 - subst. list_simpl. repeat split.
 - nil_vs_elt_inv H.
 Qed.
 
-#[local] Ltac trichot_elt_elt_exec_core H p :=
+#[local] Ltac decomp_elt_eq_elt_core H p :=
   match type of H with
   | ?lh ++ _ :: ?lr = ?l1 ++ ?x :: ?l2 =>
-      apply trichot_elt_elt in H as p;
+      apply elt_eq_elt_trichot in H as p;
         [ try subst l1; try subst lr
         | try subst x; try subst l1; try subst l2
         | try subst l2; try subst lh ]
   end.
-Tactic Notation "trichot_elt_elt_exec" hyp(H) "as" simple_intropattern(p) := trichot_elt_elt_exec_core H p.
-Tactic Notation "trichot_elt_elt_exec" hyp(H) :=
+Tactic Notation "decomp_elt_eq_elt" hyp(H) "as" simple_intropattern(p) := decomp_elt_eq_elt_core H p.
+Tactic Notation "decomp_elt_eq_elt" hyp(H) :=
   let l := fresh "l" in
   let H1 := fresh H in
   let H2 := fresh H in
   let H3 := fresh H in
-  trichot_elt_elt_exec_core H ipattern:([[l [H1 H2]] | [[H1 [H2 H3]] | [l [H1 H2]]]]).
+  decomp_elt_eq_elt_core H ipattern:([[l [H1 H2]] | [[H1 [H2 H3]] | [l [H1 H2]]]]).
+
+(* TODO check if versions above are useful or can just be replaced by _inf versions
+     add deprecation warnings *)
+(* TODO rename di/trichot_... into decomp_xxx_eq_yyyy  and [vs] into [eq] for equality
+    as done above *)
+
+Lemma trichot_app_inf A (l1 l2 l3 l4 : list A) : l1 ++ l2 = l3 ++ l4 ->
+    { l2' | l2' <> nil & l1 ++ l2' = l3 /\ l2 = l2' ++ l4 }
+  + ((l1 = l3) * (l2 = l4))
+  + { l4' | l4' <> nil & l1 = l3 ++ l4' /\ l4' ++ l2 = l4 }.
+Proof.
+induction l1 as [|b l1 IHl1] in l2, l3, l4 |- *; induction l3 as [|c l3 IHl3] in l4 |- *;
+  cbn; intro Heq; inversion Heq as [[Heq'' Heq']]; subst.
+- left. right. repeat split.
+- left. left. exists (c :: l3); [ intros [=] | repeat split ].
+- right. exists (b :: l1); [ intros [=] | repeat split ].
+- destruct (IHl1 _ _ _ Heq') as [[[l2' Hnil [<- ->]]|[-> ->]]|[l4' Hnil [-> <-]]].
+  + now left; left; exists l2'.
+  + left. right. repeat split.
+  + now right; exists l4'.
+Qed.
 
 Lemma dichot_app_inf A (l1 l2 l3 l4 : list A) : l1 ++ l2 = l3 ++ l4 ->
      { l2' | l1 ++ l2' = l3 & l2 = l2' ++ l4 }
    + { l4' | l1 = l3 ++ l4' & l4' ++ l2 = l4 }.
 Proof.
-induction l1 as [|b l1 IHl1] in l2, l3, l4 |- *; induction l3 as [|c l3 IHl3] in l4 |- *;
-  cbn; intro Heq; inversion Heq as [[Heq'' Heq']]; subst.
-- now right; exists (@nil A).
-- now left; exists (c :: l3).
-- now right; exists (b :: l1).
-- destruct (IHl1 _ _ _ Heq') as [[l2' <- H2'2] | [l4' -> H4'2]].
-  + now left; exists l2'.
-  + now right; exists l4'.
+intros [[[l2' Hnil [<- ->]]|[-> ->]]|[l4' Hnil [-> <-]]]%trichot_app_inf.
+- left. exists l2'; reflexivity.
+- left. exists nil; list_simpl; reflexivity.
+- right. exists l4'; reflexivity.
 Qed.
 
 #[local] Ltac dichot_app_inf_exec_core H p :=
@@ -325,7 +352,8 @@ Qed.
   | _ ++ _ ++ _ = _ ++ _ :: _ => simple apply eq_sym in H;
                                  apply trichot_elt_app_inf in H as p
   end.
-Tactic Notation "trichot_elt_app_inf_exec" hyp(H) "as" simple_intropattern(p) := trichot_elt_app_inf_exec_core H p.
+Tactic Notation "trichot_elt_app_inf_exec" hyp(H) "as" simple_intropattern(p) :=
+  trichot_elt_app_inf_exec_core H p.
 Tactic Notation "trichot_elt_app_inf_exec" hyp(H) :=
   let l1 := fresh "l" in
   let l2 := fresh "l" in
@@ -353,7 +381,8 @@ Qed.
         | try subst x; try subst l1; try subst l2
         | try subst l2; try subst lh ]
   end.
-Tactic Notation "trichot_elt_elt_inf_exec" hyp(H) "as" simple_intropattern(p) := trichot_elt_elt_inf_exec_core H p.
+Tactic Notation "trichot_elt_elt_inf_exec" hyp(H) "as" simple_intropattern(p) :=
+  trichot_elt_elt_inf_exec_core H p.
 Tactic Notation "trichot_elt_elt_inf_exec" hyp(H) :=
   let l := fresh "l" in
   let H1 := fresh H in
@@ -363,29 +392,37 @@ Tactic Notation "trichot_elt_elt_inf_exec" hyp(H) :=
 
 (** ** Decomposition of [map] *)
 
-Ltac decomp_map_eq H Hsrc :=
+(* works betten when right-hand side leaves are variables,
+   use [remember] to assign name to non-variables leaves *)
+
+(* recursively decompose [H : map f l = _] into smaller equations of the shape [map f _  = _]
+   by decomposing [l] *)
+Ltac decomp_map_eq H :=
   match type of H with
   | map _ _ = _ ++ _ => let l1 := fresh "l" in
                         let l2 := fresh "l" in
                         let H1 := fresh H in
                         let H2 := fresh H in
                         apply map_eq_app_inf in H as [(l1, l2) [-> [H1 H2]]];
-                        decomp_map_eq H1 Hsrc; decomp_map_eq H2 Hsrc;
+                        decomp_map_eq H1; decomp_map_eq H2;
                         assert (H := conj H1 H2); clear H1 H2
   | map _ _ = _ :: _ => let x := fresh "x" in
                         let l2 := fresh "l" in
                         let H1 := fresh H in
                         let H2 := fresh H in
                         apply map_eq_cons_inf in H as [(x, l2) [-> [H1 H2]]];
-                        decomp_map_eq H2 Hsrc;
+                        decomp_map_eq H2;
                         assert (H := conj H1 H2); clear H1 H2
   | _ => idtac
   end.
 
+(* takes a conjunction [H] of equations [f _ = _] and [map f _ = _]
+   and for each [f b = a] with [a] and [b] variables, renames [a] into [f a] and [b] into [a]
+   [b] is supposed to be a fresh name generated by [decomp_map_eq] while [a] was already there *)
 Ltac substitute_map_family H :=
   match type of H with
-  | _ /\ _ => let H1 := fresh in
-              let H2 := fresh in
+  | _ /\ _ => let H1 := fresh H in
+              let H2 := fresh H in
               destruct H as [H1 H2]; substitute_map_family H1; substitute_map_family H2;
               try (let H1' := fresh in
                    let H2' := fresh in
@@ -394,15 +431,17 @@ Ltac substitute_map_family H :=
               try rename H1 into H;
               try rename H2 into H
   | _ ?b = ?a => subst a; rename b into a
-  | _ = ?a => try (subst a)
+  | _ => idtac
   end.
 
+(* decompose [H : map f l = _] using [decomp_map_eq]
+   decompoistion of [l] is returned in [H] and sub-equations generated by [decomp_map_eq] in [Heq] *)
 Ltac decomp_map_core H Heq :=
   match type of H with
-  | map _ ?l = _ => let l' := fresh in
+  | map _ ?l = _ => let l' := fresh "l" in
                     rename H into Heq;
                     remember l as l' eqn:H in Heq; symmetry in H;
-                    decomp_map_eq Heq H
+                    decomp_map_eq Heq
   | _ = map _ _ => symmetry in H; decomp_map_core H Heq; symmetry in H
   end.
 Tactic Notation "decomp_map" ident(H) :=

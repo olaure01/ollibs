@@ -1,12 +1,12 @@
 (** Order structure on [comparison]
 [Lt] < [Eq] < [Gt] *)
 
+From Coq Require Import Orders.
+
 Set Mangle Names. Set Mangle Names Light.
 Set Default Goal Selector "!".
 Set Default Proof Using "Type".
 Set Implicit Arguments.
-
-From Coq Require Import Orders.
 
 
 Ltac destr_comparison := intros; destruct_all comparison; simpl in *; trivial; try discriminate.

@@ -1,11 +1,14 @@
 (** Add-ons for Permutation_Type library
 Usefull properties apparently missing in the Permutation_Type library. *)
 
-Set Implicit Arguments.
-
 From Coq Require Import PeanoNat Permutation CMorphisms.
 From OLlibs Require Import List_more funtheory.
 From OLlibs Require Export Permutation_Type.
+
+Set Mangle Names. Set Mangle Names Light.
+Set Default Goal Selector "!".
+Set Default Proof Using "Type".
+Set Implicit Arguments.
 
 
 (** * Additional Properties *)
@@ -91,7 +94,7 @@ destruct HP' as [(l1', l2') HP']; subst.
 apply Permutation_Type_sym, Permutation_Type_cons_app_inv,
       Permutation_Type_sym, Permutation_Type_vs_cons_inv in HP.
 destruct HP as [(l1'', l2'') HP]; symmetry in HP.
-dichot_elt_app_inf_exec HP; subst; rewrite <- ? app_assoc, <- ? app_comm_cons.
+dichot_elt_app_inf_exec HP as [[l <- ->]|[l -> <-]]; rewrite <- ? app_assoc, <- ? app_comm_cons.
 - now exists (l1'', l, l2'); right.
 - now exists (l1', l, l2''); left.
 Qed.
@@ -214,16 +217,16 @@ Lemma Permutation_Type_Forall2_inf A B (P : A -> B -> Type) l1 l1' l2 :
   Permutation_Type l1 l1' -> Forall2_inf P l1 l2 ->
   { l2' & Permutation_Type l2 l2' & Forall2_inf P l1' l2' }.
 Proof.
-intros HP; revert l2; induction HP as [ | ? ? ? ? IHP | | ? ? ? ? IHP1 ? IHP2 ];
-  intros l2 HF; inversion HF as [| ? ? ? ? ? HF0]; subst.
+intros HP; revert l2; induction HP as [ | ? ? ? ? IHP | | ? ? ? HP1 IHP1 HP2 IHP2 ];
+  intros l2 HF; inversion HF as [| ? y ? ? ? HF0]; subst.
 - exists nil; auto.
 - apply IHP in HF0 as [l2' HP2 HF2].
   exists (y :: l2'); auto.
 - inversion HF0 as [|? y'0 ? l'0]; subst.
-  exists (y'0 :: y0 :: l'0); auto.
+  exists (y'0 :: y :: l'0); auto.
   constructor.
-- apply Permutation_Type_nil in HP1; subst.
-  apply Permutation_Type_nil in HP2; subst.
+- apply Permutation_Type_nil in HP1 as ->.
+  apply Permutation_Type_nil in HP2 as ->.
   exists nil; auto.
 - apply IHP1 in HF as [l2' HP2' HF2'].
   apply IHP2 in HF2' as [l2'' HP2'' HF2''].
@@ -286,10 +289,10 @@ Lemma Permutation_Type_elt_map_inv A B (f : A -> B) a l1 l2 l3 l4 :
 Proof.
 intros HP Hf.
 apply Permutation_Type_sym, Permutation_Type_vs_elt_inv in HP as [(l', l'') Heq].
-dichot_elt_app_inf_exec Heq; subst.
-- exists (l', l). reflexivity.
+dichot_elt_app_inf_exec Heq as [[l''' <- ->]|[? -> Heq]].
+- exists (l', l'''). reflexivity.
 - exfalso.
-  decomp_map Heq1.
+  decomp_map Heq.
   exact (Hf a eq_refl).
 Qed.
 
@@ -354,7 +357,7 @@ Qed.
 Lemma perm_perm_t_Type A (l1 l2 : list A) :
   Permutation_Type l1 l2 -> Permutation_Type_transp l1 l2.
 Proof.
-intros HP; induction HP.
+intros HP; induction HP as [ | |x y | ? l' ].
 - constructor.
 - now apply Permutation_Type_transp_cons.
 - rewrite <- (app_nil_l (y :: _)), <- (app_nil_l (x :: y :: _)).
@@ -365,7 +368,7 @@ Qed.
 Lemma perm_t_perm_Type A (l1 l2 : list A) :
   Permutation_Type_transp l1 l2 -> Permutation_Type l1 l2.
 Proof.
-intros HP; induction HP; auto.
+intros HP; induction HP as [ | | ? l' ]; auto.
 - now apply Permutation_Type_app_head, Permutation_Type_swap.
 - now transitivity l'.
 Qed.
@@ -377,8 +380,8 @@ Lemma Permutation_Type_ind_transp A (P : list A -> list A -> Prop) :
      Permutation_Type l l' -> P l l' -> Permutation_Type l' l'' -> P l' l'' -> P l l'') ->
   forall l1 l2, Permutation_Type l1 l2 -> P l1 l2.
 Proof.
-intros Hr Ht Htr l1 l2 HP; apply perm_perm_t_Type in HP.
-revert Hr Ht Htr; induction HP; intros Hr Ht Htr; auto.
+intros Hr Ht Htr l1 l2 HP%perm_perm_t_Type.
+induction HP as [ | | ? l' ] in Hr, Ht, Htr |- *; auto.
 apply (Htr _ l'); auto; now apply perm_t_perm_Type.
 Qed.
 
@@ -389,8 +392,8 @@ Lemma Permutation_Type_rect_transp A (P : crelation (list A)) :
      Permutation_Type l l' -> P l l' -> Permutation_Type l' l'' -> P l' l'' -> P l l'') ->
   forall l1 l2, Permutation_Type l1 l2 -> P l1 l2.
 Proof.
-intros Hr Ht Htr l1 l2 HP; apply perm_perm_t_Type in HP.
-revert Hr Ht Htr; induction HP; intros Hr Ht Htr; auto.
+intros Hr Ht Htr l1 l2 HP%perm_perm_t_Type.
+induction HP as [ | | ? l' ] in Hr, Ht, Htr |- *; auto.
 apply (Htr _ l'); auto; now apply perm_t_perm_Type.
 Qed.
 
@@ -406,9 +409,10 @@ Qed.
 Lemma Permutation_Type_list_max l1 l2 :
   Permutation_Type l1 l2 -> list_max l1 = list_max l2.
 Proof.
-unfold list_max. intro HP. induction HP; cbn; [ reflexivity | rewrite IHHP; reflexivity | | ].
+unfold list_max. intro HP.
+induction HP as [ | ? ? ? ? IHHP | x y | ? l' ]; cbn; [ reflexivity | rewrite IHHP; reflexivity | | ].
 - rewrite ? Nat.max_assoc, (Nat.max_comm x y). reflexivity.
-- etransitivity; eassumption.
+- transitivity (fold_right Init.Nat.max 0 l'); assumption.
 Qed.
 
 Lemma partition_Permutation_Type A f (l l1 l2 : list A) :

@@ -6,6 +6,11 @@ The main tactic is [Permutation_solve] which fails is the goal is not solved. *)
 From Coq Require Import Permutation.
 From OLlibs Require Import List_more.
 
+Set Mangle Names. Set Mangle Names Light.
+Set Default Goal Selector "!".
+Set Default Proof Using "Type".
+Set Implicit Arguments.
+
 
 Ltac pre_simpl_hyp_perm H :=
   try apply Permutation_cons_inv in H;

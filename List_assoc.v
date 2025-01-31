@@ -4,14 +4,14 @@
    and https://caml.inria.fr/pub/docs/manual-ocaml/libref/List.html#1_Associationlists
    for more global approaches *)
 
+From Coq Require Import Bool.
+From Coq Require Export List.
+From OLlibs Require Export dectype.
+
 Set Mangle Names. Set Mangle Names Light.
 Set Default Goal Selector "!".
 Set Default Proof Using "Type".
 Set Implicit Arguments.
-
-From Coq Require Import Bool.
-From Coq Require Export List.
-From OLlibs Require Export dectype.
 
 
 (** [remove_assoc] *)

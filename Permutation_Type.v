@@ -5,6 +5,9 @@ From Coq Require Import List PeanoNat Compare_dec CMorphisms FinFun Permutation.
 From OLlibs Require Import List_Type.
 Import ListNotations. (* For notations [] and [a;b;c] *)
 
+Set Mangle Names. Set Mangle Names Light.
+Set Default Goal Selector "!".
+Set Default Proof Using "Type".
 Set Implicit Arguments.
 (* Set Universe Polymorphism. *)
 
@@ -42,13 +45,13 @@ Qed.
 
 Theorem Permutation_Type_refl : forall l : list A, Permutation_Type l l.
 Proof.
-  induction l; constructor. exact IHl.
+  intro l. induction l as [|a l IHl]; constructor. exact IHl.
 Qed.
 
 Theorem Permutation_Type_sym : forall l l' : list A,
  Permutation_Type l l' -> Permutation_Type l' l.
 Proof.
-  intros l l' Hperm; induction Hperm; auto.
+  intros l l' Hperm; induction Hperm as [ | | | ? l']; auto.
   apply Permutation_Type_trans with (l':=l'); assumption.
 Qed.
 
@@ -126,10 +129,10 @@ Proof.
   intros l m l' m' Hpermll' Hpermmm';
    induction Hpermll' as [|x l l'|x y l|l l' l''];
     repeat rewrite <- app_comm_cons; auto.
-  apply Permutation_Type_trans with (l' := (x :: y :: l ++ m));
-   [idtac | repeat rewrite app_comm_cons; apply Permutation_Type_app_head]; trivial.
-  apply Permutation_Type_trans with (l' := (l' ++ m')); try assumption.
-  apply Permutation_Type_app_tail; assumption.
+  - apply Permutation_Type_trans with (l' := (x :: y :: l ++ m));
+     [idtac | repeat rewrite app_comm_cons; apply Permutation_Type_app_head]; trivial.
+  - apply Permutation_Type_trans with (l' := (l' ++ m')); try assumption.
+    apply Permutation_Type_app_tail; assumption.
 Qed.
 
 #[export] Instance Permutation_Type_app' :
@@ -143,7 +146,7 @@ Proof. intros; apply Permutation_Type_app; auto. Qed.
 
 Lemma Permutation_Type_cons_append : forall (l : list A) x,
   Permutation_Type (x :: l) (l ++ x :: nil).
-Proof. induction l; intros; auto. simpl.
+Proof. intro l. induction l as [ | ? ? IHl ]; intros; auto. simpl.
 eapply Permutation_Type_trans ; [ apply Permutation_Type_swap | apply Permutation_Type_skip ].
 apply IHl. Qed.
 #[local] Hint Resolve Permutation_Type_cons_append : core.
@@ -151,13 +154,13 @@ apply IHl. Qed.
 Theorem Permutation_Type_app_comm : forall (l l' : list A),
   Permutation_Type (l ++ l') (l' ++ l).
 Proof.
-  induction l as [|x l]; simpl; intro l'.
-  rewrite app_nil_r; trivial.
-  eapply Permutation_Type_trans ; [ apply Permutation_Type_skip ; apply IHl | ].
-  rewrite app_comm_cons.
-  replace (l' ++ x :: l) with ((l' ++ x :: nil) ++ l)
-    by (rewrite <- app_assoc ; reflexivity).
-  apply Permutation_Type_app_tail. apply Permutation_Type_cons_append.
+  intro l. induction l as [|x l IHl]; simpl; intro l'.
+  - rewrite app_nil_r; trivial.
+  - eapply Permutation_Type_trans ; [ apply Permutation_Type_skip ; apply IHl | ].
+    rewrite app_comm_cons.
+    replace (l' ++ x :: l) with ((l' ++ x :: nil) ++ l)
+      by (rewrite <- app_assoc ; reflexivity).
+    apply Permutation_Type_app_tail. apply Permutation_Type_cons_append.
 Qed.
 #[local] Hint Resolve Permutation_Type_app_comm : core.
 
@@ -189,7 +192,7 @@ Qed.
 
 Theorem Permutation_Type_rev : forall (l : list A), Permutation_Type l (rev l).
 Proof.
-  induction l as [| x l]; simpl; trivial.
+  intro l. induction l as [| x l]; simpl; trivial.
   eapply Permutation_Type_trans ; [ apply Permutation_Type_cons_append | ].
   apply Permutation_Type_app_tail. assumption.
 Qed.
@@ -208,7 +211,7 @@ Qed.
 Theorem Permutation_Type_length : forall (l l' : list A),
  Permutation_Type l l' -> length l = length l'.
 Proof.
-  intros l l' Hperm; induction Hperm; simpl; auto. now transitivity (length l').
+  intros l l' Hperm; induction Hperm as [ | | | ? l' ]; simpl; auto. now transitivity (length l').
 Qed.
 
 #[export] Instance Permutation_Type_length' :
@@ -224,14 +227,14 @@ Theorem Permutation_Type_ind_bis :
    forall l l', Permutation_Type l l' -> P l l'.
 Proof.
   intros P Hnil Hskip Hswap Htrans.
-  induction 1; auto.
-  apply Htrans with (x::y::l); auto.
-  apply Hswap; auto.
-  induction l; auto.
-  apply Hskip; auto.
-  apply Hskip; auto.
-  induction l; auto.
-  eauto.
+  induction 1 as [| | x y l | ]; auto.
+  - apply Htrans with (x::y::l); auto.
+    + apply Hswap; auto.
+      induction l; auto.
+    + apply Hskip; auto.
+      apply Hskip; auto.
+      induction l; auto.
+  - eauto.
 Qed.
 
 Theorem Permutation_Type_rect_bis :
@@ -243,14 +246,14 @@ Theorem Permutation_Type_rect_bis :
    forall l l', Permutation_Type l l' -> P l l'.
 Proof.
   intros P Hnil Hskip Hswap Htrans.
-  induction 1; auto.
-  apply Htrans with (x::y::l); auto.
-  apply Hswap; auto.
-  induction l; auto.
-  apply Hskip; auto.
-  apply Hskip; auto.
-  induction l; auto.
-  eauto.
+  induction 1 as [ | | x y l | ]; auto.
+  - apply Htrans with (x::y::l); auto.
+    + apply Hswap; auto.
+      induction l; auto.
+    + apply Hskip; auto.
+      apply Hskip; auto.
+      induction l; auto.
+  - eauto.
 Qed.
 
 Theorem Permutation_Type_nil_app_cons : forall (l l' : list A) (x : A),
@@ -286,21 +289,20 @@ Proof.
  - (* trans *)
    intros l1 l l2 PE IH PE' IH' l1' l2' AD1 AD2.
    assert {l' : list A & Add_inf a l' l } as [l' AD].
-   { clear IH PE' IH' AD2 l2 l2'. revert l1' AD1. induction PE ; intros.
+   { clear IH PE' IH' AD2 l2 l2'. revert l1' AD1.
+     induction PE as [ | b l l' HP IHPE | b c l | l l' l'' HP1 IHPE1 HP2 IHPE2 ]; intros l1 AD1.
      - inversion AD1.
-     - inversion AD1 ; subst.
+     - inversion AD1 as [|? ? ? AD2]; subst.
        + apply (existT _ l'). constructor.
-       + apply IHPE in X.
-         destruct X as [l'0 X].
-         apply (existT _ (x :: l'0)).
+       + apply IHPE in AD2 as [l'0 AD2].
+         apply (existT _ (b :: l'0)).
          constructor. assumption.
-     - inversion AD1 ; subst.
-       + apply (existT _ (x :: l)). do 2 constructor.
-       + inversion X ; subst.
-         * apply (existT _ (y :: l)). do 2 constructor.
-         * apply (existT _ (x :: y :: l1)). do 2 constructor. assumption.
-     - apply IHPE1 in AD1.
-       destruct AD1 as [l'0 AD1]. apply IHPE2 in AD1. assumption. }
+     - inversion AD1 as [|? ? ? AD2]; subst.
+       + apply (existT _ (b :: l)). do 2 constructor.
+       + inversion AD2 as [|? l']; subst.
+         * apply (existT _ (c :: l)). do 2 constructor.
+         * apply (existT _ (b :: c :: l')). do 2 constructor. assumption.
+     - apply IHPE1 in AD1 as [l'0 AD1]. apply IHPE2 in AD1. assumption. }
    eapply Permutation_Type_trans.
    + apply IH.
      * apply AD1.
@@ -329,7 +331,7 @@ Qed.
 Theorem Permutation_Type_app_inv_l : forall l l1 l2,
  Permutation_Type (l ++ l1) (l ++ l2) -> Permutation_Type l1 l2.
 Proof.
-  induction l; simpl; auto.
+  intro l. induction l as [|a ? IHl]; simpl; auto.
   intros.
   apply IHl.
   apply Permutation_Type_cons_inv with a; auto.
@@ -347,8 +349,8 @@ Qed.
 
 Lemma Permutation_Type_length_1_inv: forall a l, Permutation_Type [a] l -> l = [a].
 Proof.
-  intros a l H; remember [a] as m in H.
-  induction H; try (injection Heqm as -> ->);
+  intros a l H; remember [a] as m eqn:Heqm in H.
+  induction H as [ | ? ? ? H | | ]; try (injection Heqm as -> ->);
     discriminate || auto.
   apply Permutation_Type_nil in H as ->; trivial.
 Qed.
@@ -362,13 +364,12 @@ Qed.
 Lemma Permutation_Type_length_2_inv :
   forall a1 a2 l, Permutation_Type [a1;a2] l -> { l = [a1;a2] } + { l = [a2;a1] }.
 Proof.
-  intros a1 a2 l H; remember [a1;a2] as m in H.
-  revert a1 a2 Heqm.
-  induction H; intros; try (injection Heqm as ? ?; subst);
+  intros a1 a2 l H; remember [a1;a2] as m eqn:Heqm in H.
+  induction H as [ | ? ? ? H | | ? ? ? ? IHP1 ? IHP2 ] in a1, a2, Heqm |- *; try (injection Heqm as ? ?; subst);
     discriminate || (try tauto).
-  apply Permutation_Type_length_1_inv in H as ->; left; auto.
-  apply IHPermutation_Type1 in Heqm as [H1|H1]; apply IHPermutation_Type2 in H1 as [];
-    auto.
+  - apply Permutation_Type_length_1_inv in H as ->; left; auto.
+  - apply IHP1 in Heqm. destruct Heqm as [H1|H1]; apply IHP2 in H1; destruct H1 as [];
+      auto.
 Qed.
 
 Lemma Permutation_Type_length_2 :
@@ -383,7 +384,7 @@ Lemma NoDup_inf_Permutation_Type l l' : NoDup_inf l -> NoDup_inf l' ->
   (forall x:A, iffT (In_inf x l) (In_inf x l')) -> Permutation_Type l l'.
 Proof.
  intros N. revert l'. induction N as [|a l Hal Hl IH].
- - destruct l'; simpl; auto.
+ - intro l'. destruct l' as [|a ]; simpl; auto.
    intros Hl' H. exfalso. apply (H a); auto.
  - intros l' Hl' H.
    assert (Ha : In_inf a l') by (apply H; simpl; auto).
@@ -395,7 +396,7 @@ Proof.
      apply NoDup_inf_NoDup in Hl'.
      apply Add_inf_Add in AD.
      now apply (NoDup_Add AD).
-   * split.
+   * intro x. split.
      + apply incl_inf_Add_inf_inv with a l'; trivial. intro. apply H.
      + intro Hx.
        assert (Hx' : In_inf x (a::l)).
@@ -410,9 +411,9 @@ Qed.
 Lemma NoDup_inf_Permutation_Type_bis l l' : NoDup_inf l ->
   length l' <= length l -> incl_inf l l' -> Permutation_Type l l'.
 Proof.
- intros. apply NoDup_inf_Permutation_Type; auto.
- - apply NoDup_inf_NoDup in X; apply NoDup_NoDup_inf.
-   apply incl_inf_incl in X0.
+ intros Hnd Hlen Hinc. apply NoDup_inf_Permutation_Type; auto.
+ - apply NoDup_inf_NoDup in Hnd; apply NoDup_NoDup_inf.
+   apply incl_inf_incl in Hinc.
    now apply NoDup_incl_NoDup with l.
  - split; auto.
    apply NoDup_inf_length_incl_inf; trivial.
@@ -521,9 +522,9 @@ Lemma Permutation_Type_nth_error l l' :
 Proof.
   intros P.
   split; [now apply Permutation_Type_length|].
-  induction P.
-  exists (fun n => n).
-  split; try red; auto.
+  induction P as [ | ? ? ? ? IHP | | ? ? ? ? IHP1 ? IHP2 ].
+  - exists (fun n => n).
+    split; try red; auto.
   - destruct IHP as (f & Hf & Hf').
     exists (fun n => match n with O => O | S n => S (f n) end).
     split; try red.
@@ -546,7 +547,7 @@ Lemma nth_error_Permutation_Type l l' :
    forall f, Injective f -> (forall n, nth_error l' n = nth_error l (f n)) ->
   Permutation_Type l l'.
 Proof.
-  revert l. induction l'.
+  revert l. induction l' as [|a l' IHl'].
   - intros [|l]; now auto.
   - intros l E f Hf Hf'.
     simpl in E.
@@ -611,9 +612,9 @@ Proof.
  apply Permutation_nth_error_bis in H.
  destruct H as (f & Hf & Hf2 & Hf3).
  exists f. split; [|split]; auto.
- intros x y _ _ Hxy. now apply Hf.
- intros n Hn. rewrite <- 2 nth_default_eq. unfold nth_default.
- now rewrite Hf3.
+ - intros x y _ _ Hxy. now apply Hf.
+ - intros n Hn. rewrite <- 2 nth_default_eq. unfold nth_default.
+   now rewrite Hf3.
 Qed.
 
 Lemma nth_Permutation_Type l l' d :

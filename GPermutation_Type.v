@@ -6,6 +6,9 @@ From OLlibs Require Import funtheory ComparisonOrder List_more
                            CPermutation_Type CPermutation_Type_solve.
 From OLlibs Require GPermutation.
 
+Set Mangle Names. Set Mangle Names Light.
+Set Default Goal Selector "!".
+Set Default Proof Using "Type".
 Set Implicit Arguments.
 
 

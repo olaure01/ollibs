@@ -1,12 +1,12 @@
 (** [nat]-labelled binary trees and embedding into [nat] *)
 
+From Coq Require Import PeanoNat Lia.
+From OLlibs Require Import funtheory.
+
 Set Mangle Names. Set Mangle Names Light.
 Set Default Goal Selector "!".
 Set Default Proof Using "Type".
 Set Implicit Arguments.
-
-From Coq Require Import PeanoNat Lia.
-From OLlibs Require Import funtheory.
 
 
 (* TODO use Cantor pairing from stdlib? *)

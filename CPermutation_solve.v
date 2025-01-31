@@ -6,6 +6,11 @@ The main tactic is [CPermutation_solve] which fails is the goal is not solved. *
 From Coq Require Import CPermutation.
 From OLlibs Require Import List_more.
 
+Set Mangle Names. Set Mangle Names Light.
+Set Default Goal Selector "!".
+Set Default Proof Using "Type".
+Set Implicit Arguments.
+
 
 Ltac cperm_rot :=
   cons2app; rewrite <- ? app_assoc;

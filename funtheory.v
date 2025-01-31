@@ -1,13 +1,14 @@
 (** Properties of functions *)
 
+From Coq Require Import Program.Basics Relation_Definitions RelationClasses List.
+  (* do not export Program.Basics to avoid impact on [flip] and [arrow] for setoid_rewriting *)
+From OLlibs Require Import inhabited_Type.
+
 Set Mangle Names. Set Mangle Names Light.
 Set Default Goal Selector "!".
 Set Default Proof Using "Type".
 Set Implicit Arguments.
 
-From Coq Require Import Program.Basics Relation_Definitions RelationClasses List.
-  (* do not export Program.Basics to avoid impact on [flip] and [arrow] for setoid_rewriting *)
-From OLlibs Require Import inhabited_Type.
 
 (* copy of Basics.compose to avoid exporting full Basics *)
 Definition compose {A B C} (g : B -> C) (f : A -> B) := fun x : A => g (f x).

@@ -1,12 +1,13 @@
 (** Add-ons for Vector library *)
 
+#[local] Set Warnings "-stdlib-vector".
+From Coq Require Import PeanoNat Lia Vector.
+
 Set Mangle Names. Set Mangle Names Light.
 Set Default Goal Selector "!".
 Set Default Proof Using "Type".
 Set Implicit Arguments.
 
-#[local] Set Warnings "-stdlib-vector".
-From Coq Require Import PeanoNat Lia Vector.
 
 (** * Axioms of Finite Choices over vectors *)
 Lemma AFCvec A (R : nat -> A -> Prop) n (l : Vector.t _ n) :
