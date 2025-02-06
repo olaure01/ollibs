@@ -123,7 +123,8 @@ Ltac unit_vs_elt_inv H :=
   | ?a :: nil = ?l1 ++ ?x :: ?l2 =>
       let Hnil1 := fresh in
       let Hnil2 := fresh in
-      symmetry in H; apply elt_eq_unit in H as [H [Hnil1 Hnil2]];
+      simple apply eq_sym in H; apply elt_eq_unit in H as [H [Hnil1 Hnil2]];
+(* [simple apply eq_sym] faster than [symmetry]? *)
       (try subst x); (try subst a); rewrite ? Hnil1, ? Hnil2 in *;
       clear Hnil1 Hnil2; (try clear l1); (try clear l2)
   | ?l1 ++ ?x :: ?l2 = ?a :: nil =>
@@ -179,7 +180,7 @@ Qed.
 #[local] Ltac decomp_elt_eq_app_core H p :=
   match type of H with
   | _ ++ _ :: _ = _ ++ _ => apply elt_eq_app_dichot in H as p
-  | _ ++ _ = _ ++ _ :: _ => simple apply eq_sym in H; (* TODO check why not [symmetry] *)
+  | _ ++ _ = _ ++ _ :: _ => simple apply eq_sym in H;
                             apply elt_eq_app_dichot in H as p
   end.
 Tactic Notation "decomp_elt_eq_app" hyp(H) "as" simple_intropattern(p) := decomp_elt_eq_app_core H p.
@@ -215,7 +216,7 @@ Qed.
 #[local] Ltac decomp_elt_eq_app_app_core H p :=
   match type of H with
   | _ ++ _ :: _ = _ ++ _ ++ _ => apply elt_eq_app_app_trichot in H as p
-  | _ ++ _ ++ _ = _ ++ _ :: _ => simple apply eq_sym in H; (* TODO check why not [symmetry] *)
+  | _ ++ _ ++ _ = _ ++ _ :: _ => simple apply eq_sym in H;
                                  apply elt_eq_app_app_trichot in H as p
   end.
 Tactic Notation "decomp_elt_eq_app_app" hyp(H) "as" simple_intropattern(p) := decomp_elt_eq_app_app_core H p.
@@ -440,9 +441,9 @@ Ltac decomp_map_core H Heq :=
   match type of H with
   | map _ ?l = _ => let l' := fresh "l" in
                     rename H into Heq;
-                    remember l as l' eqn:H in Heq; symmetry in H;
+                    remember l as l' eqn:H in Heq; simple apply eq_sym in H;
                     decomp_map_eq Heq
-  | _ = map _ _ => symmetry in H; decomp_map_core H Heq; symmetry in H
+  | _ = map _ _ => simple apply eq_sym in H; decomp_map_core H Heq; simple apply eq_sym in H
   end.
 Tactic Notation "decomp_map" ident(H) :=
   let Heq := fresh "Heq" in decomp_map_core H Heq; substitute_map_family Heq.
