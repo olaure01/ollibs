@@ -41,7 +41,7 @@ Proof. intros ? ? []. apply cperm_Type. Qed.
 #[export] Instance CPermutation_Type_trans A : Transitive (@CPermutation_Type A).
 Proof.
 intros l1 l2 l3 [l4 l5] HC2. inversion HC2 as [l6 l7 H1 H2]. subst.
-dichot_app_inf_exec H1 as [[l2' <- ->] | [l4' -> <-]].
+decomp_app_eq_app H1 as [[l2' <- ->] | [l4' -> <-]].
 - rewrite <- app_assoc, app_assoc. apply cperm_Type.
 - rewrite <- app_assoc, (app_assoc l7). apply cperm_Type.
 Qed.
@@ -133,7 +133,7 @@ Lemma CPermutation_Type_vs_elt_inv A (a : A) l l1 l2 :
   CPermutation_Type l (l1 ++ a :: l2) -> {'(l1',l2') | l2 ++ l1 = l2' ++ l1' & l = l1' ++ a :: l2' }.
 Proof.
 intro HC. inversion HC as [l3 l4 H1 H2]. subst.
-dichot_elt_app_inf_exec H2 as [[l <- ->]|[l -> <-]].
+decomp_elt_eq_app H2 as [[l <- ->]|[l -> <-]].
 - now exists (l3 ++ l1, l); cbn; rewrite <- app_assoc.
 - now exists (l, l2 ++ l4); cbn; rewrite <- app_assoc.
 Qed.
@@ -181,16 +181,16 @@ Lemma CPermutation_Type_app_app_inv A (l1 l2 l3 l4 : list A) :
         (CPermutation_Type l1' l2') }.
 Proof.
 intro HC. inversion HC as [lx ly Hx Hy].
-dichot_app_inf_exec Hx as [[l <- ->]|[l -> <-]];
-  dichot_app_inf_exec Hy as [[l' <- Hy]|[l' Hy <-]]; subst.
+decomp_app_eq_app Hx as [[l <- ->]|[l -> <-]];
+  decomp_app_eq_app Hy as [[l' <- Hy]|[l' Hy <-]]; subst.
 - left; left; left; right; exists (l ++ l', l' ++ l); repeat split;
     rewrite <- ? app_assoc; apply CPermutation_Type_app_rot.
-- dichot_app_inf_exec Hy as [[l'' <- ->]|[l'' -> <-]].
+- decomp_app_eq_app Hy as [[l'' <- ->]|[l'' -> <-]].
   + left; left; left; left; exists (l, l'', lx, l'); repeat split;
       apply CPermutation_Type_refl.
   + left; right; exists (l'' ++ lx , lx ++ l''); repeat split;
       rewrite <- ? app_assoc ; apply CPermutation_Type_app_rot.
-- dichot_app_inf_exec Hy as [[l'' <- ->]|[l'' -> <-]].
+- decomp_app_eq_app Hy as [[l'' <- ->]|[l'' -> <-]].
   + left; left; right; exists (ly ++ l'', l'' ++ ly); repeat split;
       rewrite <- ? app_assoc; apply CPermutation_Type_app_rot.
   + left; left; left; left; exists (l', ly, l'', l); repeat split;
@@ -215,16 +215,12 @@ Qed.
   Proper (@CPermutation_Type A ==> Basics.impl) (In a).
 Proof.
 intros l l' HC Hin.
-apply Permutation_Type_in with l; auto.
-now apply CPermutation_Permutation_Type.
+apply Permutation_Type_in with l; [ apply CPermutation_Permutation_Type | ]; assumption.
 Qed.
 
 #[export] Instance CPermutation_Type_map A B (f : A -> B) :
   Proper (@CPermutation_Type A ==> @CPermutation_Type B) (map f).
-Proof.
-intros l l' HC.
-now inversion HC; subst; rewrite ? map_app.
-Qed.
+Proof. intros l l' HC. now inversion HC; subst; rewrite ? map_app. Qed.
 
 Lemma CPermutation_Type_map_inv A B (f : A -> B) l1 l2 :
   CPermutation_Type l1 (map f l2) -> { l & l1 = map f l & CPermutation_Type l2 l }.

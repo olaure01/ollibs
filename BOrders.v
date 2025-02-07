@@ -19,7 +19,7 @@ Class BOrder := {
   total a b : leb a b = false -> leb b a = true;
   asym a b : leb a b = true -> leb b a = true -> a = b;
   trans a b c : leb a b = true -> leb b c = true -> leb a c = true }.
-Coercion car : BOrder >-> Sortclass. (* TODO integrate as [car :> Type] when it defines coercion *)
+Coercion car : BOrder >-> Sortclass. (* TODO from Rocq 9.0: integrate as [car :> Type] *)
 
 (** ** Equivalence with [UsualOrderedTypeFull] *)
 Module Type ModBOrder.

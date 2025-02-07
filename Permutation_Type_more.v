@@ -94,7 +94,7 @@ destruct HP' as [(l1', l2') HP']; subst.
 apply Permutation_Type_sym, Permutation_Type_cons_app_inv,
       Permutation_Type_sym, Permutation_Type_vs_cons_inv in HP.
 destruct HP as [(l1'', l2'') HP]; symmetry in HP.
-dichot_elt_app_inf_exec HP as [[l <- ->]|[l -> <-]]; rewrite <- ? app_assoc, <- ? app_comm_cons.
+decomp_elt_eq_app HP as [[l <- ->]|[l -> <-]]; rewrite <- ? app_assoc, <- ? app_comm_cons.
 - now exists (l1'', l, l2'); right.
 - now exists (l1', l, l2''); left.
 Qed.
@@ -155,7 +155,7 @@ revert l2 l3 l4; induction l1 as [|a l1 IHl1]; intros l2 l3 l4 HP.
 - assert (Heq := HP).
   apply Permutation_Type_sym, Permutation_Type_vs_cons_inv in Heq.
   destruct Heq as [(l1', l2') Heq].
-  dichot_elt_app_inf_exec Heq; subst.
+  decomp_elt_eq_app Heq; subst.
   + rewrite <- ?app_comm_cons, <- app_assoc, <- app_comm_cons in HP.
     apply Permutation_Type_cons_app_inv in HP.
     rewrite app_assoc in HP; apply IHl1 in HP.
@@ -289,7 +289,7 @@ Lemma Permutation_Type_elt_map_inv A B (f : A -> B) a l1 l2 l3 l4 :
 Proof.
 intros HP Hf.
 apply Permutation_Type_sym, Permutation_Type_vs_elt_inv in HP as [(l', l'') Heq].
-dichot_elt_app_inf_exec Heq as [[l''' <- ->]|[? -> Heq]].
+decomp_elt_eq_app Heq as [[l''' <- ->]|[? -> Heq]].
 - exists (l', l'''). reflexivity.
 - exfalso.
   decomp_map Heq.

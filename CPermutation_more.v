@@ -29,15 +29,15 @@ Lemma CPermutation_app_app_inv A (l1 l2 l3 l4 : list A) :
           /\ CPermutation l l').
 Proof.
 intro HC. inversion HC as [lx ly Hx Hy].
-dichot_app_inf_exec Hx as [[l <- ->]|[l -> <-]];
-  dichot_app_inf_exec Hy as [[l' <- Hy]|[l' Hy <-]]; subst.
+decomp_app_eq_app Hx as [[l <- ->]|[l -> <-]];
+  decomp_app_eq_app Hy as [[l' <- Hy]|[l' Hy <-]]; subst.
 - right. left. exists (l ++ l'), (l' ++ l).
   repeat split; rewrite <- ? app_assoc; apply CPermutation_app_rot.
-- dichot_app_inf_exec Hy as [[l'' <- ->]|[l'' -> <-]].
+- decomp_app_eq_app Hy as [[l'' <- ->]|[l'' -> <-]].
   + now left; exists l, l'', lx, l'; repeat split.
   + right. right. right. left. exists (l'' ++ lx), (lx ++ l'').
     repeat split; rewrite <- ? app_assoc; apply CPermutation_app_rot.
-- dichot_app_inf_exec Hy as [[l'' <- ->]|[l'' -> <-]].
+- decomp_app_eq_app Hy as [[l'' <- ->]|[l'' -> <-]].
   + right. right. left. exists (ly ++ l''), (l'' ++ ly).
     repeat split; rewrite <- ? app_assoc; apply CPermutation_app_rot.
   + left. exists l', ly, l'', l. repeat split; reflexivity.

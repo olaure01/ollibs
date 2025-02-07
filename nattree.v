@@ -9,7 +9,7 @@ Set Default Proof Using "Type".
 Set Implicit Arguments.
 
 
-(* TODO use Cantor pairing from stdlib? *)
+(* TODO use Cantor pairing [Arith.Cantor] from stdlib? *)
 
 
 (** * Coding of pairs of [nat] *)
