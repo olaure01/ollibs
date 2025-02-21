@@ -18,14 +18,14 @@ Definition pigeon X := forall (l1 l2 : list X),
 (** * Definitions and implications *)
 
 (* The following results are proved in the case of a DecType:
-     bijection with nat => section with nat => non-surjective self injection => injection from nat
-     injection from nat <=> choice out of finite subsets
+     bijection with nat => section with nat => bijection with one more element
+       => non-surjective self injection => injection from nat <=> choice out of finite subsets
 *)
 
 
 (* we start with results true for an arbitrary Type:
      bijection with nat => section with nat => choice out of finite subsets => injection from nat
-     bijection with nat => non-surjective self injection
+     bijection with nat => bijection with one more element => non-surjective self injection
 *)
 Section Infinite.
 
@@ -37,6 +37,8 @@ Section Infinite.
   Definition nat_section := {'(i, s) : (nat -> X) * (X -> nat) | retract s i }.
   (* non-surjective self injection *)
   Definition self_injective := { f : X -> X & injective f & { x | forall y, x <> f y } }.
+  (* bijection with extension with one more element *)
+  Definition self_option_bijective := { f : option X -> X & bijective f }.
   (* injection from nat *)
   Definition nat_injective := { f : nat -> X | injective f }.
   (* choice out of finite subsets *)
@@ -93,18 +95,35 @@ Section Infinite.
   apply (Hc (ih (pred y))). subst ih. assumption.
   Qed.
 
-  Lemma nat_bijective_self : nat_bijective -> self_injective.
+  Lemma nat_bijective_self_option : nat_bijective -> self_option_bijective.
   Proof.
   intros [i Hbij].
   destruct (bijective_inverse Hbij) as [s Hsec1 Hsec2].
-  exists (fun x => i (S (s x))).
-  - apply compose_injective; [ apply compose_injective | ].
-    + apply section_injective with i, Hsec1.
-    + intros x y. lia.
-    + apply section_injective with s, Hsec2.
-  - exists (i 0). intros x Heq.
-    apply section_injective in Hsec2.
-    apply Hsec2 in Heq. discriminate Heq.
+  exists (fun o => match o with
+                   | Some x => i (S (s x))
+                   | None => i 0
+                   end).
+  intro y. remember (s y) as n eqn:Hn. destruct n as [|n].
+  - exists None.
+    + rewrite Hn, Hsec1. reflexivity.
+    + intros [x|] ->.
+      * exfalso. rewrite Hsec2 in Hn. discriminate Hn.
+      * reflexivity.
+  - exists (Some (i (pred (S n)))).
+    + rewrite Hsec2, Nat.pred_succ, Hn, Hsec1. reflexivity.
+    + intros [x|] ->.
+      * rewrite Hsec2 in Hn. injection Hn as [= ->].
+        rewrite Nat.pred_succ, Hsec1. reflexivity.
+      * exfalso. rewrite Hsec2 in Hn. discriminate Hn.
+  Qed.
+
+  Lemma option_bijective_self : self_option_bijective -> self_injective.
+  Proof.
+  intros [f Hinj%bijective_injective].
+  exists (fun x => f (Some x)).
+  - apply compose_injective; [ intros x y [=] | ]; assumption.
+  - exists (f None).
+    intros x [=]%Hinj.
   Qed.
 
 End Infinite.
@@ -112,30 +131,48 @@ End Infinite.
 (** [DecType] case *)
 
 (* Implications requiring a DecType
-     section with nat => non-surjective self injection => injection from nat
-     injection from nat => choice out of finite subset
+     section with nat => bijection with one more element
+     non-surjective self injection => injection from nat => choice out of finite subset
 *)
 Section InfiniteDec.
 
   Variable X : DecType.
 
-  Lemma section_self_injective : nat_section X -> self_injective X.
+  Lemma section_self_bijective : nat_section X -> self_option_bijective X.
   Proof.
   intros [(i, s) Hs].
   assert (Hinj := section_injective Hs).
   assert (forall x z, x = i z -> x = i (s x)) as Hsi
-    by (now intros x z Heq; rewrite Heq at 2; rewrite Hs). clear Hs.
-  exists (fun x => if eqb x (i (s x)) then i (S (s x)) else x).
-  - intros x y.
-    case_analysis eqn:Heq1; case_analysis eqn:Heq2; intro Heqh; [ | | | exact Heqh ].
-    + rewrite Heq1, Heq2.
-      apply Hinj in Heqh as [= ->]. reflexivity.
-    + exfalso. symmetry in Heqh. apply Heq2, (Hsi _ _ Heqh).
-    + exfalso. apply Heq1, (Hsi _ _ Heqh).
-  - exists (i 0). intro x.
-    case_analysis eqn:Heq; intro Heqi.
-    + apply Hinj in Heqi. discriminate Heqi.
-    + symmetry in Heqi. apply Heq, (Hsi _ _ Heqi).
+    by (now intros x z Heq; rewrite Heq at 2; rewrite Hs).
+  exists (fun o => match o with
+                   | Some x => if eqb x (i (s x)) then i (S (s x)) else x
+                   | None => i 0
+                   end).
+  intro y. remember (eqb y (i (s y))) as b eqn:Hb. symmetry in Hb. destruct b.
+  - apply eqb_eq in Hb.
+    remember (s y) as n eqn:Hn. rewrite Hn in Hb. destruct n as [|n].
+    + exists None.
+      * rewrite Hn. assumption.
+      * intros [x|] Hy.
+        -- exfalso. remember (eqb x (i (s x))) as b' eqn:Hb'. destruct b'.
+           ++ rewrite Hy, Hs in Hn. discriminate Hn.
+           ++ symmetry in Hb'. apply eqb_neq in Hb'. apply Hb'. subst y. assumption.
+        -- reflexivity.
+    + exists (Some (i (pred (S n)))).
+      * rewrite Nat.pred_succ, ! Hs, eqb_refl, Hn. assumption.
+      * intros [x|] Hy.
+        -- remember (eqb x (i (s x))) as b' eqn:Hb'. destruct b'.
+           ++ rewrite Hy, Hs in Hn. injection Hn as [= ->].
+              symmetry in Hb'. apply eqb_eq in Hb'. rewrite Nat.pred_succ, <- Hb'. reflexivity.
+           ++ exfalso. symmetry in Hb'. apply eqb_neq in Hb'. apply Hb'. subst y. assumption.
+        -- exfalso. rewrite Hy, Hs in Hn. discriminate Hn.
+  - exists (Some y).
+    + rewrite Hb. reflexivity.
+    + apply eqb_neq in Hb. intros [x|] Hy.
+      * remember (eqb x (i (s x))) as b' eqn:Hb'. destruct b'.
+        -- exfalso. apply Hb, (Hsi _ (S (s x))), Hy.
+        -- rewrite Hy. reflexivity.
+      * exfalso. apply Hb, (Hsi _ 0), Hy.
   Qed.
 
   Lemma pigeon_dectype : pigeon X.
@@ -163,7 +200,7 @@ Section InfiniteDec.
   - remember (S (length l)) as k eqn:Heqk. clear Heqk.
     remember 0 as s eqn:Heqs. clear Heqs.
     induction k as [|k IHk] in s, Hin, Hnin |-*; cbn; [ easy | ].
-    case (eq_dt_reflect (f s) x); intros Heq; subst.
+    case (eq_dt_reflect (f s) x); [ intros <- | intro Hneq ].
     + exists s. assumption.
     + apply IHk with (S s); [ | assumption ].
       now destruct Hin.
@@ -189,7 +226,7 @@ Section InfiniteDec.
     rewrite ((Eqdep_dec.UIP_dec bool_dec) _ _ Hx Hy). reflexivity.
   - assert (eqb i (f i) = false) as Hj by apply eqb_neq, Hi.
     split with (exist _ (f i) Hj).
-    intros [y Hy]. cbn. intros Heq.
+    intros [y Hy]. cbn. intro Heq.
     inversion Heq as [Heq2].
     apply Hinj, eqb_neq in Heq2; assumption.
   Qed.
