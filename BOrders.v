@@ -3,7 +3,7 @@
 From Coq Require Import Bool PeanoNat Wf_nat Lia List Permutation Orders.
 From OLlibs Require Import funtheory.
 
-Set Mangle Names. Set Mangle Names Light.
+(* Set Mangle Names. Set Mangle Names Light. *)
 Set Default Goal Selector "!".
 Set Default Proof Using "Type".
 Set Implicit Arguments.

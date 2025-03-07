@@ -8,7 +8,7 @@ by lists up to permutation (with output in [Type]. *)
 From Coq Require Import CMorphisms List.
 From OLlibs Require Import Permutation_Type.
 
-Set Mangle Names. Set Mangle Names Light.
+(* Set Mangle Names. Set Mangle Names Light. *)
 Set Default Goal Selector "!".
 Set Default Proof Using "Type".
 Set Implicit Arguments.

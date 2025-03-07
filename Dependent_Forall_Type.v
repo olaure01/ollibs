@@ -4,7 +4,7 @@ From Coq Require Export Eqdep_dec.
 From Coq Require Import PeanoNat List.
 From OLlibs Require Import List_Type.
 
-Set Mangle Names. Set Mangle Names Light.
+(* Set Mangle Names. Set Mangle Names Light. *)
 Set Default Goal Selector "!".
 Set Default Proof Using "Type".
 Set Implicit Arguments.

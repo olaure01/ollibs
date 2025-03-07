@@ -3,7 +3,7 @@
 From Coq Require Import List Lia.
 From OLlibs Require Import funtheory Permutation_Type.
 
-Set Mangle Names. Set Mangle Names Light.
+(* Set Mangle Names. Set Mangle Names Light. *)
 Set Default Goal Selector "!".
 Set Default Proof Using "Type".
 Set Implicit Arguments.

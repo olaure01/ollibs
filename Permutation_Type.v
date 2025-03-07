@@ -5,7 +5,7 @@ From Coq Require Import List PeanoNat Compare_dec CMorphisms FinFun Permutation.
 From OLlibs Require Import List_Type.
 Import ListNotations. (* For notations [] and [a;b;c] *)
 
-Set Mangle Names. Set Mangle Names Light.
+(* Set Mangle Names. Set Mangle Names Light. *)
 Set Default Goal Selector "!".
 Set Default Proof Using "Type".
 Set Implicit Arguments.

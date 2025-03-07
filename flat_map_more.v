@@ -4,7 +4,7 @@ Properties of [flat_map]. *)
 From OLlibs Require Import funtheory List_more
                            Permutation_Type_more CPermutation_Type GPermutation_Type.
 
-Set Mangle Names. Set Mangle Names Light.
+(* Set Mangle Names. Set Mangle Names Light. *)
 Set Default Goal Selector "!".
 Set Default Proof Using "Type".
 Set Implicit Arguments.

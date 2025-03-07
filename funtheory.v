@@ -4,7 +4,7 @@ From Coq Require Import Program.Basics Relation_Definitions RelationClasses List
   (* do not export Program.Basics to avoid impact on [flip] and [arrow] for setoid_rewriting *)
 From OLlibs Require Import inhabited_Type.
 
-Set Mangle Names. Set Mangle Names Light.
+(* Set Mangle Names. Set Mangle Names Light. *)
 Set Default Goal Selector "!".
 Set Default Proof Using "Type".
 Set Implicit Arguments.

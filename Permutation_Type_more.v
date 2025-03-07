@@ -5,7 +5,7 @@ From Coq Require Import PeanoNat Permutation CMorphisms.
 From OLlibs Require Import List_more funtheory.
 From OLlibs Require Export Permutation_Type.
 
-Set Mangle Names. Set Mangle Names Light.
+(* Set Mangle Names. Set Mangle Names Light. *)
 Set Default Goal Selector "!".
 Set Default Proof Using "Type".
 Set Implicit Arguments.
@@ -218,12 +218,12 @@ Lemma Permutation_Type_Forall2_inf A B (P : A -> B -> Type) l1 l1' l2 :
   { l2' & Permutation_Type l2 l2' & Forall2_inf P l1' l2' }.
 Proof.
 intros HP; revert l2; induction HP as [ | ? ? ? ? IHP | | ? ? ? HP1 IHP1 HP2 IHP2 ];
-  intros l2 HF; inversion HF as [| ? y ? ? ? HF0]; subst.
+  intros l2 HF; inversion HF as [| ? y' ? ? ? HF0]; subst.
 - exists nil; auto.
 - apply IHP in HF0 as [l2' HP2 HF2].
-  exists (y :: l2'); auto.
+  exists (y' :: l2'); auto.
 - inversion HF0 as [|? y'0 ? l'0]; subst.
-  exists (y'0 :: y :: l'0); auto.
+  exists (y'0 :: y' :: l'0); auto.
   constructor.
 - apply Permutation_Type_nil in HP1 as ->.
   apply Permutation_Type_nil in HP2 as ->.

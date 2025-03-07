@@ -5,7 +5,7 @@ The main tactic is [cperm_solve] which fails is the goal is not solved. *)
 
 From OLlibs Require Import List_more CPermutation_Type.
 
-Set Mangle Names. Set Mangle Names Light.
+(* Set Mangle Names. Set Mangle Names Light. *)
 Set Default Goal Selector "!".
 Set Default Proof Using "Type".
 Set Implicit Arguments.

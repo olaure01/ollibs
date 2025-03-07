@@ -9,7 +9,7 @@ From OLlibs Require Import Datatypes_more Bool_more.
 From OLlibs Require Export List_Type.
 Import EqNotations.
 
-Set Mangle Names. Set Mangle Names Light.
+(* Set Mangle Names. Set Mangle Names Light. *)
 Set Default Goal Selector "!".
 Set Default Proof Using "Type".
 Set Implicit Arguments.
@@ -398,7 +398,7 @@ Tactic Notation "decomp_elt_eq_elt_Prop" hyp(H) :=
 
 (** ** Decomposition of [map] *)
 
-(* works betten when right-hand side leaves are variables,
+(* works better when right-hand side leaves are variables,
    use [remember] to assign name to non-variables leaves *)
 
 (* recursively decompose [H : map f l = _] into smaller equations of the shape [map f _  = _]
@@ -410,15 +410,17 @@ Ltac decomp_map_eq H :=
                         let H1 := fresh H in
                         let H2 := fresh H in
                         apply map_eq_app_inf in H as [(l1, l2) [-> [H1 H2]]];
+                        assert (H := I); (* protect name [H] *)
                         decomp_map_eq H1; decomp_map_eq H2;
-                        assert (H := conj H1 H2); clear H1 H2
+                        clear H; assert (H := conj H1 H2); clear H1 H2
   | map _ _ = _ :: _ => let x := fresh "x" in
                         let l2 := fresh "l" in
                         let H1 := fresh H in
                         let H2 := fresh H in
                         apply map_eq_cons_inf in H as [(x, l2) [-> [H1 H2]]];
+                        assert (H := I); (* protect name [H] *)
                         decomp_map_eq H2;
-                        assert (H := conj H1 H2); clear H1 H2
+                        clear H; assert (H := conj H1 H2); clear H1 H2
   | _ => idtac
   end.
 
@@ -429,13 +431,16 @@ Ltac substitute_map_family H :=
   match type of H with
   | _ /\ _ => let H1 := fresh H in
               let H2 := fresh H in
-              destruct H as [H1 H2]; substitute_map_family H1; substitute_map_family H2;
+              destruct H as [H1 H2];
+              assert (H := I); (* protect name [H] *)
+              substitute_map_family H1; substitute_map_family H2;
               try (let H1' := fresh in
                    let H2' := fresh in
                    rename H1 into H1'; rename H2 into H2'; (* test if both H1 and H2 exist *)
-                   assert (H := conj H1' H2'); clear H1' H2');
-              try rename H1 into H;
-              try rename H2 into H
+                   clear H; assert (H := conj H1' H2'); clear H1' H2');
+              try (match type of H with | True => clear H; rename H1 into H end);
+              try (match type of H with | True => clear H; rename H2 into H end);
+              try (match type of H with | True => clear H end)
   | _ ?b = ?a => subst a; rename b into a
   | _ => idtac
   end.

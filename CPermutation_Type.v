@@ -5,7 +5,7 @@ From Coq Require Import CMorphisms PeanoNat.
 From Coq Require CPermutation.
 From OLlibs Require Import List_more Permutation_Type_more funtheory.
 
-Set Mangle Names. Set Mangle Names Light.
+(* Set Mangle Names. Set Mangle Names Light. *)
 Set Default Goal Selector "!".
 Set Default Proof Using "Type".
 Set Implicit Arguments.

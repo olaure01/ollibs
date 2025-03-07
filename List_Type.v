@@ -4,7 +4,7 @@ From Coq Require Import PeanoNat Compare_dec List.
 Import ListNotations.
 Open Scope list_scope.
 
-Set Mangle Names. Set Mangle Names Light.
+(* Set Mangle Names. Set Mangle Names Light. *)
 Set Default Goal Selector "!".
 Set Default Proof Using "Type".
 Set Implicit Arguments.

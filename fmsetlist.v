@@ -8,7 +8,7 @@ for every type equiped with a Boolean-valued total order relation. *)
 From Coq Require Import Bool List Permutation Morphisms.
 From OLlibs Require Import BOrders.
 
-Set Mangle Names. Set Mangle Names Light.
+(* Set Mangle Names. Set Mangle Names Light. *)
 Set Default Goal Selector "!".
 Set Default Proof Using "Type".
 Set Implicit Arguments.

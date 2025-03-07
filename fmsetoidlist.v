@@ -8,7 +8,7 @@ by lists up to permutation. *)
 From Coq Require Import Relation_Definitions Morphisms Permutation.
 From OLlibs Require Import List_more.
 
-Set Mangle Names. Set Mangle Names Light.
+(* Set Mangle Names. Set Mangle Names Light. *)
 Set Default Goal Selector "!".
 Set Default Proof Using "Type".
 Set Implicit Arguments.
