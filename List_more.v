@@ -421,6 +421,7 @@ Ltac decomp_map_eq H :=
                         assert (H := I); (* protect name [H] *)
                         decomp_map_eq H2;
                         clear H; assert (H := conj H1 H2); clear H1 H2
+  | map _ _ = nil => apply map_eq_nil in H
   | _ => idtac
   end.
 
