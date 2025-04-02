@@ -33,6 +33,8 @@ Permutation_solve.v
 Permutation_Type_more.v
 Permutation_Type_solve.v
 Permutation_Type.v
+Shuffle.v
+ShuffleT.v
 SubList.v
 transp_perm.v
 Vector_more.v
