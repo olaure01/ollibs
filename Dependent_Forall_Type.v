@@ -175,15 +175,15 @@ End Eq_Dec.
 
 
 From OLlibs Require Import dectype.
-From OLlibs Require issue12394. (* TODO remove when issue #12394 solved *)
+From OLlibs Require issue12394. (* TODO remove when issue rocq#12394 solved *)
 
-(* TODO dealing with issue coq/coq#12394 *)
+(* TODO dealing with issue rocq#12394 *)
 (* Example:
   [ old code
          apply inj_pair2_eq_dec in H2; [ | apply list_eq_dec, (@eq_dt_dec Hdec)].
          apply inj_pair2_eq_dec in H3; [ | apply list_eq_dec, list_eq_dec (@eq_dt_dec Hdec)].
          subst.
-    new code should be cbnified or old code back once coq/coq#12394 solved
+    new code should be cbnified or old code back once rocq#12394 solved
          apply inj_pair2_eq_dec in H2;
            [ | apply (@list_eq_dec _ (@eqb (list_dectype Hdec))); apply eqb_eq ].
          assert (Pa = p) as Heq; subst.

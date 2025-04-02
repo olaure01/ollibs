@@ -1,7 +1,7 @@
 (** Finite Multiset over Lists
 
 We define an axiomatization of finite multisets through their relation with lists.
-Equality is required to be Coq equality.
+Equality is required to be Rocq equality.
 An implementation of the axioms is provided by sorted lists
 for every type equiped with a Boolean-valued total order relation. *)
 

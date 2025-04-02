@@ -31,6 +31,9 @@ Manual installation procedure:
 * `Vector_more`     : add-ons for standard library Vector
 * `List_Type`       : `List` with output in `Type`
 * `inhabited_Type`  : `inhabited` with output in `Type`
+* `SubList`         : sub-list of a list with no modification in order
+* `Shuffle`         : shuffle predicate for pairs of lists
+* `ShuffleT`        : `Shuffle` with output in `Type`
 
 ## Around Finite Multisets
 
@@ -61,7 +64,7 @@ Manual installation procedure:
 
 * `flat_map_more`           : decomposition properties for `flat_map`
 * `Dependent_Forall_Type`   : generalization of `Forall_inf` to dependent product
-* `issue12394`              : work around for [Issue #12394](https://github.com/coq/coq/issues/12394)
+* `issue12394`              : work around for [Issue #12394](https://github.com/rocq-prover/rocq/issues/12394)
 
 ----
 

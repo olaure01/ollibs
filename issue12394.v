@@ -1,4 +1,4 @@
-(* Adress https://github.com/coq/coq/issues/12394 *)
+(* Adress rocq#12394 https://github.com/rocq-prover/rocq/issues/12394 *)
 
 From Stdlib Require Import Eqdep_dec.
 From OLlibs Require Import List_more.

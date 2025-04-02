@@ -2,9 +2,35 @@
 
 ## Version 2.0.8
 
-Ongoing development.
-
+* fully compatible with name mangling
+* add `SubList.v`
+* add `Shuffle.v` and `ShuffleT.v`
+* add `ext_eq` in `funtheory.v` for extensional equality of functions
+* add `self_option_bijective` in `infinite.v`
+* add new lemmas
+  * `Datatypes_more` : `is_Some`
+  * `Boole_more` : `dichot_bool_negb`, `Forall_inf_filter`
+  * `List_more` : `list_sum_repeat`, `Forall_filter`, `incl_cons_cons`, `NoDup_unit`, `NoDup_app_remove`, `NoDup_remove_iff`, `last_cons_default`, `last_elt`, `in_last`
+  * `Permutation_*` : `Permutation_*_concat`, `Permutation_*_forallb`, `Permutation_incl`
+  * `CPermutation_*` : `CPermutation_*_concat`, `CPermutation_*_flat_map`, `CPermutation_*_length_3_inv`, `CPermutation_*_cons_cons_inv`
+  * `Borders`: `Permutation_insert`
+* renaming of some tactics
+  * `nil_vs_elt_inv` becomes `decomp_nil_eq_elt`
+  * `unit_vs_elt_inv` becomes `decomp_unit_eq_elt`
+  * `dichot_app_exec` becomes `decomp_app_eq_app`
+  * `dichot_elt_app_exec` becomes `decomp_elt_eq_app`
+  * `trichot_elt_app_exec` becomes `decomp_elt_eq_app_app`
+  * `trichot_elt_elt_exec` becomes `decomp_elt_eq_elt`
+* renaming of lemmas using `_vs_` into `_eq_`
+* remove useless property `elts_empty` in `FinMultiset`
+* remove `PermutationPropify.v` (now possible to replace with setoid_rewriting)
+* more uses of `crelation A` rather than `A -> A -> Type`
+* more uses of `sigT2` rather than `sigT` with `prod` in `flat_map_more.v`
+* cleaned statement of `transp_decomp` in `transp_perm.v`
 * adapt to Rocq v9.0
+  * turn `From Coq` into `From Stdlib`
+  * use `:>` for coercion with `Class`
+  * use `rocq makefile`
 
 ## Version 2.0.7
 

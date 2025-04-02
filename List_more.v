@@ -17,7 +17,7 @@ Set Implicit Arguments.
 
 (** misc *)
 
-(* TODO included in PR #11966 submitted, remove once merged and released *)
+(* TODO included in PR rocq#11966 submitted, remove once merged and released *)
 
     Lemma rev_case A (l : list A) : l = nil \/ exists a tl, l = tl ++ a :: nil.
     Proof. induction l as [|a l] using rev_ind; [ left | right; exists a, l ]; reflexivity. Qed.
@@ -288,9 +288,9 @@ Proof. intros [l [[-> ->]|[-> ->]]]%app_eq_app; [ right | left ]; exists l; repe
   match type of H with
   | _ ++ _ = _ ++ _ => apply app_eq_app_dichot in H as p
   end.
-#[deprecated(since="ollibs 2.1", note="Use decomp_app_eq_app instead.")] (* TODO Rocq 9.0 : add [use] *)
+#[deprecated(since="ollibs 2.0.8", note="Use decomp_app_eq_app instead.")] (* TODO add [use] rocq#20444 *)
 Tactic Notation "decomp_app_eq_app_Prop" hyp(H) "as" simple_intropattern(p) := decomp_app_eq_app_Prop_core H p.
-#[deprecated(since="ollibs 2.1", note="Use decomp_app_eq_app instead.")] (* TODO Rocq 9.0 : add [use] *)
+#[deprecated(since="ollibs 2.0.8", note="Use decomp_app_eq_app instead.")] (* TODO add [use] rocq#20444 *)
 Tactic Notation "decomp_app_eq_app_Prop" hyp(H) :=
   let l := fresh "l" in
   let H1 := fresh H in
@@ -317,9 +317,9 @@ Qed.
   | _ ++ _ = _ ++ _ :: _ => simple apply eq_sym in H;
                             apply elt_eq_app_dichot in H as p
   end.
-#[deprecated(since="ollibs 2.1", note="Use decomp_elt_eq_app instead.")] (* TODO Rocq 9.0 : add [use] *)
+#[deprecated(since="ollibs 2.0.8", note="Use decomp_elt_eq_app instead.")] (* TODO add [use] rocq#20444 *)
 Tactic Notation "decomp_elt_eq_app_Prop" hyp(H) "as" simple_intropattern(p) := decomp_elt_eq_app_Prop_core H p.
-#[deprecated(since="ollibs 2.1", note="Use decomp_elt_eq_app instead.")] (* TODO Rocq 9.0 : add [use] *)
+#[deprecated(since="ollibs 2.0.8", note="Use decomp_elt_eq_app instead.")] (* TODO add [use] rocq#20444 *)
 Tactic Notation "decomp_elt_eq_app_Prop" hyp(H) :=
   let l := fresh "l" in
   let H1 := fresh H in
@@ -355,10 +355,10 @@ Qed.
   | _ ++ _ ++ _ = _ ++ _ :: _ => simple apply eq_sym in H;
                                  apply elt_eq_app_app_trichot in H as p
   end.
-#[deprecated(since="ollibs 2.1", note="Use decomp_elt_eq_app_app instead.")] (* TODO Rocq 9.0 : add [use] *)
+#[deprecated(since="ollibs 2.0.8", note="Use decomp_elt_eq_app_app instead.")] (* TODO add [use] rocq#20444 *)
 Tactic Notation "decomp_elt_eq_app_app_Prop" hyp(H) "as" simple_intropattern(p) :=
   decomp_elt_eq_app_app_Prop_core H p.
-#[deprecated(since="ollibs 2.1", note="Use decomp_elt_eq_app_app instead.")] (* TODO Rocq 9.0 : add [use] *)
+#[deprecated(since="ollibs 2.0.8", note="Use decomp_elt_eq_app_app instead.")] (* TODO add [use] rocq#20444 *)
 Tactic Notation "decomp_elt_eq_app_app_Prop" hyp(H) :=
   let l1 := fresh "l" in
   let l2 := fresh "l" in
@@ -387,7 +387,7 @@ Qed.
         | try subst x; try subst l1; try subst l2
         | try subst l2; try subst lh ]
   end.
-#[deprecated(since="ollibs 2.1", note="Use decomp_elt_eq_elt instead.")] (* TODO Rocq 9.0 : add [use] *)
+#[deprecated(since="ollibs 2.0.8", note="Use decomp_elt_eq_elt instead.")] (* TODO add [use] rocq#20444 *)
 Tactic Notation "decomp_elt_eq_elt_Prop" hyp(H) "as" simple_intropattern(p) := decomp_elt_eq_elt_Prop_core H p.
 Tactic Notation "decomp_elt_eq_elt_Prop" hyp(H) :=
   let l := fresh "l" in

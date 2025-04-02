@@ -115,7 +115,7 @@ Definition nat_dectype := {|
 (** the [option] construction *)
 Scheme Equality for option.
 
-(* TODO workaround for naming problem in https://github.com/coq/coq/issues/4178 *)
+(* TODO workaround for naming problem in rocq#4178 *)
 Lemma option_dec_bl A (eq_A : A -> A -> bool) : (forall x y, eq_A x y = true -> x = y) ->
   forall x y, option_beq eq_A x y = true -> x = y.
 Proof. intros Heq [x|] [y|]; cbn; [ intros ->%Heq | intros [=] .. | ]; reflexivity. Qed.
@@ -133,7 +133,7 @@ Definition option_dectype (D : DecType) := {|
 (** the [sum] construction *)
 Scheme Equality for sum.
 
-(* TODO workaround for naming problem in https://github.com/coq/coq/issues/4178 *)
+(* TODO workaround for naming problem in rocq#4178 *)
 Lemma sum_dec_bl A B (eq_A : A -> A -> bool) (eq_B : B -> B -> bool) :
   (forall x y, eq_A x y = true -> x = y) -> (forall x y, eq_B x y = true -> x = y) ->
   forall x y, sum_beq eq_A eq_B x y = true -> x = y.
@@ -160,7 +160,7 @@ Definition sum_dectype (D1 D2 : DecType) := {|
 (** the [prod] construction *)
 Scheme Equality for prod.
 
-(* TODO workaround for naming problem in https://github.com/coq/coq/issues/4178 *)
+(* TODO workaround for naming problem in rocq#4178 *)
 Lemma prod_dec_bl A B (eq_A : A -> A -> bool) (eq_B : B -> B -> bool) :
   (forall x y, eq_A x y = true -> x = y) -> (forall x y, eq_B x y = true -> x = y) ->
   forall x y, prod_beq eq_A eq_B x y = true -> x = y.
@@ -182,7 +182,7 @@ Definition prod_dectype (D1 D2 : DecType) := {|
 (** the [list] construction *)
 Scheme Equality for list.
 
-(* TODO workaround for naming problem in https://github.com/coq/coq/issues/4178 *)
+(* TODO workaround for naming problem in rocq#4178 *)
 Lemma list_dec_bl A (eq_A : A -> A -> bool) : (forall x y, eq_A x y = true -> x = y) ->
   forall x y, list_beq eq_A x y = true -> x = y.
 Proof.
