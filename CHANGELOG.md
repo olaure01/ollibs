@@ -4,6 +4,8 @@
 
 Ongoing development.
 
+* adapt to Rocq v9.0
+
 ## Version 2.0.7
 
 * adapt to Coq v8.20

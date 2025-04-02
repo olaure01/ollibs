@@ -1,4 +1,4 @@
-(* This file is directly inspired by the corresponding Coq file
+(* This file is directly inspired by the corresponding Rocq Stdlib file
    Sorting/Permutation.v *)
 
 From Stdlib Require Import List PeanoNat Compare_dec CMorphisms FinFun Permutation.

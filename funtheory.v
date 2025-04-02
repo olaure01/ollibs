@@ -52,7 +52,7 @@ Section Function.
 
   (** ** Injective functions *)
 
-  (** Same definition as in standard library [Coq.Sets.Image] *)
+  (** Same definition as in standard library [Stdlib.Sets.Image] *)
   Definition injective := forall x y, f x = f y -> x = y.
 
   Lemma injective_neq : injective -> forall x y, x <> y -> f x <> f y.

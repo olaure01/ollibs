@@ -1,12 +1,12 @@
 # OLlibs
-**Add-ons for the Coq Standard Library**
+**Add-ons for the Rocq Standard Library**
 
-Working with `Coq 8.20`
+Working with the `Rocq Prover 9.0`
 
-[Opam](https://coq.inria.fr/opam-using.html)-based installation procedure:
+[Opam](https://rocq-prover.org/docs/using-opam)-based installation procedure:
 
-    $ opam repo add coq-released https://coq.inria.fr/opam/released
-    $ opam install coq-ollibs
+    $ opam repo add rocq-released https://rocq-prover.org/opam/released
+    $ opam install rocq-ollibs
 
 Manual installation procedure:
 
@@ -34,7 +34,7 @@ Manual installation procedure:
 
 ## Around Finite Multisets
 
-* `fmsetlist`               : finite multisets with Coq equality
+* `fmsetlist`               : finite multisets with Rocq equality
 * `fmsetoidlist`            : finite multisets as setoid
 * `fmsetlist_Type`          : `fmsetlist` with output in `Type`
 * `fmsetoidlist_Type`       : `fmsetoidlist` with output in `Type`
