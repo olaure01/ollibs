@@ -415,6 +415,16 @@ induction HP as [ | ? ? ? ? IHHP | x y | ? l' ]; cbn; [ reflexivity | rewrite IH
 - transitivity (fold_right Init.Nat.max 0 l'); assumption.
 Qed.
 
+Lemma Permutation_Type_forallb A P (l1 l2 : list A) :
+  Permutation_Type l1 l2 -> forallb P l1 = forallb P l2.
+Proof.
+intro HP. induction HP as [ | | x y l | l1 l2 l3 HP1 IHP1 HP2 IHP2 ].
+- reflexivity.
+- cbn. f_equal. assumption.
+- cbn. rewrite ! Bool.andb_assoc, (Bool.andb_comm (P y)). reflexivity.
+- transitivity (forallb P l2); assumption.
+Qed.
+
 Lemma partition_Permutation_Type A f (l l1 l2 : list A) :
   partition f l = (l1, l2) -> Permutation_Type l (l1 ++ l2).
 Proof.
@@ -444,3 +454,6 @@ intro HP. induction HP as [ | x l l' HP IHHP | x y l
      destruct (IHHP1 l3 l4 l3' l4' eq_refl eq_refl);
      destruct (IHHP2 l3' l4' l3'' l4'' eq_refl eq_refl); split; etransitivity; eassumption.
 Qed.
+
+Lemma Permutation_Type_incl A (l1 l2 l0 : list A) : Permutation_Type l1 l2 -> incl l1 l0 -> incl l2 l0.
+Proof. intros HP Hincl x Hin. symmetry in HP. apply Hincl, (Permutation_Type_in x HP Hin). Qed.

@@ -534,6 +534,13 @@ induction l as [|a l IHl]; [ reflexivity | cbn; intros [Ha Hf]%andb_true_iff ].
 destruct (g a); cbn; now rewrite ? Ha, IHl.
 Qed.
 
+Lemma Forall_filter A f P (l : list A) : (forall a, Bool.reflect (P a) (f a)) -> Forall P (filter f l).
+Proof.
+intro Hspec. induction l as [|a l IHl]; [ constructor | cbn ].
+destruct (Hspec a); [ constructor | ]; assumption.
+Qed.
+
+
 (** ** [partition] *)
 
 Lemma partition_incl1 A f (l : list A) : incl (fst (partition f l)) l.
@@ -562,6 +569,54 @@ Proof. rewrite partition_as_filter. apply incl_inf_filter. Qed.
 
 Lemma partition_incl2_inf A f (l : list A) : incl_inf (snd (partition f l)) l.
 Proof. rewrite partition_as_filter. apply incl_inf_filter. Qed.
+
+
+(** ** [incl] *)
+Lemma incl_cons_cons A (a : A) l1 l2 : incl l1 l2 -> incl (a :: l1) (a :: l2).
+Proof.
+intro Hincl. change (a :: l1) with ((a :: nil) ++ l1). change (a :: l2) with ((a :: nil) ++ l2).
+apply incl_app_app; [ intros ? ? | ]; assumption.
+Qed.
+
+
+(** ** [NoDup] *)
+Lemma NoDup_unit A (a : A) : NoDup (a :: nil).
+Proof. constructor; [ intros [] | constructor ]. Qed.
+
+Lemma NoDup_app_remove_m A (l1 l2 l3 : list A) : NoDup (l1 ++ l2 ++ l3) -> NoDup (l1 ++ l3).
+Proof. induction l2 as [|a l2 IH]; [ exact id | ]. intros [Hnd _]%NoDup_remove. apply IH, Hnd. Qed.
+
+Lemma NoDup_remove_iff A l l' (a : A) : NoDup (l ++ a :: l') <-> NoDup (l ++ l') /\ ~ In a (l ++ l').
+Proof.
+split; [ apply NoDup_remove | ].
+intro Hnd. apply (@NoDup_Add _ a (l ++ l')); [ apply Add_app | assumption ].
+Qed.
+
+
+(** ** [last] *)
+Lemma last_cons_default A (d d' : A) a l : last (a :: l) d = last (a :: l) d'.
+Proof.
+assert (a :: l <> nil) as Hnil by intros [=]. remember (a :: l) as l0 eqn:Heql. clear Heql a l.
+induction l0 as [|a l0 IHl0] in Hnil |- *; cbn.
+- contradiction Hnil. reflexivity.
+- destruct l0; [ reflexivity | ].
+  apply IHl0. intros [=].
+Qed.
+
+Lemma last_elt A (d : A) a l1 l2 : last (l1 ++ a :: l2) d = last (a :: l2) d.
+Proof.
+induction l1 as [|b l1 IHl1]; [ reflexivity | ].
+rewrite <- app_comm_cons, <- IHl1. destruct l1; reflexivity.
+Qed.
+
+Lemma in_last A (d : A) l : l <> nil -> In (last l d) l.
+Proof.
+induction l as [|a l IHl]; intro Hnil.
+- contradiction Hnil. reflexivity.
+- cbn. destruct l as [|b l].
+  + apply in_eq.
+  + right. apply IHl. intros [=].
+Qed.
 
 
 (** ** [Forall] and [Exists] *)

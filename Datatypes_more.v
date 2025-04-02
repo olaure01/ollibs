@@ -3,6 +3,12 @@ Set Default Goal Selector "!".
 Set Default Proof Using "Type".
 Set Implicit Arguments.
 
+(* TODO compare with [ssrbool.isSome] *)
+Definition is_Some T (o : option T) :=
+match o with
+| Some _ => True
+| None => False
+end.
 
 Definition iffT (A B : Type) := ((A -> B) * (B -> A))%type.
 

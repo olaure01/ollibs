@@ -4,6 +4,7 @@ Definition and basic properties of cyclic permutations in [Type]. *)
 From Stdlib Require Import CMorphisms PeanoNat.
 From Stdlib Require CPermutation.
 From OLlibs Require Import List_more Permutation_Type_more funtheory.
+Import ListNotations.
 
 (* Set Mangle Names. Set Mangle Names Light. *)
 Set Default Goal Selector "!".
@@ -129,6 +130,19 @@ Lemma CPermutation_Type_length_2_inv A (a : A) b l :
   CPermutation_Type (a :: b :: nil) l -> { l = a :: b :: nil } + { l = b :: a :: nil }.
 Proof. now intro; apply Permutation_Type_length_2_inv, CPermutation_Permutation_Type. Qed.
 
+Lemma CPermutation_Type_length_3_inv A (a b c : A) l:
+  CPermutation_Type [a ; b; c] l -> (l = [a; b; c]) + (l = [b; c; a]) + (l = [c; a; b]).
+Proof.
+intro HC. inversion HC as [l1 l2 Heq1 Heq2].
+destruct l1 as [|x [|y l1]].
+- left. left. rewrite app_nil_r. reflexivity.
+- left. right. injection Heq1 as [= -> ->]. reflexivity.
+- injection Heq1 as [= -> -> Heq].
+  apply app_eq_unit_inf in Heq as [[-> ->]|[-> ->]].
+  + right. reflexivity.
+  + left. left. reflexivity.
+Qed.
+
 Lemma CPermutation_Type_vs_elt_inv A (a : A) l l1 l2 :
   CPermutation_Type l (l1 ++ a :: l2) -> {'(l1',l2') | l2 ++ l1 = l2' ++ l1' & l = l1' ++ a :: l2' }.
 Proof.
@@ -143,6 +157,14 @@ Lemma CPermutation_Type_vs_cons_inv A (a : A) l l1 :
 Proof.
 intro HC. rewrite <- (app_nil_l (a::_)) in HC. apply CPermutation_Type_vs_elt_inv in HC as [(l1',l2') H1 ->].
 rewrite app_nil_r in H1. now exists (l1', l2').
+Qed.
+
+Lemma CPermutation_Type_cons_cons_inv A (a b : A) l1 l2 : CPermutation_Type (cons a l1) (cons b l2) ->
+  ((a = b) * (l1 = l2)) + {'(l1', l1'') | l1 = l1' ++ b :: l1'' & l2 = l1'' ++ a :: l1' }.
+Proof.
+intros [([|x l0], l0') -> Heq2]%CPermutation_Type_vs_cons_inv; [ left | right ]; injection Heq2 as [= -> ->].
+- rewrite app_nil_r. split; reflexivity.
+- exists (l0, l0'); reflexivity.
 Qed.
 
 Lemma CPermutation_Type_vs_elt_subst A (a : A) l l1 l2 :

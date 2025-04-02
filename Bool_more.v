@@ -2,12 +2,16 @@
 
 From Stdlib Require Import List.
 From Stdlib Require Export Bool.
-From OLlibs Require Import Datatypes_more.
+From OLlibs Require Import Datatypes_more List_Type.
 
 (* Set Mangle Names. Set Mangle Names Light. *)
 Set Default Goal Selector "!".
 Set Default Proof Using "Type".
 Set Implicit Arguments.
+
+
+Lemma dichot_bool_negb b1 b2 : {b1 = b2} + {b1 = negb b2}.
+Proof. destruct b1, b2; (left + right); reflexivity. Qed.
 
 
 Lemma reflect_neg P b : reflect P b -> reflect (not P) (negb b).
@@ -68,4 +72,11 @@ Lemma impl_implb_reflectT P1 b1 P2 b2 : reflectT P1 b1 -> reflectT P2 b2 -> refl
 Proof.
 intros Hspec1 Hspec2.
 destruct b1, b2; cbn; constructor; inversion Hspec1; inversion Hspec2; try intro; intuition contradiction.
+Qed.
+
+Lemma Forall_inf_filter A f P (l : list A) :
+  (forall a, reflectT (P a) (f a)) -> Forall_inf P (filter f l).
+Proof.
+intros Hspec. induction l as [|a l IHl]; cbn; [ constructor | ].
+destruct (Hspec a); [ constructor | ]; assumption.
 Qed.

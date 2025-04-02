@@ -102,6 +102,15 @@ induction l1 as [|a l1 IHl1] in l2 |- *; intros Hi HP.
     * apply in_or_app. apply in_app_or in Hy' as []; [left|right; apply in_cons]; assumption.
 Qed.
 
+Lemma Permutation_forallb A P (l1 l2 : list A) : Permutation l1 l2 -> forallb P l1 = forallb P l2.
+Proof.
+intro HP. induction HP as [ | | x y l | l1 l2 l3 HP1 IHP1 HP2 IHP2 ].
+- reflexivity.
+- cbn. f_equal. assumption.
+- cbn. rewrite ! Bool.andb_assoc, (Bool.andb_comm (P y)). reflexivity.
+- transitivity (forallb P l2); assumption.
+Qed.
+
 Lemma partition_Permutation A f (l l1 l2 : list A) : partition f l = (l1, l2) -> Permutation l (l1 ++ l2).
 Proof.
 induction l as [|a l IHl] in l1, l2 |- *; cbn; intros Hp.
@@ -143,3 +152,6 @@ Qed.
 (* simpler proof of [Permutation_flat_map] using [Permutation_concat]:
 Proof. intros l1 l2 HP. rewrite ! flat_map_concat_map. apply Permutation_concat, Permutation_map, HP. Qed.
 *)
+
+Lemma Permutation_incl A (l1 l2 l0 : list A) : Permutation l1 l2 -> incl l1 l0 -> incl l2 l0.
+Proof. intros HP Hincl x Hin. symmetry in HP. apply Hincl, (Permutation_in x HP Hin). Qed.

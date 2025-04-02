@@ -2,12 +2,34 @@
 
 From Stdlib Require Export CPermutation.
 From OLlibs Require Import List_more funtheory.
+Import ListNotations.
 
 (* Set Mangle Names. Set Mangle Names Light. *)
 Set Default Goal Selector "!".
 Set Default Proof Using "Type".
 Set Implicit Arguments.
 
+
+Lemma CPermutation_length_3_inv A (a b c : A) l:
+  CPermutation [a ; b; c] l -> l = [a; b; c] \/ l = [b; c; a] \/ l = [c; a; b].
+Proof.
+intro HC. inversion HC as [l1 l2 Heq1 Heq2].
+destruct l1 as [|x [|y l1]].
+- left. rewrite app_nil_r. reflexivity.
+- right. left. injection Heq1 as [= -> ->]. reflexivity.
+- injection Heq1 as [= -> -> Heq].
+  apply app_eq_unit in Heq as [[-> ->]|[-> ->]].
+  + right. right. reflexivity.
+  + left. reflexivity.
+Qed.
+
+Lemma CPermutation_cons_cons_inv A (a b : A) l1 l2 : CPermutation (cons a l1) (cons b l2) ->
+  (a = b /\ l1 = l2) \/ exists l1' l1'', l1 = l1' ++ b :: l1'' /\ l2 = l1'' ++ a :: l1'.
+Proof.
+intros [[|x l0] [l0' [-> Heq2]]]%CPermutation_vs_cons_inv; [ left | right ]; injection Heq2 as [= -> ->].
+- rewrite app_nil_r. split; reflexivity.
+- exists l0, l0'. split; reflexivity.
+Qed.
 
 Lemma CPermutation_app_app_inv A (l1 l2 l3 l4 : list A) :
   CPermutation (l1 ++ l2) (l3 ++ l4) ->
