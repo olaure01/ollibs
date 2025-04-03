@@ -337,7 +337,7 @@ intro s. induction s as [ | x l' l'' l''' s IHs | x l' l'' l''' s IHs ]; intro H
   + intro Hin.
     apply Permutation_Type_shuffleT, (Permutation_Type_inT x) in s.
     * contradiction s.
-    * apply inT_or_app. left. assumption.
+    * apply inT_sum_app. left. assumption.
   + apply IHs. assumption.
 - inversion Hnd. subst.
   apply IHs. assumption.

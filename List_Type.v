@@ -93,7 +93,7 @@ Section Facts.
     unfold not; intros a H; inversion_clear H.
   Qed.
 
-  Lemma inT_app_or : forall (l m : list A) (a : A),
+  Lemma inT_app_sum : forall (l m : list A) (a : A),
     InT a (l ++ m) -> InT a l + InT a m.
   Proof.
     intros l m a.
@@ -106,7 +106,7 @@ Section Facts.
     elim (H H1); auto.
   Qed.
 
-  Lemma inT_or_app : forall (l m : list A) (a : A),
+  Lemma inT_sum_app : forall (l m : list A) (a : A),
     (InT a l + InT a m) -> InT a (l ++ m).
   Proof.
     intros l m a.
@@ -121,7 +121,7 @@ Section Facts.
 
   Lemma inT_app_iff : forall l l' (a : A), iffT (InT a (l++l')) (InT a l + InT a l').
   Proof.
-    split; auto using inT_app_or, inT_or_app.
+    split; auto using inT_app_sum, inT_sum_app.
   Qed.
 
   Theorem inT_split : forall x (l : list A), InT x l -> {'(l1,l2) | l = l1 ++ x :: l2 }.
@@ -133,15 +133,15 @@ Section Facts.
   Qed.
 
   Lemma inT_elt : forall (x : A) l1 l2, InT x (l1 ++ x :: l2).
-  Proof. intros. apply inT_or_app. right. apply inT_eq. Qed.
+  Proof. intros. apply inT_sum_app. right. apply inT_eq. Qed.
 
   Lemma inT_elt_inv : forall (x y : A) l1 l2,
     InT x (l1 ++ y :: l2) -> ((x = y) + InT x (l1 ++ l2))%type.
   Proof.
   intros x y l1 l2 Hin.
-  apply inT_app_or in Hin.
+  apply inT_app_sum in Hin.
   destruct Hin as [Hin|[Hin|Hin]]; [right|left|right];
-    try apply inT_or_app; intuition.
+    try apply inT_sum_app; intuition.
   Qed.
 
   Lemma inT_inv : forall (a b : A) (l : list A),
@@ -151,21 +151,21 @@ Section Facts.
 
   Section FactsEqDec.
 
-    Hypothesis eq_dec : forall x y : A, {x = y}+{x <> y}.
+    Hypothesis eq_decT : forall x y : A, {x = y} + {x <> y}.
 
-    Theorem inT_dec : forall (a:A) (l:list A), InT a l + notT (InT a l).
-    Proof using eq_dec.
+    Theorem inT_decT : forall (a:A) (l:list A), InT a l + notT (InT a l).
+    Proof using eq_decT.
       intros a l. induction l as [| a0 l IHl].
       - right; apply inT_nil.
-      - destruct (eq_dec a0 a); simpl; auto.
+      - destruct (eq_decT a0 a); simpl; auto.
         destruct IHl; simpl; auto.
         right; unfold not; intros [Hc1| Hc2]; auto.
     Defined.
 
     Lemma in_inT : forall (a : A) l, In a l -> InT a l.
-    Proof using eq_dec.
+    Proof using eq_decT.
       intros a l Hin.
-      destruct (inT_dec a l); [ assumption | ].
+      destruct (inT_decT a l); [ assumption | ].
       exfalso; revert Hin.
       eapply notT_inT_not_in; assumption.
     Qed.
@@ -175,7 +175,7 @@ Section Facts.
 End Facts.
 
 #[export] Hint Resolve inT_eq inT_cons inT_inv inT_nil
-                       inT_app_or inT_or_app: datatypes.
+                       inT_app_sum inT_sum_app: datatypes.
 
 
 
@@ -191,7 +191,7 @@ Section Elts.
   (** ** Nth element of a list *)
   (*****************************)
 
-  Lemma nth_inT_or_default :
+  Lemma nth_inT_sum_default :
     forall (n:nat) (l:list A) (d:A), (InT (nth n l d) l + (nth n l d = d))%type.
   Proof.
     intros n l d; revert n; induction l as [|? ? IHl].
@@ -287,7 +287,7 @@ Section ListOps.
   Proof.
     intro l. induction l; simpl; intros; intuition.
     subst.
-    apply inT_or_app; right; simpl; auto.
+    apply inT_sum_app; right; simpl; auto.
   Qed.
 
 (*********************************************)
@@ -345,7 +345,7 @@ Section ListOps.
   Proof.
     intro l. induction l as [ | a l IHl]; simpl; intros y x Hx Hy.
     - contradiction.
-    - apply inT_or_app.
+    - apply inT_sum_app.
       destruct Hx as [Hx | Hx]; subst; auto.
       right; now apply (IHl y x).
   Qed.
@@ -355,7 +355,7 @@ Section ListOps.
   Proof.
     intro l. induction l as [ | a l IHl]; simpl; intros y Hy.
     - contradiction.
-    - destruct (inT_app_or _ _ _ Hy) as [Hi|Hi].
+    - destruct (inT_app_sum _ _ _ Hy) as [Hi|Hi].
       + exists a; auto.
       + destruct (IHl y Hi) as [x ? ?].
         exists x; auto.
@@ -409,7 +409,7 @@ Section Map.
     InT x l -> InT y (f x) -> InT y (flat_map f l).
   Proof.
     intros g l. induction l as [|? ? IHl]; simpl; intros y x Hin1 Hin2; auto.
-    apply inT_or_app.
+    apply inT_sum_app.
     destruct Hin1 as [ Heq | Hin1 ].
     - subst; auto.
     - right ; apply (IHl y x Hin1 Hin2).
@@ -420,7 +420,7 @@ Section Map.
   Proof.
     intros g l. induction l as [|a l IHl]; simpl.
     - contradiction.
-    - intros y Hi. destruct (inT_app_or _ _ _ Hi) as [|Hi'].
+    - intros y Hi. destruct (inT_app_sum _ _ _ Hi) as [|Hi'].
       + exists a; auto.
       + destruct (IHl y Hi') as [x H1 H2].
         exists x; auto.
@@ -619,7 +619,7 @@ Qed.
     Proof.
       intros l. induction l;
       [ simpl; tauto
-        | simpl; intros ? ? ? Hin ?; apply inT_or_app; destruct Hin as [->|i];
+        | simpl; intros ? ? ? Hin ?; apply inT_sum_app; destruct Hin as [->|i];
           [ left; apply inT_prod_aux; assumption | right; auto ] ].
     Qed.
 
@@ -629,7 +629,7 @@ Qed.
     Proof.
       intros l l' x y.
       induction l as [|a l IHl]; cbn; [easy|].
-      intros [[? [= -> ->]] %inT_map_inv|] %inT_app_or; tauto.
+      intros [[? [= -> ->]] %inT_map_inv|] %inT_app_sum; tauto.
     Qed.
 
   End ListPairs.
@@ -719,7 +719,7 @@ Section SetIncl.
   Proof.
     unfold incl; simpl; intros l m n H H0 a H1.
     now_show (InT a n).
-    elim (inT_app_or _ _ _ H1); auto.
+    elim (inT_app_sum _ _ _ H1); auto.
   Qed.
   Hint Resolve inclT_app : core.
 
@@ -1478,7 +1478,7 @@ Section Repeat.
 
   Variable A : Type.
 
-  Theorem repeat_spec_inf n (x y : A): InT y (repeat x n) -> y=x.
+  Theorem repeat_specT n (x y : A): InT y (repeat x n) -> y = x.
   Proof.
     induction n as [|k Hrec]; simpl; destruct 1; auto.
   Qed.
