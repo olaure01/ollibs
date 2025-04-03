@@ -2,7 +2,7 @@
 
 From Stdlib Require Import Bool PeanoNat Lia List.
 From OLlibs Require Import funtheory List_Type.
-From OLlibs Require Export inhabited_Type dectype.
+From OLlibs Require Export inhabitedT dectype.
 
 (* Set Mangle Names. Set Mangle Names Light. *)
 Set Default Goal Selector "!".
@@ -357,7 +357,7 @@ Section InfDecTypes.
 
   Definition Inh_of_InfDecType := {|
     inhcar := X;
-    inh_dt := inhabits_inf (fresh nil) |}.
+    inh_dt := inhabitsT (fresh nil) |}.
 
 End InfDecTypes.
 
@@ -447,7 +447,7 @@ Section Prod.
   Variable (ID : InfDecType) (D : InhDecType).
 
   Definition prodl_fresh (l : list (prod ID D)) : prod ID D :=
-    (fresh (map fst l), inhabitant_inf inh_dt).
+    (fresh (map fst l), inhabitantT inh_dt).
 
   Lemma notin_prodl_fresh l : ~ In (prodl_fresh l) l.
   Proof. intros Hin%(in_map fst). apply (fresh_spec _ Hin). Qed.
@@ -458,7 +458,7 @@ Section Prod.
     fresh_spec := notin_prodl_fresh |}.
 
   Definition prodr_fresh (l : list (prod D ID)) : prod D ID :=
-    (inhabitant_inf inh_dt, fresh (map snd l)).
+    (inhabitantT inh_dt, fresh (map snd l)).
 
   Lemma notin_prodr_fresh l : ~ In (prodr_fresh l) l.
   Proof. intros Hin%(in_map snd). apply (fresh_spec _ Hin). Qed.
@@ -473,7 +473,7 @@ End Prod.
 Definition prod_infdectype (ID1 ID2 : InfDecType) := prodl_infdectype ID1 (Inh_of_InfDecType ID2).
 
 (** [list] construction of [InfDecType] *)
-Lemma nat_injective_list (T : Type) : inhabited_inf T -> nat_injective (list T).
+Lemma nat_injective_list (T : Type) : inhabitedT T -> nat_injective (list T).
 Proof.
 intros [x]. exists (repeat x). intros n.
 induction n as [|n IHn]; cbn; intros [|m] Heq; inversion Heq; [ reflexivity | ].

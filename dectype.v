@@ -3,7 +3,7 @@ this is based on records rather than modules (as opposed to stdlib) *)
 
 From Stdlib Require Import Bool PeanoNat Equalities.
 From Stdlib Require Eqdep_dec.
-From OLlibs Require Export inhabited_Type.
+From OLlibs Require Export inhabitedT.
 From OLlibs Require Import funtheory.
 
 (* Set Mangle Names. Set Mangle Names Light. *)
@@ -252,42 +252,42 @@ Tactic Notation "case_analysis" "eqn" ":" ident(Heq) := case_analysis_eq Heq.
 
 Record InhDecType := {
   inhcar :> DecType;
-  inh_dt : inhabited_inf inhcar }.
+  inh_dt : inhabitedT inhcar }.
 Arguments inh_dt {_}.
 
 Definition unit_inhdectype := {|
   inhcar := unit_dectype;
-  inh_dt := inhabited_inf_unit |}.
+  inh_dt := inhabitedT_unit |}.
 
 Definition bool_inhdectype := {|
   inhcar := bool_dectype;
-  inh_dt := inhabited_inf_bool |}.
+  inh_dt := inhabitedT_bool |}.
 
 Definition nat_inhdectype := {|
   inhcar := nat_dectype;
-  inh_dt := inhabited_inf_nat |}.
+  inh_dt := inhabitedT_nat |}.
 
 Definition option_inhdectype (D : DecType) := {|
   inhcar := option_dectype D;
-  inh_dt := inhabited_inf_option D |}.
+  inh_dt := inhabitedT_option D |}.
 
 Definition suml_inhdectype (D1 : InhDecType) (D2 : DecType) := {|
   inhcar := sum_dectype D1 D2;
-  inh_dt := inhabited_inf_suml inh_dt |}.
+  inh_dt := inhabitedT_suml inh_dt |}.
 
 Definition sumr_inhdectype (D1 : DecType) (D2 : InhDecType) := {|
   inhcar := sum_dectype D1 D2;
-  inh_dt := inhabited_inf_sumr inh_dt |}.
+  inh_dt := inhabitedT_sumr inh_dt |}.
 
 Definition sum_inhdectype (D1 D2 : InhDecType) := suml_inhdectype D1 D2.
 
 Definition prod_inhdectype (D1 D2 : InhDecType) := {|
   inhcar := prod_dectype D1 D2;
-  inh_dt := inhabited_inf_prod inh_dt inh_dt |}.
+  inh_dt := inhabitedT_prod inh_dt inh_dt |}.
 
 Definition list_inhdectype (D : DecType) := {|
   inhcar := list_dectype D;
-  inh_dt := inhabited_inf_list D |}.
+  inh_dt := inhabitedT_list D |}.
 
 
 (** Equivalence between [DecType] and [UsualBoolEq]. *)

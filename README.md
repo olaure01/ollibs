@@ -30,7 +30,7 @@ Manual installation procedure:
 * `Wf_nat_more`     : well-founded order on products of `nat`
 * `Vector_more`     : add-ons for standard library Vector
 * `List_Type`       : `List` with output in `Type`
-* `inhabited_Type`  : `inhabited` with output in `Type`
+* `inhabitedT`      : `inhabited` with output in `Type`
 * `SubList`         : sub-list of a list with no modification in order
 * `Shuffle`         : shuffle predicate for pairs of lists
 * `ShuffleT`        : `Shuffle` with output in `Type`

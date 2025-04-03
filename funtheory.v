@@ -2,7 +2,7 @@
 
 From Stdlib Require Import Program.Basics Relation_Definitions RelationClasses List.
   (* do not export Program.Basics to avoid impact on [flip] and [arrow] for setoid_rewriting *)
-From OLlibs Require Import inhabited_Type.
+From OLlibs Require Import inhabitedT.
 
 (* Set Mangle Names. Set Mangle Names Light. *)
 Set Default Goal Selector "!".
@@ -80,7 +80,7 @@ Section Function.
 
   Definition decidable_image := forall y, { x | y = f x } + forall x, y <> f x.
 
-  Lemma injective_decidable_image_section : inhabited_inf A -> injective -> decidable_image ->
+  Lemma injective_decidable_image_section : inhabitedT A -> injective -> decidable_image ->
     { g & retract g f }.
   Proof.
   intros [a] Hi Hd.
