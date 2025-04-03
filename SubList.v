@@ -88,3 +88,6 @@ intro Hsub1. induction Hsub1 as [ | ? l1 l2 Hsub1 IHHsub1 | ? l1 l2 Hsub1 _ ]; i
   apply (Nat.nle_succ_diag_l (length l2)).
   transitivity (length l1); assumption.
 Qed.
+
+Lemma sublist_Add A (a : A) l1 l2 : Add a l1 l2 -> sublist l1 l2.
+Proof. induction 1; constructor; [ apply sublist_refl | assumption ]. Qed.
