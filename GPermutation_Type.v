@@ -150,18 +150,18 @@ Section GPermutationType.
     [ apply CPermutation_Type_Exists | intros ? ? -> | apply Permutation_Type_Exists ].
   Qed.
 
-  #[export] Instance PCEPermutation_Type_Forall_inf (P : A -> Type) :
-    Proper (PCEPermutation_Type ==> arrow) (Forall_inf P).
+  #[export] Instance PCEPermutation_Type_ForallT (P : A -> Type) :
+    Proper (PCEPermutation_Type ==> arrow) (ForallT P).
   Proof.
   now case_perm_tri;
-    [ apply CPermutation_Type_Forall_inf | intros ? ? -> | apply Permutation_Type_Forall_inf ].
+    [ apply CPermutation_Type_ForallT | intros ? ? -> | apply Permutation_Type_ForallT ].
   Qed.
 
-  #[export] Instance PCEPermutation_Type_Exists_inf (P : A -> Type) :
-    Proper (PCEPermutation_Type ==> arrow) (Exists_inf P).
+  #[export] Instance PCEPermutation_Type_ExistsT (P : A -> Type) :
+    Proper (PCEPermutation_Type ==> arrow) (ExistsT P).
   Proof.
   now case_perm_tri;
-    [ apply CPermutation_Type_Exists_inf | intros ? ? -> | apply Permutation_Type_Exists_inf ].
+    [ apply CPermutation_Type_ExistsT | intros ? ? -> | apply Permutation_Type_ExistsT ].
   Qed.
 
 
@@ -239,14 +239,14 @@ Section GPermutationType.
     Proper (PCPermutation_Type ==> Basics.impl) (Exists P).
   Proof. now case_perm; [ apply Permutation_Type_Exists | apply CPermutation_Type_Exists ]. Qed.
 
-  #[export] Instance PCPermutation_Type_Forall_inf (P : A -> Type) :
-    Proper (PCPermutation_Type ==> arrow) (Forall_inf P).
-  Proof. case_perm; [ apply Permutation_Type_Forall_inf | apply CPermutation_Type_Forall_inf ]. Qed.
+  #[export] Instance PCPermutation_Type_ForallT (P : A -> Type) :
+    Proper (PCPermutation_Type ==> arrow) (ForallT P).
+  Proof. case_perm; [ apply Permutation_Type_ForallT | apply CPermutation_Type_ForallT ]. Qed.
 
-  #[export] Instance PCPermutation_Type_Exists_inf (P : A -> Type) :
-    Proper (PCPermutation_Type ==> arrow) (Exists_inf P).
+  #[export] Instance PCPermutation_Type_ExistsT (P : A -> Type) :
+    Proper (PCPermutation_Type ==> arrow) (ExistsT P).
   Proof.
-  now case_perm; [ apply Permutation_Type_Exists_inf | apply CPermutation_Type_Exists_inf ].
+  now case_perm; [ apply Permutation_Type_ExistsT | apply CPermutation_Type_ExistsT ].
   Qed.
 
 
@@ -344,16 +344,16 @@ Section GPermutationType.
   now case_perm; simpl; intros l1 l2 HP HF; subst; [ apply Permutation_Type_Exists with l1 | ].
   Qed.
 
-  #[export] Instance PEPermutation_Type_Forall_inf (P : A -> Type) :
-    Proper (PEPermutation_Type ==> arrow) (Forall_inf P).
+  #[export] Instance PEPermutation_Type_ForallT (P : A -> Type) :
+    Proper (PEPermutation_Type ==> arrow) (ForallT P).
   Proof.
-  now case_perm; simpl; intros l1 l2 HP HF; subst; [ apply Permutation_Type_Forall_inf with l1 | ].
+  now case_perm; simpl; intros l1 l2 HP HF; subst; [ apply Permutation_Type_ForallT with l1 | ].
   Qed.
 
-  #[export] Instance PEPermutation_Type_Exists_inf (P : A -> Type) :
-    Proper (PEPermutation_Type ==> arrow) (Exists_inf P).
+  #[export] Instance PEPermutation_Type_ExistsT (P : A -> Type) :
+    Proper (PEPermutation_Type ==> arrow) (ExistsT P).
   Proof.
-  now case_perm; simpl; intros l1 l2 HP HF; subst; [ apply Permutation_Type_Exists_inf with l1 | ].
+  now case_perm; simpl; intros l1 l2 HP HF; subst; [ apply Permutation_Type_ExistsT with l1 | ].
   Qed.
 
   #[export] Instance PEPermutation_Type_rev :
@@ -436,26 +436,26 @@ Section MultiGPermutationType.
   Variable c : comparison.
   Variable b : bool.
 
-  Lemma PCEPermutation_Type_Forall2_inf (P : A -> B -> Type) l1 l1' l2 :
-    PCEPermutation_Type c l1 l1' -> Forall2_inf P l1 l2 -> 
-      { l2' & PCEPermutation_Type c l2 l2' & Forall2_inf P l1' l2' }.
+  Lemma PCEPermutation_Type_Forall2T (P : A -> B -> Type) l1 l1' l2 :
+    PCEPermutation_Type c l1 l1' -> Forall2T P l1 l2 ->
+      { l2' & PCEPermutation_Type c l2 l2' & Forall2T P l1' l2' }.
   Proof.
-  destruct c; [ apply CPermutation_Type_Forall2_inf | | apply Permutation_Type_Forall2_inf ].
+  destruct c; [ apply CPermutation_Type_Forall2T | | apply Permutation_Type_Forall2T ].
   now simpl; intros -> HF; exists l2.
   Qed.
 
-  Lemma PCPermutation_Type_Forall2_inf (P : A -> B -> Type) l1 l1' l2 :
-    PCPermutation_Type b l1 l1' -> Forall2_inf P l1 l2 -> 
-      { l2' & PCPermutation_Type b l2 l2' & Forall2_inf P l1' l2' }.
+  Lemma PCPermutation_Type_Forall2T (P : A -> B -> Type) l1 l1' l2 :
+    PCPermutation_Type b l1 l1' -> Forall2T P l1 l2 ->
+      { l2' & PCPermutation_Type b l2 l2' & Forall2T P l1' l2' }.
   Proof.
-  destruct b; [ apply Permutation_Type_Forall2_inf | apply CPermutation_Type_Forall2_inf ].
+  destruct b; [ apply Permutation_Type_Forall2T | apply CPermutation_Type_Forall2T ].
   Qed.
 
-  Lemma PEPermutation_Type_Forall2_inf (P : A -> B -> Type) l1 l1' l2 :
-    PEPermutation_Type b l1 l1' -> Forall2_inf P l1 l2 ->
-      { l2' & PEPermutation_Type b l2 l2' & Forall2_inf P l1' l2' }.
+  Lemma PEPermutation_Type_Forall2T (P : A -> B -> Type) l1 l1' l2 :
+    PEPermutation_Type b l1 l1' -> Forall2T P l1 l2 ->
+      { l2' & PEPermutation_Type b l2 l2' & Forall2T P l1' l2' }.
   Proof.
-  destruct b; [ apply Permutation_Type_Forall2_inf | simpl; intros; subst; now exists l2 ].
+  destruct b; [ apply Permutation_Type_Forall2T | simpl; intros; subst; now exists l2 ].
   Qed.
 
   Variable f : A -> B.

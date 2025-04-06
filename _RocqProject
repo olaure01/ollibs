@@ -13,7 +13,7 @@ CPermutation_Type_solve.v
 CPermutation_Type.v
 Datatypes_more.v
 dectype.v
-Dependent_Forall_Type.v
+Dependent_ForallT.v
 flat_map_more.v
 fmsetlist_Type.v
 fmsetlist.v

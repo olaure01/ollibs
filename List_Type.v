@@ -929,281 +929,281 @@ Section Exists_Forall.
 
     Variable P:A->Type.
 
-    Inductive Exists_inf : list A -> Type :=
-      | Exists_inf_cons_hd : forall x l, P x -> Exists_inf (x::l)
-      | Exists_inf_cons_tl : forall x l, Exists_inf l -> Exists_inf (x::l).
+    Inductive ExistsT : list A -> Type :=
+      | ExistsT_cons_hd : forall x l, P x -> ExistsT (x::l)
+      | ExistsT_cons_tl : forall x l, ExistsT l -> ExistsT (x::l).
 
-    Hint Constructors Exists_inf : core.
+    Hint Constructors ExistsT : core.
 
-    Lemma Exists_inf_exists (l:list A) :
-      Exists_inf l -> { x  & InT x l & P x }.
+    Lemma ExistsT_exists (l:list A) :
+      ExistsT l -> { x & InT x l & P x }.
     Proof.
       induction 1; firstorder.
     Qed.
 
-    Lemma exists_Exists_inf (l:list A) x :
-      InT x l -> P x -> Exists_inf l.
+    Lemma exists_ExistsT (l:list A) x :
+      InT x l -> P x -> ExistsT l.
     Proof.
       induction l; firstorder; subst; auto.
     Qed.
 
-    Lemma Exists_inf_nth l :
-      Exists_inf l -> {'(i, d) & i < length l & P (nth i l d) }.
+    Lemma ExistsT_nth l :
+      ExistsT l -> {'(i, d) & i < length l & P (nth i l d) }.
     Proof.
-      intros HE; apply Exists_inf_exists in HE.
+      intros HE; apply ExistsT_exists in HE.
       destruct HE as [a Hin HP].
       apply InT_nth with (d := a) in Hin; destruct Hin as [i Hl Heq].
       rewrite <- Heq in HP.
       now exists (i, a).
     Qed.
 
-    Lemma nth_Exists_inf l i d :
-      i < length l -> P (nth i l d) -> Exists_inf l.
+    Lemma nth_ExistsT l i d :
+      i < length l -> P (nth i l d) -> ExistsT l.
     Proof.
       intros Hl HP.
-      refine (exists_Exists_inf _ _ HP).
+      refine (exists_ExistsT _ _ HP).
       apply nth_InT; assumption.
     Qed.
 
-    Lemma Exists_inf_nil : notT (Exists_inf nil).
+    Lemma ExistsT_nil : notT (ExistsT nil).
     Proof. inversion 1. Qed.
 
-    Lemma Exists_inf_cons x l:
-      Exists_inf (x::l) -> P x + Exists_inf l.
+    Lemma ExistsT_cons x l:
+      ExistsT (x::l) -> P x + ExistsT l.
     Proof. inversion 1; auto. Qed.
 
-    Lemma Exists_inf_app l1 l2 :
-      Exists_inf (l1 ++ l2) -> Exists_inf l1 + Exists_inf l2.
+    Lemma ExistsT_app l1 l2 :
+      ExistsT (l1 ++ l2) -> ExistsT l1 + ExistsT l2.
     Proof.
       induction l1; simpl; intros HE; try now intuition.
       inversion_clear HE; intuition.
     Qed.
 
-    Lemma Exists_inf_app_l l1 l2 :
-      Exists_inf l1 -> Exists_inf (l1 ++ l2).
+    Lemma ExistsT_app_l l1 l2 :
+      ExistsT l1 -> ExistsT (l1 ++ l2).
     Proof.
       induction l1; simpl; intros HE; try now intuition.
       inversion_clear HE; intuition.
     Qed.
 
-    Lemma Exists_inf_app_r l1 l2 :
-      Exists_inf l2 -> Exists_inf (l1 ++ l2).
+    Lemma ExistsT_app_r l1 l2 :
+      ExistsT l2 -> ExistsT (l1 ++ l2).
     Proof.
       induction l1; simpl; intros HE; try now intuition.
     Qed.
 
-    Lemma Exists_inf_rev l : Exists_inf l -> Exists_inf (rev l).
+    Lemma ExistsT_rev l : ExistsT l -> ExistsT (rev l).
     Proof.
       induction l; intros HE; intuition.
       inversion_clear HE; simpl.
-      - apply Exists_inf_app_r; intuition.
-      - apply Exists_inf_app_l; intuition.
+      - apply ExistsT_app_r; intuition.
+      - apply ExistsT_app_l; intuition.
     Qed.
 
-    Lemma Exists_inf_decT l:
-      (forall x:A, P x + notT (P x)) -> Exists_inf l + notT (Exists_inf l).
+    Lemma ExistsT_decT l:
+      (forall x:A, P x + notT (P x)) -> ExistsT l + notT (ExistsT l).
     Proof.
       intro Pdec. induction l as [|a l' Hrec].
-      - right. now apply Exists_inf_nil.
+      - right. now apply ExistsT_nil.
       - destruct Hrec as [Hl'|Hl'].
-        * left. now apply Exists_inf_cons_tl.
+        * left. now apply ExistsT_cons_tl.
         * destruct (Pdec a) as [Ha|Ha].
-          + left. now apply Exists_inf_cons_hd.
+          + left. now apply ExistsT_cons_hd.
           + right. now inversion_clear 1.
     Defined.
 
-    Lemma Exists_inf_fold_right l :
-      Exists_inf l -> fold_right (fun x => sum (P x)) False l.
+    Lemma ExistsT_fold_right l :
+      ExistsT l -> fold_right (fun x => sum (P x)) False l.
     Proof.
       induction l; simpl; intros HE; try now inversion HE; intuition.
     Qed.
 
-    Lemma fold_right_Exists_inf l :
-      fold_right (fun x => sum (P x)) False l -> Exists_inf l.
+    Lemma fold_right_ExistsT l :
+      fold_right (fun x => sum (P x)) False l -> ExistsT l.
     Proof.
       induction l; simpl; intros HE; try now inversion HE; intuition.
     Qed.
 
-    Lemma inclT_Exists_inf l1 l2 : inclT l1 l2 -> Exists_inf l1 -> Exists_inf l2.
+    Lemma inclT_ExistsT l1 l2 : inclT l1 l2 -> ExistsT l1 -> ExistsT l2.
     Proof.
       intros Hincl HE.
-      apply Exists_inf_exists in HE; destruct HE as [a Hin HP].
-      apply exists_Exists_inf with a; intuition.
+      apply ExistsT_exists in HE; destruct HE as [a Hin HP].
+      apply exists_ExistsT with a; intuition.
     Qed.
 
-    Inductive Forall_inf : list A -> Type :=
-      | Forall_inf_nil : Forall_inf nil
-      | Forall_inf_cons : forall x l, P x -> Forall_inf l -> Forall_inf (x::l).
+    Inductive ForallT : list A -> Type :=
+      | ForallT_nil : ForallT nil
+      | ForallT_cons : forall x l, P x -> ForallT l -> ForallT (x::l).
 
-    Hint Constructors Forall_inf : core.
+    Hint Constructors ForallT : core.
 
-    Lemma Forall_inf_forall (l:list A):
-      Forall_inf l -> forall x, InT x l -> P x.
+    Lemma ForallT_forall (l:list A):
+      ForallT l -> forall x, InT x l -> P x.
     Proof.
       induction 1; firstorder; subst; auto.
     Qed.
 
-    Lemma forall_Forall_inf (l:list A):
-      (forall x, InT x l -> P x) -> Forall_inf l.
+    Lemma forall_ForallT (l:list A):
+      (forall x, InT x l -> P x) -> ForallT l.
     Proof.
       induction l; intuition.
     Qed.
 
-    Lemma Forall_inf_nth l :
-      Forall_inf l -> forall i d, i < length l -> P (nth i l d).
+    Lemma ForallT_nth l :
+      ForallT l -> forall i d, i < length l -> P (nth i l d).
     Proof.
       intros HF i d Hl.
-      apply Forall_inf_forall with (x := nth i l d) in HF.
+      apply ForallT_forall with (x := nth i l d) in HF.
       - assumption.
       - apply nth_InT; assumption.
     Qed.
 
-    Lemma nth_Forall_inf l :
-      (forall i d, i < length l -> P (nth i l d)) -> Forall_inf l.
+    Lemma nth_ForallT l :
+      (forall i d, i < length l -> P (nth i l d)) -> ForallT l.
     Proof.
       intros HF.
-      apply forall_Forall_inf; intros a Hin.
+      apply forall_ForallT; intros a Hin.
       apply InT_nth with (d := a) in Hin; destruct Hin as [i Hl <-]; intuition.
     Qed.
 
-    Lemma Forall_inf_inv : forall (a:A) l, Forall_inf (a :: l) -> P a.
+    Lemma ForallT_inv : forall (a:A) l, ForallT (a :: l) -> P a.
     Proof.
       intros ? ? H; inversion H; trivial.
     Qed.
 
-    Theorem Forall_inf_inv_tail : forall (a:A) l, Forall_inf (a :: l) -> Forall_inf l.
+    Theorem ForallT_inv_tail : forall (a:A) l, ForallT (a :: l) -> ForallT l.
     Proof.
       intros ? ? H; inversion H; trivial.
     Qed.
 
-    Lemma Forall_inf_app_l l1 l2 :
-      Forall_inf (l1 ++ l2) -> Forall_inf l1.
+    Lemma ForallT_app_l l1 l2 :
+      ForallT (l1 ++ l2) -> ForallT l1.
     Proof.
       induction l1; simpl; intros HF; try now intuition.
       inversion_clear HF; intuition.
     Qed.
 
-    Lemma Forall_inf_app_r l1 l2 :
-      Forall_inf (l1 ++ l2) -> Forall_inf l2.
+    Lemma ForallT_app_r l1 l2 :
+      ForallT (l1 ++ l2) -> ForallT l2.
     Proof.
       induction l1; simpl; intros HF; try now intuition.
       inversion_clear HF; intuition.
     Qed.
 
-    Lemma Forall_inf_app l1 l2 :
-      Forall_inf l1 -> Forall_inf l2 -> Forall_inf (l1 ++ l2).
+    Lemma ForallT_app l1 l2 :
+      ForallT l1 -> ForallT l2 -> ForallT (l1 ++ l2).
     Proof.
       induction l1; simpl; intros HF1 HF2; try now intuition.
       inversion_clear HF1; intuition.
     Qed.
 
-    Lemma Forall_inf_elt a l1 l2 : Forall_inf (l1 ++ a :: l2) -> P a.
+    Lemma ForallT_elt a l1 l2 : ForallT (l1 ++ a :: l2) -> P a.
     Proof.
-      intros HF; apply Forall_inf_app_r in HF; now inversion HF.
+      intros HF; apply ForallT_app_r in HF; now inversion HF.
     Qed.
 
-    Lemma Forall_inf_rev l : Forall_inf l -> Forall_inf (rev l).
+    Lemma ForallT_rev l : ForallT l -> ForallT (rev l).
     Proof.
       induction l; intros HF; intuition.
-      inversion_clear HF; simpl; apply Forall_inf_app; intuition.
+      inversion_clear HF; simpl; apply ForallT_app; intuition.
     Qed.
 
-    Lemma Forall_inf_rect' : forall (Q : list A -> Type),
-      Q [] -> (forall b l, P b -> Q (b :: l)) -> forall l, Forall_inf l -> Q l.
+    Lemma ForallT_rect' : forall (Q : list A -> Type),
+      Q [] -> (forall b l, P b -> Q (b :: l)) -> forall l, ForallT l -> Q l.
     Proof.
-      intros Q H H' l; induction l; intro; [|eapply H', Forall_inf_inv]; eassumption.
+      intros Q H H' l; induction l; intro; [|eapply H', ForallT_inv]; eassumption.
     Qed.
 
-    Lemma Forall_inf_decT :
-      (forall x:A, P x + notT (P x)) -> forall l:list A, Forall_inf l + notT (Forall_inf l).
+    Lemma ForallT_decT :
+      (forall x:A, P x + notT (P x)) -> forall l:list A, ForallT l + notT (ForallT l).
     Proof.
       intros Pdec l. induction l as [|a l' Hrec].
-      - left. apply Forall_inf_nil.
+      - left. apply ForallT_nil.
       - destruct Hrec as [Hl'|Hl'].
         + destruct (Pdec a) as [Ha|Ha].
-          * left. now apply Forall_inf_cons.
+          * left. now apply ForallT_cons.
           * right. abstract now inversion 1.
         + right. abstract now inversion 1.
     Defined.
 
-    Lemma Forall_inf_fold_right l :
-      Forall_inf l -> fold_right (fun x => prod (P x)) True l.
+    Lemma ForallT_fold_right l :
+      ForallT l -> fold_right (fun x => prod (P x)) True l.
     Proof.
       induction l; simpl; intros HF; try now inversion HF; intuition.
     Qed.
 
-    Lemma fold_right_Forall_inf l :
-      fold_right (fun x => prod (P x)) True l -> Forall_inf l.
+    Lemma fold_right_ForallT l :
+      fold_right (fun x => prod (P x)) True l -> ForallT l.
     Proof.
       induction l; simpl; intros HF; try now inversion HF; intuition.
     Qed.
 
-    Lemma inclT_Forall_inf l1 l2 : inclT l2 l1 -> Forall_inf l1 -> Forall_inf l2.
+    Lemma inclT_ForallT l1 l2 : inclT l2 l1 -> ForallT l1 -> ForallT l2.
     Proof.
       intros Hincl HF.
-      apply forall_Forall_inf; intros a Ha.
-      apply Forall_inf_forall with (x:=a) in HF; intuition.
+      apply forall_ForallT; intros a Ha.
+      apply ForallT_forall with (x:=a) in HF; intuition.
     Qed.
 
   End One_predicate_Type.
 
-  Lemma Exists_inf_Exists (P:A->Prop) l : Exists_inf P l -> Exists P l.
+  Lemma ExistsT_Exists (P:A->Prop) l : ExistsT P l -> Exists P l.
   Proof. now induction 1; constructor. Qed.
 
-  Lemma Forall_inf_Forall (P:A->Prop) l : Forall_inf P l -> Forall P l.
+  Lemma ForallT_Forall (P:A->Prop) l : ForallT P l -> Forall P l.
   Proof. now induction 1; constructor. Qed.
 
-  Theorem Exists_inf_arrow : forall (P Q : A -> Type), (forall a : A, P a -> Q a) ->
-    forall l, Exists_inf P l -> Exists_inf Q l.
+  Theorem ExistsT_arrow : forall (P Q : A -> Type), (forall a : A, P a -> Q a) ->
+    forall l, ExistsT P l -> ExistsT Q l.
   Proof.
     intros P Q H l H0.
     induction H0 as [x l p|x ? ? IH].
-    - apply (Exists_inf_cons_hd Q x l (H x p)).
-    - apply (Exists_inf_cons_tl x IH).
+    - apply (ExistsT_cons_hd Q x l (H x p)).
+    - apply (ExistsT_cons_tl x IH).
   Qed.
 
-  Lemma Exists_inf_sum : forall (P Q : A -> Type) l,
-    Exists_inf P l + Exists_inf Q l -> Exists_inf (fun x => P x + Q x)%type l.
+  Lemma ExistsT_sum : forall (P Q : A -> Type) l,
+    ExistsT P l + ExistsT Q l -> ExistsT (fun x => P x + Q x)%type l.
   Proof.
     intros P Q l. induction l as [|? ? IHl]; intros [H | H]; inversion H; subst.
-    1,3: apply Exists_inf_cons_hd; auto.
-    all: apply Exists_inf_cons_tl, IHl; auto.
+    1,3: apply ExistsT_cons_hd; auto.
+    all: apply ExistsT_cons_tl, IHl; auto.
   Qed.
 
-  Lemma Exists_inf_sum_inv : forall (P Q : A -> Type) l,
-    Exists_inf (fun x => P x + Q x)%type l -> Exists_inf P l + Exists_inf Q l.
+  Lemma ExistsT_sum_inv : forall (P Q : A -> Type) l,
+    ExistsT (fun x => P x + Q x)%type l -> ExistsT P l + ExistsT Q l.
   Proof.
     intros P Q l. induction l as [|? ? IHl]; intro Hl; inversion Hl as [ ? ? H | ? ? H ]; subst.
     - inversion H; now repeat constructor.
     - destruct (IHl H); now repeat constructor.
   Qed.
 
-  Lemma Forall_inf_arrow : forall (P Q : A -> Type), (forall a, P a -> Q a) ->
-    forall l, Forall_inf P l -> Forall_inf Q l.
+  Lemma ForallT_arrow : forall (P Q : A -> Type), (forall a, P a -> Q a) ->
+    forall l, ForallT P l -> ForallT Q l.
   Proof.
     intros P Q HPQ l. induction l; intros H; inversion H; constructor; auto.
   Qed.
 
-  Lemma Forall_inf_prod : forall (P Q : A -> Type) l,
-    Forall_inf P l -> Forall_inf Q l -> Forall_inf (fun x => P x * Q x)%type l.
+  Lemma ForallT_prod : forall (P Q : A -> Type) l,
+    ForallT P l -> ForallT Q l -> ForallT (fun x => P x * Q x)%type l.
   Proof.
     intros P Q l. induction l; intros HP HQ; constructor; inversion HP; inversion HQ; auto.
   Qed.
 
-  Lemma Forall_inf_prod_inv : forall (P Q : A -> Type) l,
-    Forall_inf (fun x => P x * Q x)%type l -> Forall_inf P l * Forall_inf Q l.
+  Lemma ForallT_prod_inv : forall (P Q : A -> Type) l,
+    ForallT (fun x => P x * Q x)%type l -> ForallT P l * ForallT Q l.
   Proof.
     intros P Q l. induction l; intro Hl; split; constructor; inversion Hl; firstorder.
   Qed.
 
-  Lemma Forall_inf_Exists_inf_notT (P:A->Type)(l:list A) :
-   Forall_inf (fun x => notT (P x)) l -> notT (Exists_inf P l).
+  Lemma ForallT_ExistsT_notT (P:A->Type)(l:list A) :
+   ForallT (fun x => notT (P x)) l -> notT (ExistsT P l).
   Proof.
    induction l; intros HF HE; inversion HE; inversion HF; [ contradiction | apply IHl; assumption ].
   Qed.
 
-  Lemma Exists_inf_notT_Forall_inf (P:A->Type)(l:list A) :
-   notT (Exists_inf P l) -> Forall_inf (fun x => notT (P x)) l.
+  Lemma ExistsT_notT_ForallT (P:A->Type)(l:list A) :
+   notT (ExistsT P l) -> ForallT (fun x => notT (P x)) l.
   Proof.
    induction l as [|? ? IHl]; intros HE; constructor.
    - intros Ha; apply HE.
@@ -1212,65 +1212,65 @@ Section Exists_Forall.
      now constructor.
   Qed.
 
-  Lemma Exists_inf_Forall_inf_notT (P:A->Type)(l:list A) :
-    Exists_inf (fun x => notT (P x)) l -> notT (Forall_inf P l).
+  Lemma ExistsT_ForallT_notT (P:A->Type)(l:list A) :
+    ExistsT (fun x => notT (P x)) l -> notT (ForallT P l).
   Proof.
    induction l; intros HE HF; inversion HE; inversion HF; [ contradiction | apply IHl; assumption ].
   Qed.
 
-  Lemma Forall_inf_notT_Exists_inf (P:A->Type)(l:list A) :
+  Lemma ForallT_notT_ExistsT (P:A->Type)(l:list A) :
     (forall x, P x + notT (P x)) ->
-    notT (Forall_inf P l) -> Exists_inf (fun x => notT (P x)) l.
+    notT (ForallT P l) -> ExistsT (fun x => notT (P x)) l.
   Proof.
    intro Dec.
    induction l as [|a l IHl]; intros HF.
    - contradiction HF. constructor.
    - destruct (Dec a) as [ Ha | Hna ].
-     + apply Exists_inf_cons_tl, IHl.
+     + apply ExistsT_cons_tl, IHl.
        intros HFl.
        apply HF; now constructor.
-     + now apply Exists_inf_cons_hd.
+     + now apply ExistsT_cons_hd.
   Qed.
 
-  Lemma Forall_inf_Exists_inf_decT (P:A->Type) :
+  Lemma ForallT_ExistsT_decT (P:A->Type) :
     (forall x:A, P x + notT (P x)) ->
-    forall l:list A, Forall_inf P l + Exists_inf (fun x => notT (P x)) l.
+    forall l:list A, ForallT P l + ExistsT (fun x => notT (P x)) l.
   Proof.
     intros Dec l.
-    destruct (Forall_inf_decT P Dec l); [left|right]; trivial.
-    now apply Forall_inf_notT_Exists_inf.
+    destruct (ForallT_decT P Dec l); [left|right]; trivial.
+    now apply ForallT_notT_ExistsT.
   Defined.
 
-  Lemma inclT_Forall_inf_inT l l' :
-    inclT l l' -> Forall_inf (fun x => InT x l') l.
-  Proof. now intros; apply forall_Forall_inf. Qed.
+  Lemma inclT_ForallT_inT l l' :
+    inclT l l' -> ForallT (fun x => InT x l') l.
+  Proof. now intros; apply forall_ForallT. Qed.
 
-  Lemma Forall_inf_inT_inclT l l' :
-    Forall_inf (fun x => InT x l') l -> inclT l l'.
-  Proof. now intros HF x Hin; apply Forall_inf_forall with (x:= x) in HF. Qed.
+  Lemma ForallT_inT_inclT l l' :
+    ForallT (fun x => InT x l') l -> inclT l l'.
+  Proof. now intros HF x Hin; apply ForallT_forall with (x:= x) in HF. Qed.
 
 End Exists_Forall.
 
-#[export] Hint Constructors Exists_inf Forall_inf : core.
+#[export] Hint Constructors ExistsT ForallT : core.
 
-Lemma exists_Forall_inf A B : forall (P : A -> B -> Type) l,
-  { k & Forall_inf (P k) l } -> Forall_inf (fun x => { k & P k x }) l.
+Lemma exists_ForallT A B : forall (P : A -> B -> Type) l,
+  { k & ForallT (P k) l } -> ForallT (fun x => { k & P k x }) l.
 Proof.
   intros P l. induction l as [|? ? IHl]; intros [k HF]; constructor; inversion_clear HF.
   - now exists k.
   - now apply IHl; exists k.
 Qed.
 
-Lemma Forall_inf_image A B : forall (f : A -> B) l,
-  Forall_inf (fun y => { x | y = f x }) (map f l).
+Lemma ForallT_image A B : forall (f : A -> B) l,
+  ForallT (fun y => { x | y = f x }) (map f l).
 Proof.
   intros f l. induction l as [ | a l IHl ]; constructor.
   - now exists a.
   - now apply IHl; exists l.
 Qed.
 
-Lemma Forall_inf_image_inv A B : forall (f : A -> B) l,
-  Forall_inf (fun y => { x | y = f x }) l -> { l' | l = map f l' }.
+Lemma ForallT_image_inv A B : forall (f : A -> B) l,
+  ForallT (fun y => { x | y = f x }) l -> { l' | l = map f l' }.
 Proof.
   intros f l. induction l as [ | a l IHl ]; intros HF.
   - exists nil; reflexivity.
@@ -1279,180 +1279,179 @@ Proof.
     now exists (x :: l').
 Qed.
 
-Lemma concat_nil_Forall_inf A : forall (l : list (list A)),
-  concat l = nil -> Forall_inf (fun x => x = nil) l.
+Lemma concat_nil_ForallT A : forall (l : list (list A)),
+  concat l = nil -> ForallT (fun x => x = nil) l.
 Proof.
   intro l. induction l; simpl; intros Hc; auto.
   apply app_eq_nil in Hc.
   constructor; firstorder.
 Qed.
 
-Lemma Forall_inf_concat_nil A : forall (l : list (list A)),
-  Forall_inf (fun x => x = nil) l -> concat l = nil.
+Lemma ForallT_concat_nil A : forall (l : list (list A)),
+  ForallT (fun x => x = nil) l -> concat l = nil.
 Proof.
   intro l. induction l as [|? ? IHl]; simpl; intros Hc; auto.
   inversion Hc; subst; simpl.
   now apply IHl.
 Qed.
 
-Lemma inT_flat_map_Exists_inf A B : forall (f : A -> list B) x l,
-  InT x (flat_map f l) -> Exists_inf (fun y => InT x (f y)) l.
+Lemma inT_flat_map_ExistsT A B : forall (f : A -> list B) x l,
+  InT x (flat_map f l) -> ExistsT (fun y => InT x (f y)) l.
 Proof.
   intros f x l Hin.
   destruct (inT_flat_map_inv _ _ _ Hin) as [y Hin1 Hin2].
-  now apply exists_Exists_inf with y.
+  now apply exists_ExistsT with y.
 Qed.
 
-Lemma Exists_inf_inT_flat_map A B : forall (f : A -> list B) x l,
-  Exists_inf (fun y => InT x (f y)) l -> InT x (flat_map f l).
+Lemma ExistsT_inT_flat_map A B : forall (f : A -> list B) x l,
+  ExistsT (fun y => InT x (f y)) l -> InT x (flat_map f l).
 Proof.
   intros f x l HE.
-  destruct (Exists_inf_exists HE) as [y Hin1 Hin2].
+  destruct (ExistsT_exists HE) as [y Hin1 Hin2].
   now apply inT_flat_map with y.
 Qed.
 
-Lemma notT_inT_flat_map_Forall_inf A B : forall (f : A -> list B) x l,
-  notT (InT x (flat_map f l)) -> Forall_inf (fun y => notT (InT x (f y))) l.
+Lemma notT_inT_flat_map_ForallT A B : forall (f : A -> list B) x l,
+  notT (InT x (flat_map f l)) -> ForallT (fun y => notT (InT x (f y))) l.
 Proof.
   intros f x l Hnin.
-  apply Exists_inf_notT_Forall_inf.
-  now intros HE; apply Exists_inf_inT_flat_map in HE.
+  apply ExistsT_notT_ForallT.
+  now intros HE; apply ExistsT_inT_flat_map in HE.
 Qed.
 
-Lemma Forall_inf_notT_inT_flat_map A B : forall (f : A -> list B) x l,
-  Forall_inf (fun y => notT (InT x (f y))) l -> notT (InT x (flat_map f l)).
+Lemma ForallT_notT_inT_flat_map A B : forall (f : A -> list B) x l,
+  ForallT (fun y => notT (InT x (f y))) l -> notT (InT x (flat_map f l)).
 Proof.
   intros f x l HF Hin.
-  apply Forall_inf_Exists_inf_notT in HF.
-  apply HF, inT_flat_map_Exists_inf, Hin.
+  apply ForallT_ExistsT_notT in HF.
+  apply HF, inT_flat_map_ExistsT, Hin.
 Qed.
 
 
-Section Forall2_inf.
+Section Forall2T.
 
-  (** [Forall2_inf]: stating that elements of two lists are pairwise related. *)
+  (** [Forall2T]: stating that elements of two lists are pairwise related. *)
 
   Variables A B : Type.
   Variable R : A -> B -> Type.
 
-  Inductive Forall2_inf : list A -> list B -> Type :=
-    | Forall2_inf_nil : Forall2_inf [] []
-    | Forall2_inf_cons : forall x y l l',
-      R x y -> Forall2_inf l l' -> Forall2_inf (x::l) (y::l').
+  Inductive Forall2T : list A -> list B -> Type :=
+    | Forall2T_nil : Forall2T [] []
+    | Forall2T_cons : forall x y l l',
+      R x y -> Forall2T l l' -> Forall2T (x::l) (y::l').
 
-  Hint Constructors Forall2_inf : core.
+  Hint Constructors Forall2T : core.
 
-  Theorem Forall2_inf_refl : Forall2_inf [] [].
-  Proof. intros; apply Forall2_inf_nil. Qed.
+  Theorem Forall2T_refl : Forall2T [] [].
+  Proof. intros; apply Forall2T_nil. Qed.
 
-  Theorem Forall2_inf_app_inv_l : forall l1 l2 l,
-    Forall2_inf (l1 ++ l2) l ->
-    {'(l1', l2') : _ & (Forall2_inf l1 l1' * Forall2_inf l2 l2')%type
-                     & l = l1' ++ l2' }.
+  Theorem Forall2T_app_inv_l : forall l1 l2 l,
+    Forall2T (l1 ++ l2) l ->
+    {'(l1', l2') & (Forall2T l1 l1' * Forall2T l2 l2')%type
+                 & l = l1' ++ l2' }.
   Proof.
     intro l1. induction l1 as [|a l1 IHl1]; intros l1' l2' HF.
     - exists (nil, l2'); auto.
     - simpl in HF; inversion_clear HF as [|? y ? ? ? HF'].
       apply IHl1 in HF' as [(l1'',l2'') [HF1 HF2] ->].
-      assert (Forall2_inf (a :: l1) (y :: l1'')) as HF3 by auto.
+      assert (Forall2T (a :: l1) (y :: l1'')) as HF3 by auto.
       exists (y :: l1'', l2''); auto.
   Qed.
 
-  Theorem Forall2_inf_app_inv_r : forall l1 l2 l,
-    Forall2_inf l (l1 ++ l2) ->
-    {'(l1', l2') : _ & (Forall2_inf l1' l1 * Forall2_inf l2' l2)%type
-                     & l = l1' ++ l2' }.
+  Theorem Forall2T_app_inv_r : forall l1 l2 l,
+    Forall2T l (l1 ++ l2) ->
+    {'(l1', l2') & (Forall2T l1' l1 * Forall2T l2' l2)%type
+                 & l = l1' ++ l2' }.
   Proof.
     intro l1. induction l1 as [|a l1 IHl1]; intros l1' l2' HF.
     - exists (nil, l2'); auto.
     - simpl in HF; inversion_clear HF as [|x ? ? ? ? HF'].
       apply IHl1 in HF' as [(l1'',l2'') [HF1 HF2] ->].
-      assert (Forall2_inf (x :: l1'') (a :: l1)) as HF3 by auto.
+      assert (Forall2T (x :: l1'') (a :: l1)) as HF3 by auto.
       exists (x :: l1'', l2''); auto.
   Qed.
 
-  Theorem Forall2_inf_app : forall l1 l2 l1' l2',
-    Forall2_inf l1 l1' -> Forall2_inf l2 l2' -> Forall2_inf (l1 ++ l2) (l1' ++ l2').
+  Theorem Forall2T_app : forall l1 l2 l1' l2',
+    Forall2T l1 l1' -> Forall2T l2 l2' -> Forall2T (l1 ++ l2) (l1' ++ l2').
   Proof.
     intros l1 l2 l1' l2' HF1 HF2. induction l1 in l1', HF1, HF2 |- *; inversion HF1; subst; simpl; auto.
   Qed.
 
-  Lemma Forall2_inf_length : forall l1 l2,
-    Forall2_inf l1 l2 -> length l1 = length l2.
+  Lemma Forall2T_length : forall l1 l2,
+    Forall2T l1 l2 -> length l1 = length l2.
   Proof.
     intros l1 l2 HF; induction HF as [|? ? ? ? ? ? IHHF]; auto.
     now simpl; rewrite IHHF.
   Qed.
 
-End Forall2_inf.
+End Forall2T.
 
-#[export] Hint Constructors Forall2_inf : core.
+#[export] Hint Constructors Forall2T : core.
 
-Lemma Forall2_inf_Forall2 {A B} (R : A -> B -> Prop) l1 l2 :
-  Forall2_inf R l1 l2 -> Forall2 R l1 l2.
+Lemma Forall2T_Forall2 {A B} (R : A -> B -> Prop) l1 l2 :
+  Forall2T R l1 l2 -> Forall2 R l1 l2.
 Proof. induction 1 ; auto. Qed.
 
 
-Section ForallPairs_inf.
+Section ForallPairsT.
 
-  (** [ForallPairs_inf] : specifies that a certain relation should
+  (** [ForallPairsT] : specifies that a certain relation should
     always hold when inspecting all possible pairs of elements of a list. *)
 
   Variable A : Type.
   Variable R : A -> A -> Type.
 
-  Definition ForallPairs_inf l :=
+  Definition ForallPairsT l :=
     forall a b, InT a l -> InT b l -> R a b.
 
-  (** [ForallOrdPairs_inf] : we still check a relation over all pairs
+  (** [ForallOrdPairsT] : we still check a relation over all pairs
      of elements of a list, but now the order of elements matters. *)
 
-  Inductive ForallOrdPairs_inf : list A -> Type :=
-    | FOP_inf_nil : ForallOrdPairs_inf nil
-    | FOP_inf_cons : forall a l,
-      Forall_inf (R a) l -> ForallOrdPairs_inf l -> ForallOrdPairs_inf (a::l).
+  Inductive ForallOrdPairsT : list A -> Type :=
+    | FOPT_nil : ForallOrdPairsT nil
+    | FOPT_cons : forall a l, ForallT (R a) l -> ForallOrdPairsT l -> ForallOrdPairsT (a::l).
 
-  Hint Constructors ForallOrdPairs_inf : core.
+  Hint Constructors ForallOrdPairsT : core.
 
-  Lemma ForallOrdPairs_inf_InT : forall l,
-    ForallOrdPairs_inf l ->
+  Lemma ForallOrdPairsT_InT : forall l,
+    ForallOrdPairsT l ->
     forall x y, InT x l -> InT y l -> ((x=y) + R x y + R y x)%type.
   Proof.
     induction 1 as [|? ? f].
     - inversion 1.
     - intros x y. simpl; destruct 1; destruct 1; subst; auto.
       + left. right.
-        apply Forall_inf_forall with _ _ _ y in f; eauto.
+        apply ForallT_forall with _ _ _ y in f; eauto.
       + right.
-        apply Forall_inf_forall with _ _ _ x in f; eauto.
+        apply ForallT_forall with _ _ _ x in f; eauto.
   Qed.
 
-  (** [ForallPairs_inf] implies [ForallOrdPairs_inf].
+  (** [ForallPairsT] implies [ForallOrdPairsT].
     The reverse implication is true only when [R] is symmetric and reflexive. *)
 
-  Lemma ForallPairs_inf_ForallOrdPairs_inf l:
-    ForallPairs_inf l -> ForallOrdPairs_inf l.
+  Lemma ForallPairsT_ForallOrdPairsT l:
+    ForallPairsT l -> ForallOrdPairsT l.
   Proof.
     induction l as [|? ? IHl]; auto. intros H.
     constructor.
-    - apply forall_Forall_inf. intros; apply H; simpl; auto.
+    - apply forall_ForallT. intros; apply H; simpl; auto.
     - apply IHl. red; intros; apply H; simpl; auto.
   Qed.
 
-  Lemma ForallOrdPairs_inf_ForallPairs_inf :
+  Lemma ForallOrdPairsT_ForallPairsT :
     (forall x, R x x) ->
     (forall x y, R x y -> R y x) ->
-    forall l, ForallOrdPairs_inf l -> ForallPairs_inf l.
+    forall l, ForallOrdPairsT l -> ForallPairsT l.
   Proof.
     intros Refl Sym l Hl x y Hx Hy.
-    destruct (ForallOrdPairs_inf_InT Hl _ _ Hx Hy); subst; intuition.
+    destruct (ForallOrdPairsT_InT Hl _ _ Hx Hy); subst; intuition.
     subst; intuition.
   Qed.
 
-End ForallPairs_inf.
+End ForallPairsT.
 
-Lemma ForallPairs_inf_ForallPairs {A} (R : A -> A -> Prop) l :
-  ForallPairs_inf R l -> ForallPairs R l.
+Lemma ForallPairsT_ForallPairs A (R : A -> A -> Prop) l :
+  ForallPairsT R l -> ForallPairs R l.
 Proof.
 intros HFP x y Hinx.
 apply notF_inT_notF_in; intros Hiny.
@@ -1460,18 +1459,18 @@ revert Hinx; apply notF_inT_notF_in; intros Hinx.
 now apply HFP.
 Qed.
 
-Lemma ForallPairs_ForallPairs_inf {A} (R : A -> A -> Prop) l :
-  ForallPairs R l -> ForallPairs_inf R l.
+Lemma ForallPairs_ForallPairsT A (R : A -> A -> Prop) l :
+  ForallPairs R l -> ForallPairsT R l.
 Proof.
 intros HFP x y Hinx Hiny.
 apply HFP; now apply inT_in.
 Qed.
 
-Lemma ForallOrdPairs_inf_ForallOrdPairs {A} (R : A -> A -> Prop) l :
-  ForallOrdPairs_inf R l -> ForallOrdPairs R l.
+Lemma ForallOrdPairsT_ForallOrdPairs A (R : A -> A -> Prop) l :
+  ForallOrdPairsT R l -> ForallOrdPairs R l.
 Proof.
   induction 1; constructor; intuition.
-  now apply Forall_inf_Forall.
+  now apply ForallT_Forall.
 Qed.
 
 Section Repeat.
@@ -1488,16 +1487,16 @@ End Repeat.
 
 (** Max of elements of a list of [nat]: [list_max] *)
 
-Lemma list_max_le_inf : forall l n,
-  list_max l <= n -> Forall_inf (fun k => k <= n) l.
+Lemma list_max_leT : forall l n,
+  list_max l <= n -> ForallT (fun k => k <= n) l.
 Proof.
 intro l. induction l as [|? ? IHl]; simpl; intros n; intros H; intuition.
 apply Nat.max_lub_iff in H.
 now constructor; [ | apply IHl ].
 Qed.
 
-Lemma list_max_lt_inf : forall l n, l <> nil ->
-  list_max l < n -> Forall_inf (fun k => k < n) l.
+Lemma list_max_ltT : forall l n, l <> nil ->
+  list_max l < n -> ForallT (fun k => k < n) l.
 Proof.
 intro l. induction l as [|? l IHl]; simpl; intros n Hnil; intros H; intuition.
 destruct l.

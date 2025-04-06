@@ -9,10 +9,10 @@ Set Default Proof Using "Type".
 Set Implicit Arguments.
 
 
-Lemma injection_list_Forall_inf_cons A P :
+Lemma injection_list_ForallT_cons A P :
   (forall x y : A, { x = y } + { x <> y }) ->
-  forall (a : A) l p p' (F F' : Forall_inf P l),
-  Forall_inf_cons a p F = Forall_inf_cons a p' F' -> p = p' /\ F = F'.
+  forall (a : A) l p p' (F F' : ForallT P l),
+  ForallT_cons a p F = ForallT_cons a p' F' -> p = p' /\ F = F'.
 Proof.
 intros Hdec a l p p' F F'
   [= ->%(inj_pair2_eq_dec _ Hdec) ->%(inj_pair2_eq_dec _ (list_eq_dec Hdec))];

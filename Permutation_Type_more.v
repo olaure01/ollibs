@@ -187,8 +187,8 @@ apply Permutation_Type_Permutation in H.
 rewrite H; reflexivity.
 Qed.
 
-#[export] Instance Permutation_Type_Forall_inf A (P : A -> Type) :
-  Proper ((@Permutation_Type A) ==> arrow) (Forall_inf P).
+#[export] Instance Permutation_Type_ForallT A (P : A -> Type) :
+  Proper ((@Permutation_Type A) ==> arrow) (ForallT P).
 Proof.
 intros l1 l2 HP.
 induction HP as [ | ? ? ? ? IHP | | ]; intro HF0; auto.
@@ -198,24 +198,24 @@ induction HP as [ | ? ? ? ? IHP | | ]; intro HF0; auto.
   now repeat constructor.
 Qed.
 
-#[export] Instance Permutation_Type_Exists_inf A (P : A -> Type) :
-  Proper ((@Permutation_Type A) ==> arrow) (Exists_inf P).
+#[export] Instance Permutation_Type_ExistsT A (P : A -> Type) :
+  Proper ((@Permutation_Type A) ==> arrow) (ExistsT P).
 Proof.
 intros l1 l2 HP.
 induction HP as [ | ? ? ? ? IHP | | ]; intro HE0; auto.
 - inversion_clear HE0 as [ | ? ? HE ].
-  + now apply Exists_inf_cons_hd.
+  + now apply ExistsT_cons_hd.
   + apply IHP in HE.
-    now apply Exists_inf_cons_tl.
+    now apply ExistsT_cons_tl.
 - inversion_clear HE0 as [ | ? ? HE ]; [ | inversion_clear HE ].
-  + now apply Exists_inf_cons_tl, Exists_inf_cons_hd.
-  + now apply Exists_inf_cons_hd.
-  + now apply Exists_inf_cons_tl, Exists_inf_cons_tl.
+  + now apply ExistsT_cons_tl, ExistsT_cons_hd.
+  + now apply ExistsT_cons_hd.
+  + now apply ExistsT_cons_tl, ExistsT_cons_tl.
 Qed.
 
-Lemma Permutation_Type_Forall2_inf A B (P : A -> B -> Type) l1 l1' l2 :
-  Permutation_Type l1 l1' -> Forall2_inf P l1 l2 ->
-  { l2' & Permutation_Type l2 l2' & Forall2_inf P l1' l2' }.
+Lemma Permutation_Type_Forall2T A B (P : A -> B -> Type) l1 l1' l2 :
+  Permutation_Type l1 l1' -> Forall2T P l1 l2 ->
+  { l2' & Permutation_Type l2 l2' & Forall2T P l1' l2' }.
 Proof.
 intros HP; revert l2; induction HP as [ | ? ? ? ? IHP | | ? ? ? HP1 IHP1 HP2 IHP2 ];
   intros l2 HF; inversion HF as [| ? y' ? ? ? HF0]; subst.

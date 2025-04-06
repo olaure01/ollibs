@@ -489,17 +489,17 @@ induction L as [|l' L IHL] in l1, l2 |- *; cbn; intro eq.
     now split with (l' :: L1, L2, l1', l2'); [ split | ]; cbn; rewrite <- ?app_assoc.
 Qed.
 
-Lemma concat_Forall2_inf A B (L : list (list A)) (l : list B) R :
-  Forall2_inf R (concat L) l -> { L' & concat L' = l & Forall2_inf (Forall2_inf R) L L' }.
+Lemma concat_Forall2T A B (L : list (list A)) (l : list B) R :
+  Forall2T R (concat L) l -> { L' & concat L' = l & Forall2T (Forall2T R) L L' }.
 Proof.
 induction L as [|l' L IHL] in l, R |- *; cbn; intro F2R.
 - inversion_clear F2R.
   now split with nil.
-- destruct Forall2_inf_app_inv_l with A B R l' (concat L) l as [(l1, l2) [] ->]; [ assumption | ].
+- destruct Forall2T_app_inv_l with A B R l' (concat L) l as [(l1, l2) [] ->]; [ assumption | ].
   destruct IHL with l2 R as [L' p1 p2]; [ assumption | ].
   split with (l1 :: L').
   + cbn. rewrite p1. reflexivity.
-  + apply Forall2_inf_cons; assumption.
+  + apply Forall2T_cons; assumption.
 Qed.
 
 (** ** [flat_map] *)
@@ -647,27 +647,27 @@ induction l1 as [|a l1 IH] in l2 |- *; intro HF; destruct l2 as [|b l2]; inversi
 Qed.
 
 
-(** ** [Forall_inf] *)
+(** ** [ForallT] *)
 
-(** Translation from [Forall_inf] to a list of dependent pairs *)
+(** Translation from [ForallT] to a list of dependent pairs *)
 
-Fixpoint list_to_Forall T P (l : list (sigT P)) : Forall_inf P (map (@projT1 T P) l) :=
+Fixpoint list_to_Forall T P (l : list (sigT P)) : ForallT P (map (@projT1 T P) l) :=
   match l with
-  | nil => Forall_inf_nil _
-  | p :: l => Forall_inf_cons (projT1 p) (projT2 p) (list_to_Forall l)
+  | nil => ForallT_nil _
+  | p :: l => ForallT_cons (projT1 p) (projT2 p) (list_to_Forall l)
   end.
 
-Fixpoint Forall_to_list T P (l : list T) (Fl : Forall_inf P l) : list (sigT P) :=
+Fixpoint Forall_to_list T P (l : list T) (Fl : ForallT P l) : list (sigT P) :=
   match Fl with
-  | Forall_inf_nil _ => nil
-  | Forall_inf_cons x Px Fl => (existT P x Px) :: (Forall_to_list Fl)
+  | ForallT_nil _ => nil
+  | ForallT_cons x Px Fl => (existT P x Px) :: (Forall_to_list Fl)
   end.
 
 Lemma Forall_to_list_support T P L FL :
   map (@projT1 _ _) (@Forall_to_list T P L FL) = L.
 Proof. induction FL as [|? ? ? ? IHFL]; [ | cbn; rewrite IHFL ]; reflexivity. Defined.
 
-Lemma Forall_to_list_length T P (l : list T) (Fl : Forall_inf P l) :
+Lemma Forall_to_list_length T P (l : list T) (Fl : ForallT P l) :
   length (Forall_to_list Fl) = length l.
 Proof. induction Fl as [|? ? ? ? IHFl]; [ | cbn; rewrite IHFl ]; reflexivity. Defined.
 
@@ -675,18 +675,18 @@ Lemma Forall_to_list_to_Forall T P : forall L FL,
  rew (Forall_to_list_support _) in list_to_Forall (@Forall_to_list T P L FL) = FL.
 Proof.
 intros L FL. induction FL as [|x l p FL IHFL]; [ reflexivity | ].
-transitivity (Forall_inf_cons x p
-             (rew [Forall_inf P] Forall_to_list_support FL in
+transitivity (ForallT_cons x p
+             (rew [ForallT P] Forall_to_list_support FL in
                  list_to_Forall (Forall_to_list FL))).
 - clear. simpl. destruct (Forall_to_list_support FL). reflexivity.
 - rewrite IHFL. reflexivity.
 Qed.
 
 
-(** ** [Forall2_inf] *)
+(** ** [Forall2T] *)
 
-Lemma Forall2_inf_in_l A B (R : A -> B -> Type) l1 l2 a :
-  Forall2_inf R l1 l2 -> InT a l1 -> { b & InT b l2 & R a b }.
+Lemma Forall2T_inT_l A B (R : A -> B -> Type) l1 l2 a :
+  Forall2T R l1 l2 -> InT a l1 -> { b & InT b l2 & R a b }.
 Proof.
 intro HF. induction HF as [| x y ? ? ? ? IHF]; intros [].
 - subst. now split with y; [ left | ].
@@ -694,8 +694,8 @@ intro HF. induction HF as [| x y ? ? ? ? IHF]; intros [].
   now split with b; [ right | ].
 Qed.
 
-Lemma Forall2_inf_in_r A B (R : A -> B -> Type) l1 l2 b :
-  Forall2_inf R l1 l2 -> InT b l2 -> { a & InT a l1 & R a b }.
+Lemma Forall2T_inT_r A B (R : A -> B -> Type) l1 l2 b :
+  Forall2T R l1 l2 -> InT b l2 -> { a & InT a l1 & R a b }.
 Proof.
 intro HF. induction HF as [| x y ? ? ? ? IHF]; intros [].
 - subst. now split with x; [ left | ].
@@ -703,11 +703,11 @@ intro HF. induction HF as [| x y ? ? ? ? IHF]; intros [].
   now split with a; [ right | ].
 Qed.
 
-Lemma Forall2_inf_rev A B (R : A -> B -> Type) l1 l2 : Forall2_inf R l1 l2 -> Forall2_inf R (rev l1) (rev l2).
+Lemma Forall2T_rev A B (R : A -> B -> Type) l1 l2 : Forall2T R l1 l2 -> Forall2T R (rev l1) (rev l2).
 Proof.
 induction l1 as [|a l1 IH] in l2 |- *; intro HF; destruct l2 as [|b l2]; inversion_clear HF.
 - constructor.
-- cbn. apply Forall2_inf_app.
+- cbn. apply Forall2T_app.
   + apply IH. assumption.
   + now constructor.
 Qed.
@@ -806,22 +806,22 @@ Ltac in_solve :=
     end);
   intuition auto with *; fail.
 
-Ltac Forall_inf_simpl_hyp :=
+Ltac ForallT_simpl_hyp :=
   repeat (
     match goal with
-    | H:Forall_inf _ (_ ++ _) |- _ => let H1 := fresh H in assert (H1 := Forall_inf_app_l _ _ H);
-                                      let H2 := fresh H in assert (H2 := Forall_inf_app_r _ _ H);
-                                      clear H
-    | H:Forall_inf _ (_ :: _) |- _ => inversion H; clear H
+    | H:ForallT _ (_ ++ _) |- _ => let H1 := fresh H in assert (H1 := ForallT_app_l _ _ H);
+                                   let H2 := fresh H in assert (H2 := ForallT_app_r _ _ H);
+                                   clear H
+    | H:ForallT _ (_ :: _) |- _ => inversion H; clear H
     end).
-Ltac Forall_inf_solve_rec :=
+Ltac ForallT_solve_rec :=
   match goal with
-  | |- Forall_inf _ (_ ++ _) => apply Forall_inf_app; Forall_inf_solve_rec
-  | |- Forall_inf _ (_ :: _) => constructor; [ assumption | Forall_inf_solve_rec ]
-  | |- Forall_inf _ nil => constructor
+  | |- ForallT _ (_ ++ _) => apply ForallT_app; ForallT_solve_rec
+  | |- ForallT _ (_ :: _) => constructor; [ assumption | ForallT_solve_rec ]
+  | |- ForallT _ nil => constructor
   | _ => try assumption
   end.
-Ltac Forall_inf_solve := Forall_inf_simpl_hyp; cbn; Forall_inf_solve_rec; fail.
+Ltac ForallT_solve := ForallT_simpl_hyp; cbn; ForallT_solve_rec; fail.
 
 
 (** reflect *)
@@ -839,8 +839,8 @@ destruct (f a), (forallb f l); inversion Hspec as [Hspect|Hspecf]; inversion IHl
 - intro HF. apply IHlf. inversion HF. assumption.
 Qed.
 
-Lemma Forall_inf_forallb_reflectT A P f (l : list A) :
-  (forall a, reflectT (P a) (f a)) -> reflectT (Forall_inf P l) (forallb f l).
+Lemma ForallT_forallb_reflectT A P f (l : list A) :
+  (forall a, reflectT (P a) (f a)) -> reflectT (ForallT P l) (forallb f l).
 Proof.
 intro Hspec. induction l as [|a l IHl]; [ constructor; constructor | cbn ].
 specialize (Hspec a).

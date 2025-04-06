@@ -276,24 +276,24 @@ apply Permutation_Type_Exists with l1, HE.
 apply CPermutation_Permutation_Type, HC.
 Qed.
 
-#[export] Instance CPermutation_Type_Forall_inf A (P : A -> Type) :
-  Proper (@CPermutation_Type A ==> arrow) (Forall_inf P).
+#[export] Instance CPermutation_Type_ForallT A (P : A -> Type) :
+  Proper (@CPermutation_Type A ==> arrow) (ForallT P).
 Proof.
 intros l1 l2 HC HF.
-apply Permutation_Type_Forall_inf with l1, HF.
+apply Permutation_Type_ForallT with l1, HF.
 apply CPermutation_Permutation_Type, HC.
 Qed.
 
-#[export] Instance CPermutation_Type_Exists_inf A (P : A -> Type) :
-  Proper (@CPermutation_Type A ==> arrow) (Exists_inf P).
+#[export] Instance CPermutation_Type_ExistsT A (P : A -> Type) :
+  Proper (@CPermutation_Type A ==> arrow) (ExistsT P).
 Proof.
 intros l1 l2 HC HE.
-apply Permutation_Type_Exists_inf with l1, HE.
+apply Permutation_Type_ExistsT with l1, HE.
 apply CPermutation_Permutation_Type, HC.
 Qed.
 
-Lemma CPermutation_Type_Forall2_inf A B (P : A -> B -> Type) l1 l1' l2 :
-  CPermutation_Type l1 l1' -> Forall2_inf P l1 l2 -> { l2' & CPermutation_Type l2 l2' & Forall2_inf P l1' l2' }.
+Lemma CPermutation_Type_Forall2T A B (P : A -> B -> Type) l1 l1' l2 :
+  CPermutation_Type l1 l1' -> Forall2T P l1 l2 -> { l2' & CPermutation_Type l2 l2' & Forall2T P l1' l2' }.
 Proof.
 intro HP. induction HP as [lc1 lc1'] in l2 |- *; intro HF; inversion HF as [HF' | a b la lb Hab HF' Ha]; subst.
 - exists nil.
@@ -304,10 +304,10 @@ intro HP. induction HP as [lc1 lc1'] in l2 |- *; intro HF; inversion HF as [HF' 
     exists (b :: lb).
     * reflexivity.
     * rewrite app_nil_r. assumption.
-  + apply Forall2_inf_app_inv_l in HF' as [(la', lb') [HF1 HF2] ->].
+  + apply Forall2T_app_inv_l in HF' as [(la', lb') [HF1 HF2] ->].
     exists (lb' ++ b :: la').
     * rewrite app_comm_cons. constructor.
-    * apply Forall2_inf_app; [ | constructor ]; assumption.
+    * apply Forall2T_app; [ | constructor ]; assumption.
 Qed.
 
 Lemma CPermutation_Type_image A B (f : A -> B) a l l' :

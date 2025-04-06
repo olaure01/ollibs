@@ -74,8 +74,8 @@ intros Hspec1 Hspec2.
 destruct b1, b2; cbn; constructor; inversion Hspec1; inversion Hspec2; try intro; intuition contradiction.
 Qed.
 
-Lemma Forall_inf_filter A f P (l : list A) :
-  (forall a, reflectT (P a) (f a)) -> Forall_inf P (filter f l).
+Lemma ForallT_filter A f P (l : list A) :
+  (forall a, reflectT (P a) (f a)) -> ForallT P (filter f l).
 Proof.
 intros Hspec. induction l as [|a l IHl]; cbn; [ constructor | ].
 destruct (Hspec a); [ constructor | ]; assumption.
