@@ -1,5 +1,5 @@
-From Stdlib Require Import PeanoNat List.
-From OLlibs Require Import List_more List_Type.
+From Stdlib Require Import PeanoNat.
+From OLlibs Require Import List_more.
 Import ListNotations.
 
 (* Set Mangle Names. Set Mangle Names Light. *)

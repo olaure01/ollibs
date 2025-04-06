@@ -2,7 +2,7 @@
 
 From Stdlib Require Export Eqdep_dec.
 From Stdlib Require Import PeanoNat List.
-From OLlibs Require Import List_Type.
+From OLlibs Require Import ListT.
 
 (* Set Mangle Names. Set Mangle Names Light. *)
 Set Default Goal Selector "!".

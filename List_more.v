@@ -6,7 +6,7 @@ Usefull tactics and properties apparently missing in the [List] library. *)
 From Stdlib Require Import PeanoNat.
 From Stdlib Require Export List.
 From OLlibs Require Import Datatypes_more Bool_more.
-From OLlibs Require Export List_Type.
+From OLlibs Require Export ListT.
 Import EqNotations.
 
 (* Set Mangle Names. Set Mangle Names Light. *)

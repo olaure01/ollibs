@@ -2,7 +2,7 @@
    Sorting/Permutation.v *)
 
 From Stdlib Require Import List PeanoNat Compare_dec CMorphisms FinFun Permutation.
-From OLlibs Require Import List_Type.
+From OLlibs Require Import ListT.
 Import ListNotations. (* For notations [] and [a;b;c] *)
 
 (* Set Mangle Names. Set Mangle Names Light. *)

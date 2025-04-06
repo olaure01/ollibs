@@ -1,7 +1,7 @@
 (** Infinite Types *)
 
 From Stdlib Require Import Bool PeanoNat Lia List.
-From OLlibs Require Import funtheory List_Type.
+From OLlibs Require Import funtheory ListT.
 From OLlibs Require Export inhabitedT dectype.
 
 (* Set Mangle Names. Set Mangle Names Light. *)

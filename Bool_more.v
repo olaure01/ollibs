@@ -2,7 +2,7 @@
 
 From Stdlib Require Import List.
 From Stdlib Require Export Bool.
-From OLlibs Require Import Datatypes_more List_Type.
+From OLlibs Require Import Datatypes_more ListT.
 
 (* Set Mangle Names. Set Mangle Names Light. *)
 Set Default Goal Selector "!".
