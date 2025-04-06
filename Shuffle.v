@@ -207,7 +207,6 @@ inversion s'' as [ | x l1 l2 l3 | x l1 l2 l3 ]; subst.
 - exists l1', l1'', l2', l2. now split; [ right | ].
 Qed.
 
-(* TODO same with [Permutation_Type]? *)
 Lemma Permutation_shuffle A (l1 l2 l3 : list A) :
   shuffle l1 l2 l3 -> Permutation (l1 ++ l2) l3.
 Proof.
@@ -217,7 +216,6 @@ intro s. induction s.
 - symmetry. apply Permutation_cons_app. symmetry. assumption.
 Qed.
 
-(* TODO same with [Permutation_Type]? *)
 Lemma shuffle_Permutation A (l1 l2 l3 l3' : list A) : shuffle l1 l2 l3 -> Permutation l3 l3' ->
   exists l1' l2', Permutation l1 l1' /\ Permutation l2 l2' /\ shuffle l1' l2' l3'.
 Proof.
@@ -272,7 +270,6 @@ intro s. induction s as [ | x l' l'' l''' s IHs | x l' l'' l''' s IHs ] in l3' |
       -- cbn. apply shuffle_r. assumption.
 Qed.
 
-(* TODO same with [Permutation_Type]? *)
 Lemma Permutation_app_shuffle A (l1 l2 l3 : list A) : Permutation (l1 ++ l2) l3 ->
   exists l1' l2', Permutation l1 l1' /\ Permutation l2 l2' /\ shuffle l1' l2' l3.
 Proof. intro p. refine (shuffle_Permutation _ p). apply shuffle_app. Qed.

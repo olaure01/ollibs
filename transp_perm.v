@@ -1,7 +1,7 @@
 (** Transposition function on elements of a list *)
 
 From Stdlib Require Import List Lia.
-From OLlibs Require Import funtheory Permutation_Type.
+From OLlibs Require Import funtheory PermutationT.
 
 (* Set Mangle Names. Set Mangle Names Light. *)
 Set Default Goal Selector "!".
@@ -78,13 +78,13 @@ Proof.
 revert l. induction n as [|n IHn]; intros [|? l]; [ | destruct l | | cbn; rewrite IHn ]; reflexivity.
 Qed.
 
-Lemma transp_perm A n (l : list A) : Permutation_Type l (transp n l).
+Lemma transp_perm A n (l : list A) : PermutationT l (transp n l).
 Proof.
 revert l. induction n; intros [|? l]; cbn; auto.
 destruct l; repeat constructor.
 Qed.
 
-Lemma perm_transp A (l1 l2 : list A) : Permutation_Type l1 l2 ->
+Lemma perm_transp A (l1 l2 : list A) : PermutationT l1 l2 ->
   { l | l2 = fold_right transp l1 l }.
 Proof.
 intro HP. induction HP as [ | a l1 l2 _ [l0 ->] | | l1 l2 l3 HP1 IHHP1 HP2 [l2' ->]].

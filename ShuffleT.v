@@ -1,5 +1,5 @@
 From Stdlib Require Import List.
-From OLlibs Require Import Datatypes_more List_more SubList Permutation_Type_more Shuffle.
+From OLlibs Require Import Datatypes_more List_more SubList PermutationT_more Shuffle.
 Import ListNotations.
 
 (* Set Mangle Names. Set Mangle Names Light. *)
@@ -210,78 +210,78 @@ inversion s'' as [ | x l1 l2 l3 | x l1 l2 l3 ]; subst.
 - now exists (l1', l1'', l2', l2); [ right | ].
 Qed.
 
-Lemma Permutation_Type_shuffleT A (l1 l2 l3 : list A) :
-  shuffleT l1 l2 l3 -> Permutation_Type (l1 ++ l2) l3.
+Lemma PermutationT_shuffleT A (l1 l2 l3 : list A) :
+  shuffleT l1 l2 l3 -> PermutationT (l1 ++ l2) l3.
 Proof.
 intro s. induction s.
-- apply Permutation_Type_nil_nil.
-- now apply Permutation_Type_cons.
-- symmetry. apply Permutation_Type_cons_app. symmetry. assumption.
+- apply PermutationT_nil_nil.
+- now apply PermutationT_cons.
+- symmetry. apply PermutationT_cons_app. symmetry. assumption.
 Qed.
 
-Lemma shuffleT_Permutation_Type A (l1 l2 l3 l3' : list A) : shuffleT l1 l2 l3 -> Permutation_Type l3 l3' ->
-  {'(l1', l2') & (Permutation_Type l1 l1' * Permutation_Type l2 l2')%type & shuffleT l1' l2' l3' }.
+Lemma shuffleT_PermutationT A (l1 l2 l3 l3' : list A) : shuffleT l1 l2 l3 -> PermutationT l3 l3' ->
+  {'(l1', l2') & (PermutationT l1 l1' * PermutationT l2 l2')%type & shuffleT l1' l2' l3' }.
 Proof.
 intro s. induction s as [ | x l' l'' l''' s IHs | x l' l'' l''' s IHs ] in l3' |-; intro p.
 - exists (nil, nil).
   + split; reflexivity.
-  + rewrite (Permutation_Type_nil p). apply shuffleT_nil.
-- assert (p' := p). symmetry in p'. apply Permutation_Type_vs_cons_inv in p' as [(l31, l32) ->].
-  apply Permutation_Type_cons_app_inv in p.
+  + rewrite (PermutationT_nil p). apply shuffleT_nil.
+- assert (p' := p). symmetry in p'. apply PermutationT_vs_cons_inv in p' as [(l31, l32) ->].
+  apply PermutationT_cons_app_inv in p.
   apply IHs in p as [(l1', l2') [p1 p2] s'].
   clear s IHs l'''. induction l31 as [|b l31 IHl] in l', l1', l'', l2', s', p1, p2 |- *.
   + exists (x :: l1', l2').
-    * now split; [ apply Permutation_Type_cons | ].
+    * now split; [ apply PermutationT_cons | ].
     * cbn. apply shuffleT_l. assumption.
   + cbn in s'. inversion s' as [ | y l0' l0'' l0''' s'' | y l0' l0'' l0''' s'' ]; subst.
-    * assert (p' := p1). apply Permutation_Type_vs_cons_inv in p' as [(l11, l12) ->].
-      symmetry in p1. apply Permutation_Type_cons_app_inv in p1. symmetry in p1.
+    * assert (p' := p1). apply PermutationT_vs_cons_inv in p' as [(l11, l12) ->].
+      symmetry in p1. apply PermutationT_cons_app_inv in p1. symmetry in p1.
       destruct (IHl _ _ _ _ p1 p2 s'') as [(l1'', l2'') [] ].
       exists (b :: l1'', l2'').
       -- split; [ | assumption ].
-         symmetry. rewrite app_comm_cons. apply Permutation_Type_cons_app. cbn.
+         symmetry. rewrite app_comm_cons. apply PermutationT_cons_app. cbn.
          symmetry. assumption.
       -- cbn. apply shuffleT_l. assumption.
-    * assert (p' := p2). apply Permutation_Type_vs_cons_inv in p' as [(l21, l22) ->].
-      symmetry in p2. apply Permutation_Type_cons_app_inv in p2. symmetry in p2.
+    * assert (p' := p2). apply PermutationT_vs_cons_inv in p' as [(l21, l22) ->].
+      symmetry in p2. apply PermutationT_cons_app_inv in p2. symmetry in p2.
       destruct (IHl _ _ _ _ p1 p2 s'') as [(l1'', l2'') [] ].
       exists (l1'', b :: l2'').
       -- split; [ assumption | ].
-         symmetry. apply Permutation_Type_cons_app. cbn.
+         symmetry. apply PermutationT_cons_app. cbn.
          symmetry. assumption.
       -- cbn. apply shuffleT_r. assumption.
-- assert (p' := p). symmetry in p'. apply Permutation_Type_vs_cons_inv in p' as [(l31, l32) ->].
-  apply Permutation_Type_cons_app_inv in p.
+- assert (p' := p). symmetry in p'. apply PermutationT_vs_cons_inv in p' as [(l31, l32) ->].
+  apply PermutationT_cons_app_inv in p.
   apply IHs in p as [(l1', l2') [p1 p2] s'].
   clear s IHs l'''. induction l31 as [|b l31 IHl] in l', l1', l'', l2', s', p1, p2 |- *.
   + exists (l1', x :: l2').
-    * now split; [ | apply Permutation_Type_cons ].
+    * now split; [ | apply PermutationT_cons ].
     * cbn. apply shuffleT_r. assumption.
   + cbn in s'. inversion s' as [ | y l0' l0'' l0''' s'' | y l0' l0'' l0''' s'' ]; subst.
-    * assert (p' := p1). apply Permutation_Type_vs_cons_inv in p' as [(l11, l12) ->].
-      symmetry in p1. apply Permutation_Type_cons_app_inv in p1. symmetry in p1.
+    * assert (p' := p1). apply PermutationT_vs_cons_inv in p' as [(l11, l12) ->].
+      symmetry in p1. apply PermutationT_cons_app_inv in p1. symmetry in p1.
       destruct (IHl _ _ _ _ p1 p2 s'') as [(l1'', l2'') [] ].
       exists (b :: l1'', l2'').
       -- split; [ | assumption ].
-         symmetry. apply Permutation_Type_cons_app. cbn.
+         symmetry. apply PermutationT_cons_app. cbn.
          symmetry. assumption.
       -- cbn. apply shuffleT_l. assumption.
-    * assert (p' := p2). apply Permutation_Type_vs_cons_inv in p' as [(l21, l22) ->].
-      symmetry in p2. apply Permutation_Type_cons_app_inv in p2. symmetry in p2.
+    * assert (p' := p2). apply PermutationT_vs_cons_inv in p' as [(l21, l22) ->].
+      symmetry in p2. apply PermutationT_cons_app_inv in p2. symmetry in p2.
       destruct (IHl _ _ _ _ p1 p2 s'') as [(l1'', l2'') [] ].
       exists (l1'', b :: l2'').
       -- split; [ assumption | ].
-         symmetry. rewrite app_comm_cons. apply Permutation_Type_cons_app. cbn.
+         symmetry. rewrite app_comm_cons. apply PermutationT_cons_app. cbn.
          symmetry. assumption.
       -- cbn. apply shuffleT_r. assumption.
 Qed.
 
-Lemma Permutation_Type_app_shuffleT A (l1 l2 l3 : list A) : Permutation_Type (l1 ++ l2) l3 ->
-  {'(l1', l2') & (Permutation_Type l1 l1' * Permutation_Type l2 l2')%type & shuffleT l1' l2' l3}.
-Proof. intro p. refine (shuffleT_Permutation_Type _ p). apply shuffleT_app. Qed.
+Lemma PermutationT_app_shuffleT A (l1 l2 l3 : list A) : PermutationT (l1 ++ l2) l3 ->
+  {'(l1', l2') & (PermutationT l1 l1' * PermutationT l2 l2')%type & shuffleT l1' l2' l3}.
+Proof. intro p. refine (shuffleT_PermutationT _ p). apply shuffleT_app. Qed.
 
 Lemma shuffleT_length A (l1 l2 l3 : list A) : shuffleT l1 l2 l3 -> length l1 + length l2 = length l3.
-Proof. intros s%Permutation_Type_shuffleT%Permutation_Type_length. rewrite <- length_app. assumption. Qed.
+Proof. intros s%PermutationT_shuffleT%PermutationT_length. rewrite <- length_app. assumption. Qed.
 
 Lemma shuffleT_map A B (f : A -> B) l1 l2 l3 :
   shuffleT l1 l2 l3 -> shuffleT (map f l1) (map f l2) (map f l3).
@@ -335,7 +335,7 @@ intro s. induction s as [ | x l' l'' l''' s IHs | x l' l'' l''' s IHs ]; intro H
 - inversion Hnd. subst.
   constructor.
   + intro Hin.
-    apply Permutation_Type_shuffleT, (Permutation_Type_inT x) in s.
+    apply PermutationT_shuffleT, (PermutationT_inT x) in s.
     * contradiction s.
     * apply inT_sum_app. left. assumption.
   + apply IHs. assumption.

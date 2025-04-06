@@ -29,7 +29,7 @@ Manual installation procedure:
 * `nattree`         : nat-labelled trees and coding into nat
 * `Wf_nat_more`     : well-founded order on products of `nat`
 * `Vector_more`     : add-ons for standard library Vector
-* `List_Type`       : `List` with output in `Type`
+* `ListT`           : `List` with output in `Type`
 * `inhabitedT`      : `inhabited` with output in `Type`
 * `SubList`         : sub-list of a list with no modification in order
 * `Shuffle`         : shuffle predicate for pairs of lists
@@ -39,8 +39,8 @@ Manual installation procedure:
 
 * `fmsetlist`               : finite multisets with Rocq equality
 * `fmsetoidlist`            : finite multisets as setoid
-* `fmsetlist_Type`          : `fmsetlist` with output in `Type`
-* `fmsetoidlist_Type`       : `fmsetoidlist` with output in `Type`
+* `fmsetlistT`              : `fmsetlist` with output in `Type`
+* `fmsetoidlistT`           : `fmsetoidlist` with output in `Type`
 
 ## Around Permutations
 
@@ -51,19 +51,19 @@ Manual installation procedure:
     * permutation and equality
     * permutation and cyclic permutation and equality
 * `transp_perm`             : transpositions
-* `Permutation_Type`        : `Permutation` with output in `Type`
-* `Permutation_Type_more`   : `Permutation_more` with output in `Type`
-* `CPermutation_Type`       : `CyclicPerm` with output in `Type`
-* `GPermutation_Type`       : `genperm` with output in `Type`
+* `PermutationT`            : `Permutation` with output in `Type`
+* `PermutationT_more`       : `Permutation_more` with output in `Type`
+* `CPermutationT`           : `CyclicPerm` with output in `Type`
+* `GPermutationT`           : `genperm` with output in `Type`
 * `Permutation_solve`       : automatic tactic for permutation goals
 * `CPermutation_solve`      : automatic tactic for cyclic permutation goals
-* `Permutation_Type_solve`  : `Permutation_solve` with output in `Type`
-* `CPermutation_Type_solve` : `CPermutation_solve` with output in `Type`
+* `PermutationT_solve`      : `Permutation_solve` with output in `Type`
+* `CPermutationT_solve`     : `CPermutation_solve` with output in `Type`
 
 ## Misc
 
 * `flat_map_more`           : decomposition properties for `flat_map`
-* `Dependent_Forall_Type`   : generalization of `Forall_inf` to dependent product
+* `Dependent_ForallT`      : generalization of `Forall_inf` to dependent product
 * `issue12394`              : work around for [Issue #12394](https://github.com/rocq-prover/rocq/issues/12394)
 
 ----

@@ -925,7 +925,7 @@ Section Exists_Forall.
 
   Variable A:Type.
 
-  Section One_predicate_Type.
+  Section OnePredicateType.
 
     Variable P:A->Type.
 
@@ -1145,7 +1145,7 @@ Section Exists_Forall.
       apply ForallT_forall with (x:=a) in HF; intuition.
     Qed.
 
-  End One_predicate_Type.
+  End OnePredicateType.
 
   Lemma ExistsT_Exists (P:A->Prop) l : ExistsT P l -> Exists P l.
   Proof. now induction 1; constructor. Qed.

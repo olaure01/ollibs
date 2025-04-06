@@ -1,4 +1,4 @@
-(** Finite Multiset over Lists
+(** Finite Multiset over Lists relying on [PermutationT]
 
 We define an axiomatization of finite multisets through their relation with lists.
 Equality is required to be Rocq equality.
@@ -7,7 +7,7 @@ An implementation of the axioms is provided by sorted lists
 for every type equiped with a Boolean-valued total order relation. *)
 
 From Stdlib Require Import Bool List CMorphisms.
-From OLlibs Require Import BOrders Permutation_Type_more.
+From OLlibs Require Import BOrders PermutationT_more.
 
 (* Set Mangle Names. Set Mangle Names Light. *)
 Set Default Goal Selector "!".
@@ -23,9 +23,9 @@ Class FinMultiset M A := {
   empty : M;
   add : A -> M -> M;
   elts : M -> list A;
-  elts_add a m : Permutation_Type (elts (add a m)) (a :: elts m);
+  elts_add a m : PermutationT (elts (add a m)) (a :: elts m);
   elts_retract m : fold_right add empty (elts m) = m;
-  perm_eq l1 l2 : Permutation_Type l1 l2 -> fold_right add empty l1 = fold_right add empty l2 }.
+  perm_eq l1 l2 : PermutationT l1 l2 -> fold_right add empty l1 = fold_right add empty l2 }.
 
 (** [Mst] and [Elt] define a finite multiset construction over a type [K]
     if for any [A] in [K], [Mst A] is a finite multiset with elements [Elt A]. *)
@@ -41,7 +41,7 @@ Section FMSet2List.
 
   Definition list2fm := fold_right add empty.
 
-  #[export] Instance list2fm_perm : Proper (@Permutation_Type A ==> eq) list2fm
+  #[export] Instance list2fm_perm : Proper (@PermutationT A ==> eq) list2fm
     := perm_eq.
 
   Lemma list2fm_retract m : list2fm (elts m) = m.
@@ -56,26 +56,26 @@ Section FMSet2List.
   symmetry.
   change (add a (list2fm (l1 ++ l2)))
     with (list2fm (a :: l1 ++ l2)).
-  apply perm_eq, Permutation_Type_middle.
+  apply perm_eq, PermutationT_middle.
   Qed.
 
   Lemma list2fm_cons l a : list2fm (a :: l) = add a (list2fm l).
   Proof. now rewrite <- (app_nil_l (a :: l)), list2fm_elt. Qed.
 
-  Lemma elts_perm_empty l : Permutation_Type (elts (list2fm l)) (l ++ elts empty).
+  Lemma elts_perm_empty l : PermutationT (elts (list2fm l)) (l ++ elts empty).
   Proof. induction l as [|a l IHl]; [ | cbn; rewrite elts_add, IHl ]; reflexivity. Qed.
 
   Lemma elts_empty : elts empty = nil.
   Proof.
-  apply Permutation_Type_nil, (Permutation_Type_app_inv_l (elts empty)).
+  apply PermutationT_nil, (PermutationT_app_inv_l (elts empty)).
   rewrite app_nil_r, <- list2fm_retract at 1.
   apply elts_perm_empty.
   Qed.
 
-  Lemma elts_perm l : Permutation_Type (elts (list2fm l)) l.
+  Lemma elts_perm l : PermutationT (elts (list2fm l)) l.
   Proof. rewrite <- (app_nil_r l) at 2. rewrite <- elts_empty. apply elts_perm_empty. Qed.
 
-  #[export] Instance elts_perm' : Proper (eq ==> @Permutation_Type A) elts.
+  #[export] Instance elts_perm' : Proper (eq ==> @PermutationT A) elts.
   Proof. now intros m1 m2 Heq ; subst. Qed.
 
   Lemma elts_eq_nil m : elts m = nil -> m = empty.
@@ -84,7 +84,7 @@ Section FMSet2List.
   now assert (Hr := elts_retract m); rewrite Heq in Hr; simpl in Hr; subst.
   Qed.
 
-  Lemma Permutation_Type_elts_eq m1 m2 : Permutation_Type (elts m1) (elts m2) -> m1 = m2.
+  Lemma PermutationT_elts_eq m1 m2 : PermutationT (elts m1) (elts m2) -> m1 = m2.
   Proof. intros HP%perm_eq. rewrite ! elts_retract in HP. assumption. Qed.
 
   Lemma add_swap m a b : add a (add b m) = add b (add a m).
@@ -93,19 +93,19 @@ Section FMSet2List.
   rewrite <- list2fm_retract at 1.
   apply list2fm_perm.
   etransitivity ; [ apply elts_add | ].
-  etransitivity ; [ apply Permutation_Type_cons ;
+  etransitivity ; [ apply PermutationT_cons ;
                       [ reflexivity | apply elts_add ] | ].
   symmetry.
   etransitivity ; [ apply elts_add | ].
-  etransitivity ; [ apply Permutation_Type_cons ;
+  etransitivity ; [ apply PermutationT_cons ;
                       [ reflexivity | apply elts_add ] | ].
-  apply Permutation_Type_swap.
+  apply PermutationT_swap.
   Qed.
 
   Definition sum m1 m2 := list2fm (elts m1 ++ elts m2).
 
   Lemma elts_sum m1 m2 :
-    Permutation_Type (elts (sum m1 m2)) (elts m1 ++ elts m2).
+    PermutationT (elts (sum m1 m2)) (elts m1 ++ elts m2).
   Proof. apply elts_perm. Qed.
 
   Lemma sum_empty_left m : sum empty m = m.
@@ -115,23 +115,23 @@ Section FMSet2List.
   Proof. unfold sum; rewrite elts_empty, app_nil_r; apply elts_retract. Qed.
 
   Lemma sum_comm m1 m2 : sum m1 m2 = sum m2 m1.
-  Proof. apply list2fm_perm, Permutation_Type_app_comm. Qed.
+  Proof. apply list2fm_perm, PermutationT_app_comm. Qed.
 
   Lemma sum_ass m1 m2 m3 : sum (sum m1 m2) m3 = sum m1 (sum m2 m3).
   Proof.
   unfold sum; apply perm_eq.
   transitivity ((elts m1 ++ elts m2) ++ elts m3).
-  - apply Permutation_Type_app_tail, elts_perm.
+  - apply PermutationT_app_tail, elts_perm.
   - rewrite <- app_assoc; symmetry.
-    apply Permutation_Type_app_head, elts_perm.
+    apply PermutationT_app_head, elts_perm.
   Qed.
 
   Lemma list2fm_app l1 l2 : list2fm (l1 ++ l2) = sum (list2fm l1) (list2fm l2).
   Proof.
   unfold sum; apply perm_eq.
   transitivity (elts (list2fm l1) ++ l2); symmetry.
-  - apply Permutation_Type_app_tail, elts_perm.
-  - apply Permutation_Type_app_head, elts_perm.
+  - apply PermutationT_app_tail, elts_perm.
+  - apply PermutationT_app_head, elts_perm.
   Qed.
 
 End FMSet2List.
@@ -150,9 +150,9 @@ Section Fmmap.
   Definition fmmap (m : M) := list2fm (map f (elts m)).
 
   Lemma list2fm_map l : list2fm (map f l) = fmmap (list2fm l).
-  Proof. symmetry; apply perm_eq, Permutation_Type_map, elts_perm. Qed.
+  Proof. symmetry; apply perm_eq, PermutationT_map, elts_perm. Qed.
 
-  Lemma elts_fmmap m : Permutation_Type (elts (fmmap m)) (map f (elts m)).
+  Lemma elts_fmmap m : PermutationT (elts (fmmap m)) (map f (elts m)).
   Proof.
   rewrite <- (elts_retract m).
   remember (elts m) as l eqn:Heql; clear m Heql; induction l; simpl.
@@ -176,9 +176,9 @@ Section Induction.
   Proof.
   intros He Ha m.
   remember (elts m) as l eqn:Heql.
-  apply Permutation_Type_refl' in Heql; unfold id in Heql.
+  apply PermutationT_refl' in Heql; unfold id in Heql.
   revert m Heql; induction l as [|a l IHl]; intros m Heql.
-  - apply Permutation_Type_nil in Heql.
+  - apply PermutationT_nil in Heql.
     now apply elts_eq_nil in Heql; subst.
   - assert (Hr := elts_retract m).
     symmetry in Heql; rewrite (perm_eq Heql) in Hr; simpl in Hr; subst.
@@ -234,7 +234,7 @@ split with (@fmslist_empty A) (@fmslist_add A) (fun m => proj1_sig m).
   revert Hsort; induction l as [|a' l IHl]; simpl; intros Hsort; auto.
   destruct (leb a a'); auto.
   change (a :: a' :: l) with ((a :: nil) ++ a' :: l).
-  apply Permutation_Type_cons_app.
+  apply PermutationT_cons_app.
   apply is_sorted_tail in Hsort.
   apply (IHl Hsort).
 - intros [l Hsort].
