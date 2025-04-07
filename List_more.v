@@ -3,7 +3,7 @@ Usefull tactics and properties apparently missing in the [List] library. *)
 
 (* TODO once it is confirmed that deprecated tactics are subsumed by Type versions, remove them *)
 
-From Stdlib Require Import PeanoNat.
+From Stdlib Require Import PeanoNat Morphisms.
 From Stdlib Require Export List.
 From OLlibs Require Import Datatypes_more Bool_more.
 From OLlibs Require Export ListT.
@@ -577,6 +577,9 @@ Proof.
 intro Hincl. change (a :: l1) with ((a :: nil) ++ l1). change (a :: l2) with ((a :: nil) ++ l2).
 apply incl_app_app; [ intros ? ? | ]; assumption.
 Qed.
+
+#[export] Instance incl_preorder A : PreOrder (@incl A).
+Proof. split; intro; [ apply incl_refl | apply incl_tran ]. Qed.
 
 
 (** ** [NoDup] *)
