@@ -39,7 +39,7 @@ Lemma compose_retract A B C (s1 : B -> A) (s2 : C -> B) i1 i2 :
   retract s1 i1 -> retract s2 i2 -> retract (compose s1 s2) (compose i2 i1).
 Proof. intros Hr1 Hr2 x. unfold compose. rewrite Hr2, Hr1. reflexivity. Qed.
 
-Definition embedding A B := {'(s,i) : _ * (A -> B) | retract s i }.
+Definition embedding A B := {'(s,i) : (B -> A) * (A -> B) | retract s i }.
 
 Lemma id_embedding A : embedding A A.
 Proof. exists (id, id). unfold retract, id. reflexivity. Qed.
@@ -252,14 +252,48 @@ Qed.
 Definition ext_eq A B (f g : A -> B) := forall a, f a = g a.
 Notation " f ~ g " := (ext_eq f g) (at level 60).
 
-Lemma compose_ext_eq  A B C (f1 g1 : A -> B) (f2 g2 : B -> C) :
+Lemma compose_ext_eq A B C (f1 g1 : A -> B) (f2 g2 : B -> C) :
   f1 ~ g1 -> f2 ~ g2 -> compose f2 f1 ~ compose g2 g1.
 Proof.
 intros Hext1 Hext2 x.
 unfold compose. rewrite (Hext1 x), (Hext2 (g1 x)). reflexivity.
 Qed.
 
-(* TODO develop this section with properties: equivalence relation, compatibility, etc. *)
+#[export] Instance ext_eq_refl A B : Reflexive (@ext_eq A B).
+Proof. intros f x. reflexivity. Qed.
+
+#[export] Instance ext_eq_sym A B : Symmetric (@ext_eq A B).
+Proof. intros f g Heq x. rewrite (Heq x). reflexivity. Qed.
+
+#[export] Instance ext_eq_trans A B : Transitive (@ext_eq A B).
+Proof. intros f g h Heq1 Heq2 x. rewrite (Heq1 x), (Heq2 x). reflexivity. Qed.
+
+Lemma id_compose_ext A B (f : A -> B) : compose id f ~ f.
+Proof. intro x. reflexivity. Qed.
+
+Lemma compose_id_ext A B (f : A -> B) : compose f id ~ f.
+Proof. intro x. reflexivity. Qed.
+
+Lemma compose_assoc_ext A B C D (f : A -> B) (g : B -> C) (h : C -> D) :
+  compose h (compose g f) ~ compose (compose h g) f.
+Proof. intro x. reflexivity. Qed.
+
+Lemma injective_ext A B (f g : A -> B) : injective f -> f ~ g -> injective g.
+Proof. intros Hi Heq x y Hg. apply Hi. rewrite (Heq x), (Heq y). assumption. Qed.
+
+Lemma surjective_ext A B (f g : A -> B) : surjective f -> f ~ g -> surjective g.
+Proof. intros Hs Heq y. destruct (Hs y) as [x ->]. exists x. apply Heq. Qed.
+
+Lemma bijective_ext A B (f g : A -> B) : bijective f -> f ~ g -> bijective g.
+Proof.
+intros Hs Heq y. destruct (Hs y) as [x -> Hi]. exists x.
+- apply Heq.
+- intros y Hy. apply Hi.
+  rewrite (Heq y). assumption.
+Qed.
+
+Lemma map_ext A B (f g : A -> B) : f ~ g -> map f ~ map g.
+Proof. intros Heq l. induction l as [|a l IHl]; [ | cbn; rewrite IHl, (Heq a) ]; reflexivity. Qed.
 
 
 (** * Additional definitions *)
