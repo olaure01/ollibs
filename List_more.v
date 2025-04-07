@@ -646,6 +646,38 @@ induction l1 as [|a l1 IH] in l2 |- *; intro HF; destruct l2 as [|b l2]; inversi
   + now constructor.
 Qed.
 
+Lemma Forall_impl_ext A (P Q : A -> Prop) l :
+  (forall a, In a l -> P a -> Q a) -> Forall P l -> Forall Q l.
+Proof.
+induction l as [|b l IHl]; cbn; intros HPQ HP; constructor; inversion_clear HP.
+- now apply HPQ; [ left | ].
+- apply IHl; [ | assumption ].
+  intros a Ha. apply HPQ. right. assumption.
+Qed.
+
+Lemma Forall_remove A (eqdec : forall x y : A, {x = y} + {x <> y}) P a l :
+  Forall P (remove eqdec a l) -> P a -> Forall P l.
+Proof.
+induction l as [|b l IHl]; cbn; intros HF HP; constructor.
+- destruct (eqdec a b) as [ -> | ]; [ | inversion HF ]; assumption.
+- refine (IHl _ HP).
+  destruct (eqdec a b); [ | inversion HF ]; assumption.
+Qed.
+
+Lemma Forall_remove_impl A (eqdec : forall x y : A, {x = y} + {x <> y}) (P Q : A -> Prop) a l :
+  Forall P (remove eqdec a l) -> (forall x, x <> a -> P x -> Q x) -> Q a -> Forall Q l.
+Proof.
+intros HP HPQ HQ.
+apply (@Forall_remove _ eqdec _ a); [ | assumption ].
+refine (Forall_impl_ext _ _ HP).
+intros x Hx. apply HPQ.
+apply in_remove in Hx. apply Hx.
+Qed.
+
+Lemma in_empty_remove_Forall A (eqdec : forall x y : A, {x = y} + {x <> y}) a l :
+  remove eqdec a l = nil -> Forall (eq a) l.
+Proof. now intros Hemp; apply (@Forall_remove _ eqdec _ a); [ rewrite Hemp | ]. Qed.
+
 
 (** ** [ForallT] *)
 
@@ -805,6 +837,23 @@ Ltac in_solve :=
     | H : In _ _ |- _ => cbn in H; apply in_app_or in H as []
     end);
   intuition auto with *; fail.
+
+Ltac Forall_simpl_hyp :=
+  repeat (
+    match goal with
+    | H:Forall _ (_ ++ _) |- _ => let H1 := fresh H in assert (H1 := proj1 (proj1 (Forall_app _ _ _) H));
+                                  let H2 := fresh H in assert (H2 := proj2 (proj1 (Forall_app _ _ _) H));
+                                  clear H
+    | H:Forall _ (_ :: _) |- _ => inversion H; clear H
+    end).
+Ltac Forall_solve_rec :=
+  match goal with
+  | |- Forall _ (_ ++ _) => apply (fun HF1 HF2 => proj2 (Forall_app _ _ _) (conj HF1 HF2)); Forall_solve_rec
+  | |- Forall _ (_ :: _) => constructor; [ assumption | Forall_solve_rec ]
+  | |- Forall _ nil => constructor
+  | _ => try assumption
+  end.
+Ltac Forall_solve := Forall_simpl_hyp; cbn; Forall_solve_rec; fail.
 
 Ltac ForallT_simpl_hyp :=
   repeat (
