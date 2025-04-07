@@ -457,3 +457,6 @@ Qed.
 
 Lemma PermutationT_incl A (l1 l2 l0 : list A) : PermutationT l1 l2 -> incl l1 l0 -> incl l2 l0.
 Proof. intros HP Hincl x Hin. symmetry in HP. apply Hincl, (PermutationT_in x HP Hin). Qed.
+
+Lemma PermutationT_repeat A (x : A) n l : PermutationT l (repeat x n) -> l = repeat x n.
+Proof. intros Heq%PermutationT_Permutation%Permutation_repeat. exact Heq. Qed.
