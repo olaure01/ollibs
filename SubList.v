@@ -1,4 +1,5 @@
 From Stdlib Require Import PeanoNat Morphisms.
+From Stdlib Require Decidable ListDec.
 From OLlibs Require Import List_more.
 Import ListNotations.
 
@@ -97,3 +98,33 @@ Proof. intro. apply sublist_antisym. Qed.
 
 Lemma sublist_Add A (a : A) l1 l2 : Add a l1 l2 -> sublist l1 l2.
 Proof. induction 1; constructor; [ apply sublist_refl | assumption ]. Qed.
+
+
+(* with decidable equality *)
+
+Lemma uniquify_map_sublist A B (eq_dec : forall x y:B, Decidable.decidable (x=y)) (f : A -> B) l :
+ exists l', NoDup (map f l') /\ incl (map f l) (map f l') /\ sublist (map f l') (map f l).
+Proof.
+induction l as [ | a l IHl ].
+- exists nil. simpl. split; [ | split ]; [ | red; trivial | ]; constructor.
+- destruct IHl as [l' [Hnd [Hinc Hsub]]].
+  destruct (ListDec.In_decidable eq_dec (f a) (map f l')).
+  + exists l'. cbn. split; [ | split ]; [ assumption | | ].
+    * intros x [|].
+      -- now subst.
+      -- now apply Hinc.
+    * constructor. assumption.
+  + exists (a :: l'). cbn. split; [ | split ].
+    * now constructor.
+    * intros x [|].
+      -- subst. now left.
+      -- right. now apply Hinc.
+    * constructor. assumption.
+Qed.
+
+Lemma uniquify_sublist A (eq_dec : forall x y:A, Decidable.decidable (x=y)) (l:list A) :
+  exists l', NoDup l' /\ incl l l' /\ sublist l' l.
+Proof.
+destruct (uniquify_map_sublist eq_dec id l) as [l' H].
+exists l'. now rewrite !map_id in H.
+Qed.
