@@ -3,7 +3,7 @@
 From Stdlib Require Import PeanoNat Compare_dec List.
 Import ListNotations.
 Open Scope list_scope.
-From OLlibs Require Import Datatypes_more.
+From OLlibs Require Import Logic_Datatypes_more.
 
 (* Set Mangle Names. Set Mangle Names Light. *)
 Set Default Goal Selector "!".

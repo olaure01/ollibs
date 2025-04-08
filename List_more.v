@@ -5,7 +5,7 @@ Usefull tactics and properties apparently missing in the [List] library. *)
 
 From Stdlib Require Import PeanoNat Morphisms.
 From Stdlib Require Export List.
-From OLlibs Require Import Datatypes_more Bool_more.
+From OLlibs Require Import Logic_Datatypes_more Bool_more.
 From OLlibs Require Export ListT.
 Import EqNotations.
 

@@ -11,7 +11,6 @@ CPermutation_more.v
 CPermutation_solve.v
 CPermutationT_solve.v
 CPermutationT.v
-Datatypes_more.v
 dectype.v
 Dependent_ForallT.v
 flat_map_more.v
@@ -27,6 +26,7 @@ inhabitedT.v
 List_assoc.v
 List_more.v
 ListT.v
+Logic_Datatypes_more.v
 nattree.v
 Permutation_more.v
 Permutation_solve.v
