@@ -2,9 +2,23 @@
 
 ## Version 2.1.0
 
-* use names ending with `T` rather than `_Type` or `_inf`
-* use `iffT` for equivalence statements in `Type`
-* use `notT` for negation in `Type`
+Ongoing development.
+
+* use names ending with `T` rather than `_Type` or `_inf` (for files and statements)
+* add `DecidableT.v` with type `decidableT`
+  * add results about decidable properties
+  * more uniform naming
+  * add `Decidable_more.v`
+  * rename `decidable_image` into `decT_image`
+* rename `Datatypes_more.v` into `Logic_Datatypes_more.v` containing extensions for both `Corelib.Logic` and `Corelib.Datatypes`
+* more use of `iffT` for equivalence statements in `Type`
+* more use of `notT` for negation in `Type`
+* add new lemmas
+  * `funtheory` : more about `ext_eq`
+  * `List_more` : `Forall_impl`, `Forall_remove*`, `Forall_solve`, `incl_preorder`
+  * `Logic_Datatypes_more` : `sum_*`, `prod_*`
+  * `PermutationT` : `PermutationT_repeat`
+  * `SubList` : `sublist_Add`, `sublist_preorder`, `sublist_antisym'`, `uniquify*_sublist`
 
 
 # Versions 2.0.x

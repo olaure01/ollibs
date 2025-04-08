@@ -11,6 +11,8 @@ CPermutation_more.v
 CPermutation_solve.v
 CPermutationT_solve.v
 CPermutationT.v
+Decidable_more.v
+DecidableT.v
 dectype.v
 Dependent_ForallT.v
 flat_map_more.v

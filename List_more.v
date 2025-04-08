@@ -3,7 +3,7 @@ Usefull tactics and properties apparently missing in the [List] library. *)
 
 (* TODO once it is confirmed that deprecated tactics are subsumed by Type versions, remove them *)
 
-From Stdlib Require Import PeanoNat Morphisms.
+From Stdlib Require Import Decidable PeanoNat Morphisms.
 From Stdlib Require Export List.
 From OLlibs Require Import Logic_Datatypes_more Bool_more.
 From OLlibs Require Export ListT.
@@ -902,3 +902,40 @@ destruct (f a), (forallb f l); inversion Hspec as [Hspect|Hspecf]; inversion IHl
 - intro HF. apply Hspecf. inversion HF. assumption.
 - intro HF. apply IHlf. inversion HF. assumption.
 Qed.
+
+
+(** * Add-ons for [Lists.ListDec] *)
+(* [Exists_dec] and [Forall_dec] exists in [Lists.List]
+   we follow here the naming convention from [List.ListDec] *)
+
+Lemma Forall_decidable_ext A (P : A -> Prop) l : (forall x, In x l -> decidable (P x)) -> decidable (Forall P l).
+Proof.
+intro Pdec. induction l as [|a l' Hrec].
+- left. apply Forall_nil.
+- destruct Hrec as [Hl'|Hl'].
+  + intros x Hinx. apply Pdec. right. assumption.
+  + destruct (Pdec a) as [Ha|Ha].
+    * apply in_eq.
+    * left. now apply Forall_cons.
+    * right. abstract now inversion 1.
+  + right. now inversion 1.
+Qed.
+
+Lemma Forall_decidable A (P : A -> Prop) (Pdec : forall x, decidable (P x)) l : decidable (Forall P l).
+Proof. apply Forall_decidable_ext. intros x _. apply Pdec. Qed.
+
+Lemma Exists_decidable_ext A (P : A -> Prop) l : (forall x, In x l -> decidable (P x)) -> decidable (Exists P l).
+Proof.
+intro Pdec. induction l as [|a l' Hrec].
+- right. now rewrite Exists_nil.
+- destruct Hrec as [Hl'|Hl'].
+  + intros x Hinx. apply Pdec. right. assumption.
+  + left. now apply Exists_cons_tl.
+  + destruct (Pdec a) as [Ha|Ha].
+    * apply in_eq.
+    * left. now apply Exists_cons_hd.
+    * right. now inversion 1.
+Qed.
+
+Lemma Exists_decidable A (P : A -> Prop) (Pdec : forall x, decidable (P x)) l : decidable (Exists P l).
+Proof. apply Exists_decidable_ext. intros x _. apply Pdec. Qed.

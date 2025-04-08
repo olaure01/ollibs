@@ -3,7 +3,7 @@
 From Stdlib Require Import PeanoNat Compare_dec List.
 Import ListNotations.
 Open Scope list_scope.
-From OLlibs Require Import Logic_Datatypes_more.
+From OLlibs Require Import Logic_Datatypes_more DecidableT.
 
 (* Set Mangle Names. Set Mangle Names Light. *)
 Set Default Goal Selector "!".
@@ -151,19 +151,19 @@ Section Facts.
 
   Section FactsEqDec.
 
-    Hypothesis eq_decT : forall x y : A, {x = y} + {x <> y}.
+    Hypothesis eq_dec : forall x y : A, decidableP (x = y).
 
     Theorem inT_decT : forall (a:A) (l:list A), InT a l + notT (InT a l).
-    Proof using eq_decT.
+    Proof using eq_dec.
       intros a l. induction l as [| a0 l IHl].
       - right; apply inT_nil.
-      - destruct (eq_decT a0 a); simpl; auto.
+      - destruct (eq_dec a0 a); simpl; auto.
         destruct IHl; simpl; auto.
         right; unfold not; intros [Hc1| Hc2]; auto.
     Defined.
 
     Lemma in_inT : forall (a : A) l, In a l -> InT a l.
-    Proof using eq_decT.
+    Proof using eq_dec.
       intros a l Hin.
       destruct (inT_decT a l); [ assumption | ].
       exfalso; revert Hin.
@@ -882,6 +882,15 @@ Section ReDun.
      * now apply inclT_AddT_inv with a l'.
   Qed.
 
+  Lemma NoDupT_list_dec (l:list A) : NoDupT l -> forall x y, InT x l -> InT y l -> decidableP (x=y).
+  Proof.
+  intro Hl. induction Hl as [|a l Hnin Hnd IH].
+  - intros ? ? [].
+  - intros x y [ <- | Hx ] [ <- | Hy ]; try (right; intros <-; contradiction).
+    + left. constructor.
+    + apply IH; assumption.
+  Qed.
+
 End ReDun.
 
 
@@ -1001,7 +1010,7 @@ Section Exists_Forall.
     Qed.
 
     Lemma ExistsT_decT l:
-      (forall x:A, P x + notT (P x)) -> ExistsT l + notT (ExistsT l).
+      (forall x:A, decidableT (P x)) -> decidableT (ExistsT l).
     Proof.
       intro Pdec. induction l as [|a l' Hrec].
       - right. now apply ExistsT_nil.
@@ -1010,7 +1019,7 @@ Section Exists_Forall.
         * destruct (Pdec a) as [Ha|Ha].
           + left. now apply ExistsT_cons_hd.
           + right. now inversion_clear 1.
-    Defined.
+    Qed.
 
     Lemma ExistsT_fold_right l :
       ExistsT l -> fold_right (fun x => sum (P x)) False l.
@@ -1115,7 +1124,7 @@ Section Exists_Forall.
     Qed.
 
     Lemma ForallT_decT :
-      (forall x:A, P x + notT (P x)) -> forall l:list A, ForallT l + notT (ForallT l).
+      (forall x:A, decidableT (P x)) -> forall l:list A, decidableT (ForallT l).
     Proof.
       intros Pdec l. induction l as [|a l' Hrec].
       - left. apply ForallT_nil.
@@ -1124,7 +1133,7 @@ Section Exists_Forall.
           * left. now apply ForallT_cons.
           * right. abstract now inversion 1.
         + right. abstract now inversion 1.
-    Defined.
+    Qed.
 
     Lemma ForallT_fold_right l :
       ForallT l -> fold_right (fun x => prod (P x)) True l.
@@ -1218,12 +1227,10 @@ Section Exists_Forall.
    induction l; intros HE HF; inversion HE; inversion HF; [ contradiction | apply IHl; assumption ].
   Qed.
 
-  Lemma ForallT_notT_ExistsT (P:A->Type)(l:list A) :
-    (forall x, P x + notT (P x)) ->
+  Lemma ForallT_notT_ExistsT (P:A->Type)(l:list A) : (forall x, decidableT (P x)) ->
     notT (ForallT P l) -> ExistsT (fun x => notT (P x)) l.
   Proof.
-   intro Dec.
-   induction l as [|a l IHl]; intros HF.
+   intro Dec. induction l as [|a l IHl]; intros HF.
    - contradiction HF. constructor.
    - destruct (Dec a) as [ Ha | Hna ].
      + apply ExistsT_cons_tl, IHl.
@@ -1232,14 +1239,13 @@ Section Exists_Forall.
      + now apply ExistsT_cons_hd.
   Qed.
 
-  Lemma ForallT_ExistsT_decT (P:A->Type) :
-    (forall x:A, P x + notT (P x)) ->
+  Lemma ForallT_ExistsT_decT (P:A->Type) : (forall x:A, decidableT (P x)) ->
     forall l:list A, ForallT P l + ExistsT (fun x => notT (P x)) l.
   Proof.
     intros Dec l.
     destruct (ForallT_decT P Dec l); [left|right]; trivial.
     now apply ForallT_notT_ExistsT.
-  Defined.
+  Qed.
 
   Lemma inclT_ForallT_inT l l' :
     inclT l l' -> ForallT (fun x => InT x l') l.

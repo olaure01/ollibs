@@ -18,6 +18,7 @@ Manual installation procedure:
 
 * `Bool_more`       : add-ons for standard library Bool
 * `Logic_Datatypes_more` : add-ons for core libraries Logic and Datatypes
+* `Decidable_more` : add-ons for standard library Decidable
 * `List_more`       : add-ons for standard library List
 * `funtheory`       : properties of functions
 * `dectype`         : types with decidable/Boolean equality (using records rather than modules)
@@ -29,10 +30,11 @@ Manual installation procedure:
 * `nattree`         : nat-labelled trees and coding into nat
 * `Wf_nat_more`     : well-founded order on products of `nat`
 * `Vector_more`     : add-ons for standard library Vector
-* `ListT`           : `List` with output in `Type`
-* `inhabitedT`      : `inhabited` with output in `Type`
 * `SubList`         : sub-list of a list with no modification in order
 * `Shuffle`         : shuffle predicate for pairs of lists
+* `DecidableT`      : `Decidable` with output as a `sum` in `Type`
+* `ListT`           : `List` with output in `Type`
+* `inhabitedT`      : `inhabited` with output in `Type`
 * `ShuffleT`        : `Shuffle` with output in `Type`
 
 ## Around Finite Multisets

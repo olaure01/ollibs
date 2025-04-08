@@ -78,9 +78,9 @@ Section Function.
 
   (** ** Surjective functions *)
 
-  Definition decidable_image := forall y, { x | y = f x } + forall x, y <> f x.
+  Definition decT_image := forall y, { x | y = f x } + forall x, y <> f x.
 
-  Lemma injective_decidable_image_section : inhabitedT A -> injective -> decidable_image ->
+  Lemma injective_decT_image_section : inhabitedT A -> injective -> decT_image ->
     { g & retract g f }.
   Proof.
   intros [a] Hi Hd.
@@ -94,7 +94,7 @@ Section Function.
 
   Definition surjective := forall y, { x | y = f x }.
 
-  Lemma surjective_decidable_image : surjective -> decidable_image.
+  Lemma surjective_decT_image : surjective -> decT_image.
   Proof. intros Hs y. left. exact (Hs y). Qed.
 
   Lemma retract_surjective g : retract f g -> surjective.

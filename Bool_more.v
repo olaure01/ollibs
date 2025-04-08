@@ -1,6 +1,6 @@
 From Stdlib Require Import List.
 From Stdlib Require Export Bool.
-From OLlibs Require Import Logic_Datatypes_more ListT.
+From OLlibs Require Import Logic_Datatypes_more DecidableT ListT.
 
 (* Set Mangle Names. Set Mangle Names Light. *)
 Set Default Goal Selector "!".
@@ -45,11 +45,14 @@ intros Hiff. destr_bool; constructor.
 - intros HP. apply Hiff in HP as [=].
 Defined.
 
-Lemma reflectT_dec P b : reflectT P b -> P + notT P.
+Lemma reflectT_decT P b : reflectT P b -> decidableT P.
 Proof. intros [|]; [ left | right ]; assumption. Defined.
 
+Lemma decT_reflectT P (HdecT : decidableT P) : reflectT P (if HdecT then true else false).
+Proof. destruct HdecT; constructor; assumption. Qed.
+
 Lemma eqb_specT b b' : reflectT (b = b') (eqb b b').
-Proof. destruct b, b'; now constructor. Defined.
+Proof. destruct b, b'; constructor; (constructor + intros [=]). Defined.
 
 Lemma reflectT_neg P b : reflectT P b -> reflectT (notT P) (negb b).
 Proof. intros H. now inversion H; constructor. Qed.

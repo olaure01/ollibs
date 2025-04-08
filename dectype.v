@@ -4,7 +4,7 @@ this is based on records rather than modules (as opposed to stdlib) *)
 From Stdlib Require Import Bool PeanoNat Equalities.
 From Stdlib Require Eqdep_dec.
 From OLlibs Require Export inhabitedT.
-From OLlibs Require Import funtheory.
+From OLlibs Require Import DecidableT funtheory.
 
 (* Set Mangle Names. Set Mangle Names Light. *)
 Set Default Goal Selector "!".
@@ -44,7 +44,13 @@ Section DecTypes.
   - apply eqb_eq in Hyx as ->. rewrite eqb_refl in Hxy. discriminate Hxy.
   Qed.
 
-  Lemma eq_dt_dec x y : {x = y} + {x <> y}.
+  Definition eq_dec_dectype (eq_dec : forall x y, decidableP (x = y)) : DecType.
+  Proof.
+  exists X (fun x y => if eq_dec x y then true else false).
+  intros x y. split; destruct (eq_dec x y); now intros [=].
+  Defined.
+
+  Lemma eq_dt_dec x y : decidableP (x = y).
   Proof. destruct (eqb x y) eqn:Heq; [ left; apply eqb_eq in Heq | right; apply eqb_neq in Heq ]; assumption. Qed.
 
   Lemma eq_dt_reflect x y : reflect (x = y) (eqb x y).
@@ -339,7 +345,7 @@ destruct (eq_dt_dec y (f (g y))) as [-> | Hneq].
     subst y. rewrite Hr. reflexivity.
 Qed.
 
-Lemma section_decidable_image A (B : DecType) (f : A -> B) g : retract g f -> decidable_image f.
+Lemma section_decT_image A (B : DecType) (f : A -> B) g : retract g f -> decT_image f.
 Proof.
 intros Hr y.
 destruct (section_coimage_option _ Hr y) as [[x|] Hx]; [ left | right ].
