@@ -27,6 +27,9 @@ Class FinMultiset M A := {
   elts_retract m : fold_right add empty (elts m) = m;
   perm_eq l1 l2 : PermutationT l1 l2 -> fold_right add empty l1 = fold_right add empty l2 }.
 
+Definition FinMultiset_carrier M A : FinMultiset M A -> Type := fun _ => M.
+Coercion FinMultiset_carrier : FinMultiset >-> Sortclass.
+
 (** [Mst] and [Elt] define a finite multiset construction over a type [K]
     if for any [A] in [K], [Mst A] is a finite multiset with elements [Elt A]. *)
 Definition FMConstructor K Mst Elt := forall A : K, FinMultiset (Mst A) (Elt A).

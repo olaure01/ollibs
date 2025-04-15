@@ -30,6 +30,9 @@ Class FinMultisetoid M A := {
   meq_perm m1 m2 : meq m1 m2 -> PermutationT (elts m1) (elts m2);
   retract_meq m : meq (fold_right add empty (elts m)) m }.
 
+Definition FinMultisetoid_carrier M A : FinMultisetoid M A -> Type := fun _ => M.
+Coercion FinMultisetoid_carrier : FinMultisetoid >-> Sortclass.
+
 (** [Mst] and [Elt] define a finite multiset construction over a type [K]
     if for any [A] in [K], [Mst A] is a finite multiset with elements [Elt A]. *)
 Definition FMoidConstructor K Mst Elt := forall A : K, FinMultisetoid (Mst A) (Elt A).
