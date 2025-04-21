@@ -11,6 +11,7 @@ Ongoing development.
   * add `Decidable_more.v`
   * rename `decidable_image` into `decT_image`
 * rename `Datatypes_more.v` into `Logic_Datatypes_more.v` containing extensions for both `Corelib.Logic` and `Corelib.Datatypes`
+* in `nattree`, codings `cpair`, `dpair`, `pcpair`, etc. replaced by codings from `Stdlib.Arith.Cantor`
 * more use of `iffT` for equivalence statements in `Type`
 * more use of `notT` for negation in `Type`
 * add new lemmas
