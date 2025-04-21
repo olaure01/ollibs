@@ -10,6 +10,7 @@ Ongoing development.
   * more uniform naming
   * add `Decidable_more.v`
   * rename `decidable_image` into `decT_image`
+* add `FinFun_more.v`: add-ons for standard library `FinFun` with finite sets generalized to finite subsets
 * rename `Datatypes_more.v` into `Logic_Datatypes_more.v` containing extensions for both `Corelib.Logic` and `Corelib.Datatypes`
 * in `nattree`, codings `cpair`, `dpair`, `pcpair`, etc. replaced by codings from `Stdlib.Arith.Cantor`
 * more use of `iffT` for equivalence statements in `Type`

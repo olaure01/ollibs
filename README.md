@@ -30,6 +30,7 @@ Manual installation procedure:
 * `nattree`         : nat-labelled trees and coding into nat
 * `Wf_nat_more`     : well-founded order on products of `nat`
 * `Vector_more`     : add-ons for standard library Vector
+* `FinFun_more`     : add-ons for standard library FinFun (generalize finite sets to finite subsets)
 * `SubList`         : sub-list of a list with no modification in order
 * `Shuffle`         : shuffle predicate for pairs of lists
 * `DecidableT`      : `Decidable` with output as a `sum` in `Type`

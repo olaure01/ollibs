@@ -15,6 +15,7 @@ Decidable_more.v
 DecidableT.v
 dectype.v
 Dependent_ForallT.v
+FinFun_more.v
 flat_map_more.v
 fmsetlistT.v
 fmsetlist.v
