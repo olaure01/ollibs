@@ -420,7 +420,7 @@ Qed.
 
 Lemma PermutationT_NoDupT l l' : PermutationT l l' -> NoDupT l -> NoDupT l'.
 Proof.
- induction 1; auto.
+ induction 1 as [ | ? l | | ]; auto.
  - inversion_clear 1; constructor; [ intros Hin%(@PermutationT_inT _ l) | ]; auto.
  - inversion_clear 1 as [|? ? Hni Hnd]. inversion_clear Hnd; simpl in *.
    constructor.

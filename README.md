@@ -27,7 +27,7 @@ Manual installation procedure:
 * `ComparisonOrder` : order structure on `comparison`
 * `List_assoc`      : some operations on association lists
 * `AFC`             : finite versions of the axiom of choice
-* `nattree`         : nat-labelled trees and coding into nat
+* `nattree`         : `nat`-labeled trees and coding into nat
 * `Wf_nat_more`     : well-founded order on products of `nat`
 * `Vector_more`     : add-ons for standard library Vector
 * `FinFun_more`     : add-ons for standard library FinFun (generalize finite sets to finite subsets)
@@ -56,8 +56,8 @@ Manual installation procedure:
 * `transp_perm`             : transpositions
 * `PermutationT`            : `Permutation` with output in `Type`
 * `PermutationT_more`       : `Permutation_more` with output in `Type`
-* `CPermutationT`           : `CyclicPerm` with output in `Type`
-* `GPermutationT`           : `genperm` with output in `Type`
+* `CPermutationT`           : `CPermutation` with output in `Type`
+* `GPermutationT`           : `GPermutation` with output in `Type`
 * `Permutation_solve`       : automatic tactic for permutation goals
 * `CPermutation_solve`      : automatic tactic for cyclic permutation goals
 * `PermutationT_solve`      : `Permutation_solve` with output in `Type`
@@ -66,7 +66,7 @@ Manual installation procedure:
 ## Misc
 
 * `flat_map_more`           : decomposition properties for `flat_map`
-* `Dependent_ForallT`      : generalization of `Forall_inf` to dependent product
+* `Dependent_ForallT`      : generalization of `ForallT` to dependent product
 * `issue12394`              : work around for [Issue #12394](https://github.com/rocq-prover/rocq/issues/12394)
 
 ----

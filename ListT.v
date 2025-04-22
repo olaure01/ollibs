@@ -1208,7 +1208,7 @@ Section Exists_Forall.
   Lemma ForallT_ExistsT_notT (P:A->Type)(l:list A) :
    ForallT (fun x => notT (P x)) l -> notT (ExistsT P l).
   Proof.
-   induction l; intros HF HE; inversion HE; inversion HF; [ contradiction | apply IHl; assumption ].
+  induction l as [|? l IHl]; intros HF HE; inversion HE; inversion HF; [ contradiction | apply IHl; assumption ].
   Qed.
 
   Lemma ExistsT_notT_ForallT (P:A->Type)(l:list A) :
@@ -1224,7 +1224,7 @@ Section Exists_Forall.
   Lemma ExistsT_ForallT_notT (P:A->Type)(l:list A) :
     ExistsT (fun x => notT (P x)) l -> notT (ForallT P l).
   Proof.
-   induction l; intros HE HF; inversion HE; inversion HF; [ contradiction | apply IHl; assumption ].
+  induction l as [|? ? IHl]; intros HE HF; inversion HE; inversion HF; [ contradiction | apply IHl; assumption ].
   Qed.
 
   Lemma ForallT_notT_ExistsT (P:A->Type)(l:list A) : (forall x, decidableT (P x)) ->

@@ -2,8 +2,6 @@
 
 ## Version 2.1.0
 
-Ongoing development.
-
 * use names ending with `T` rather than `_Type` or `_inf` (for files and statements)
 * add `DecidableT.v` with type `decidableT`
   * add results about decidable properties
@@ -13,11 +11,10 @@ Ongoing development.
 * add `FinFun_more.v`: add-ons for standard library `FinFun` with finite sets generalized to finite subsets
 * rename `Datatypes_more.v` into `Logic_Datatypes_more.v` containing extensions for both `Corelib.Logic` and `Corelib.Datatypes`
 * in `nattree`, codings `cpair`, `dpair`, `pcpair`, etc. replaced by codings from `Stdlib.Arith.Cantor`
-* more use of `iffT` for equivalence statements in `Type`
-* more use of `notT` for negation in `Type`
+* more use of `iffT` for equivalence statements in `Type`, more use of `notT` for negation in `Type`
 * add new lemmas
   * `funtheory` : more about `ext_eq`
-  * `List_more` : `Forall_impl`, `Forall_remove*`, `Forall_solve`, `incl_preorder`
+  * `List_more` : `Forall_impl_ext`, `Forall_remove*`, `Forall_solve`, `incl_preorder`
   * `Logic_Datatypes_more` : `sum_*`, `prod_*`
   * `PermutationT` : `PermutationT_repeat`
   * `SubList` : `sublist_Add`, `sublist_preorder`, `sublist_antisym'`, `uniquify*_sublist`
