@@ -54,7 +54,7 @@ Section DecidableEquality.
 Variable A B : Type.
 
 Lemma eq_decT_eq_dec (eq_decT : forall x y : A, decidableT (x = y)) (x y : A) : decidableP (x = y).
-Proof. destruct (eq_decT x y) as [Heq | Hneq]; [ left | right ]; assumption. Qed.
+Proof. apply decT_decP, eq_decT. Qed.
 
 Variable eq_decA : forall x y : A, decidableP (x = y).
 

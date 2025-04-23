@@ -1,5 +1,9 @@
 # Versions 2.1.x
 
+## Version 2.1.1
+
+Ongoing development.
+
 ## Version 2.1.0
 
 * use names ending with `T` rather than `_Type` or `_inf` (for files and statements)

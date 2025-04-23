@@ -1,8 +1,7 @@
 (** Add-ons for [List] library:
 Properties of [flat_map]. *)
 
-From OLlibs Require Import funtheory List_more
-                           PermutationT_more CPermutationT GPermutationT.
+From OLlibs Require Import funtheory List_more PermutationT_more CPermutationT GPermutationT.
 
 (* Set Mangle Names. Set Mangle Names Light. *)
 Set Default Goal Selector "!".
@@ -123,7 +122,7 @@ Lemma elt_eq_app_flat_map_cons_fun_trichot C T (f : C -> T) l0 L l1 l2 B :
 Proof.
 intro Heq. decomp_elt_eq_app Heq as [[l <- ->]|[l -> Heq]]; [ now left; left; exists l | ].
 induction L as [|[n l'] L IHL] in l, l2, Heq |- *; cbn in Heq.
-- exfalso. decomp_nil_eq_elt Heq.
+- exfalso. decomp_nil_eq Heq.
 - rewrite app_comm_cons in Heq. decomp_elt_eq_app Heq as [[l1 Heq ->]|[l1 -> Heq]].
   + destruct l as [|t l]; inversion Heq; subst.
     * right. exists (nil, L, n, l'); repeat split.
@@ -133,7 +132,7 @@ induction L as [|[n l'] L IHL] in l, l2, Heq |- *; cbn in Heq.
                       | [(((L', L''), n'), l'') [-> ->] [->%app_inv_head ->]]].
     * exfalso.
       rewrite <- (app_nil_r l0), <- 2 app_assoc in Heqa. apply app_inv_head in Heqa.
-      cbn in Heqa. decomp_nil_eq_elt Heqa.
+      cbn in Heqa. decomp_nil_eq Heqa.
     * left. right. exists ((n, l') :: L', L'', n', l'', l'''); list_simpl; repeat split.
     * right. exists ((n, l') :: L', L'', n' , l''); repeat split.
 Qed.
@@ -194,7 +193,7 @@ induction L as [|[n a] l0 IHL] in lw, l |- *; cbn; intros HP.
     * rewrite <- ? app_assoc in HP' ; rewrite <- ? app_assoc.
       now apply PermutationT_app_middle.
   + exists (L1 ++ (n', l1) :: (n, l2) :: L2, l'); simpl; repeat split.
-    * intros _ Heqnil. decomp_nil_eq_elt Heqnil.
+    * intros _ Heqnil. decomp_nil_eq Heqnil.
     * now rewrite ? flat_map_app; list_simpl.
     * rewrite ? flat_map_app in HP'. cbn in HP'. rewrite <- app_assoc in HP'.
       rewrite ? flat_map_app. cbn. rewrite <- ? app_assoc, app_assoc.
@@ -203,7 +202,7 @@ induction L as [|[n a] l0 IHL] in lw, l |- *; cbn; intros HP.
       rewrite app_assoc, (app_assoc l'). apply PermutationT_app_middle.
       now rewrite <- ? app_assoc.
   + exists (L1 ++ (n , nil) :: L2, l'); simpl; repeat split.
-    * intros _ Heqnil. decomp_nil_eq_elt Heqnil.
+    * intros _ Heqnil. decomp_nil_eq Heqnil.
     * now rewrite ? flat_map_app, <- app_assoc.
     * rewrite ? flat_map_app, <- app_assoc in HP'.
       rewrite ? flat_map_app, <- app_assoc. cbn.
@@ -521,7 +520,7 @@ Proof.
 intro Heq. decomp_elt_eq_app Heq as [[l <- ->]|[l -> Heq1]];
   [ left; left; exists l; repeat split | ].
 induction L as [|l' L IHL] in l, l2, Heq1 |- *; cbn in Heq1.
-- exfalso. decomp_nil_eq_elt Heq1.
+- exfalso. decomp_nil_eq Heq1.
 - rewrite app_comm_cons in Heq1.
   decomp_elt_eq_app Heq1 as [[l1 Heq0 ->]|[l1 -> Heq2]].
   + destruct l as [|t l]; destr_eq Heq0; subst.
@@ -532,7 +531,7 @@ induction L as [|l' L IHL] in l, l2, Heq1 |- *; cbn in Heq1.
                        | [((L', L''), l'') [-> ->] [->%app_inv_head ->]]].
     * exfalso.
       rewrite <- (app_nil_r l0) in Heqa. rewrite <- 2 app_assoc in Heqa. apply app_inv_head in Heqa.
-      cbn in Heqa. decomp_nil_eq_elt Heqa.
+      cbn in Heqa. decomp_nil_eq Heqa.
     * left. right. exists (l' :: L', L'', l'', l'''); list_simpl; repeat split.
     * right. exists (l' :: L', L'', l''); repeat split.
 Qed.

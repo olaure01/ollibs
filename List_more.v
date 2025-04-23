@@ -1,5 +1,5 @@
 (** Add-ons for List library
-Usefull tactics and properties apparently missing in the [List] library. *)
+Useful tactics and properties apparently missing in the [List] library. *)
 
 (* TODO once it is confirmed that deprecated tactics are subsumed by Type versions, remove them *)
 
@@ -112,6 +112,43 @@ induction n as [|n IHn] in l, m |- *; intro Heq.
   split with (a :: l1, l2); [ split | ]; reflexivity.
 Qed.
 
+Ltac decomp_nil_eq H :=
+  match type of H with
+  | nil = nil => clear H
+  | nil = ?l => subst l
+  | ?l = nil => subst l
+  | nil = ?x :: ?l2 => discriminate H
+  | ?x :: ?l2 = nil => discriminate H
+  | nil = ?l1 ++ ?x :: ?l2 => destruct l1; discriminate H
+  | ?l1 ++ ?x :: ?l2 = nil => destruct l1; discriminate H
+  | nil = ?l1 ++ ?l2 => simple apply eq_sym in H;
+                        let H1 := fresh H in
+                        let H2 := fresh H in
+                        apply app_eq_nil in H as [H1 H2];
+                        assert (H := I); (* protect name [H] *)
+                        try decomp_nil_eq H1; try decomp_nil_eq H2;
+                        try (let H1' := fresh in
+                             let H2' := fresh in
+                             rename H1 into H1'; rename H2 into H2'; (* test if both H1 and H2 exist *)
+                             clear H; assert (H := conj H1' H2'); clear H1' H2');
+                        try (match type of H with True => clear H; rename H1 into H end);
+                        try (match type of H with True => clear H; rename H2 into H end);
+                        try (match type of H with True => clear H end)
+  | ?l1 ++ ?l2 = nil => let H1 := fresh H in
+                        let H2 := fresh H in
+                        apply app_eq_nil in H as [H1 H2];
+                        assert (H := I); (* protect name [H] *)
+                        try decomp_nil_eq H1; try decomp_nil_eq H2;
+                        try (let H1' := fresh in
+                             let H2' := fresh in
+                             rename H1 into H1'; rename H2 into H2'; (* test if both H1 and H2 exist *)
+                             clear H; assert (H := conj H1' H2'); clear H1' H2');
+                        try (match type of H with True => clear H; rename H1 into H end);
+                        try (match type of H with True => clear H; rename H2 into H end);
+                        try (match type of H with True => clear H end)
+  end.
+
+#[deprecated(since="ollibs 2.1.1", note="Use decomp_nil_eq instead.")] (* TODO add [use] rocq#20444 *)
 Ltac decomp_nil_eq_elt H :=
   match type of H with
   | nil = ?x :: ?l2 => discriminate H
@@ -120,21 +157,51 @@ Ltac decomp_nil_eq_elt H :=
   | ?l1 ++ ?x :: ?l2 = nil => destruct l1; discriminate H
   end.
 
+Ltac decomp_unit_eq H :=
+  match type of H with
+  | _ :: nil = nil => discriminate H
+  | nil = _ :: nil => discriminate H
+  | ?a :: nil = ?x :: ?l => let Hnil := fresh H in injection H as [= H Hnil];
+                              (try subst x); (try subst a); try decomp_nil_eq Hnil
+  | ?x :: ?l = ?a :: nil => let Hnil := fresh H in injection H as [= H Hnil];
+                              (try subst x); (try subst a); try decomp_nil_eq Hnil
+  | ?a :: nil = ?l1 ++ ?x :: ?l2 =>
+      let Hnil1 := fresh H in
+      let Hnil2 := fresh H in
+      simple apply eq_sym in H; apply elt_eq_unit in H as [H [Hnil1 Hnil2]];
+(* [simple apply eq_sym] faster than [symmetry]? *)
+      (try subst x); (try subst a); try decomp_nil_eq Hnil1; try decomp_nil_eq Hnil2;
+      (try clear l1); (try clear l2)
+  | ?l1 ++ ?x :: ?l2 = ?a :: nil =>
+      let Hnil1 := fresh H in
+      let Hnil2 := fresh H in
+      apply elt_eq_unit in H as [H [Hnil1 Hnil2]];
+      (try subst x); (try subst a); try decomp_nil_eq Hnil1; try decomp_nil_eq Hnil2;
+      (try clear l1); (try clear l2)
+  | ?a :: nil = ?l1 ++ ?l2 => simple apply eq_sym in H; let Hnil := fresh H in
+                                apply app_eq_unitT in H as [[Hnil H] | [H Hnil]];
+                                try decomp_nil_eq Hnil; try decomp_unit_eq H
+  | ?l1 ++ ?l2 = ?a :: nil => let Hnil := fresh H in
+                              apply app_eq_unitT in H as [[Hnil H] | [H Hnil]];
+                              try decomp_nil_eq Hnil; try decomp_unit_eq H
+  end.
+
+#[deprecated(since="ollibs 2.1.1", note="Use decomp_unit_eq instead.")] (* TODO add [use] rocq#20444 *)
 Ltac decomp_unit_eq_elt H :=
   match type of H with
   | ?a :: nil = ?l1 ++ ?x :: ?l2 =>
-      let Hnil1 := fresh in
-      let Hnil2 := fresh in
+      let Hnil1 := fresh H in
+      let Hnil2 := fresh H in
       simple apply eq_sym in H; apply elt_eq_unit in H as [H [Hnil1 Hnil2]];
 (* [simple apply eq_sym] faster than [symmetry]? *)
-      (try subst x); (try subst a); rewrite ? Hnil1, ? Hnil2 in *;
-      clear Hnil1 Hnil2; (try clear l1); (try clear l2)
+      (try subst x); (try subst a); decomp_nil_eq Hnil1; decomp_nil_eq Hnil2;
+      (try clear l1); (try clear l2)
   | ?l1 ++ ?x :: ?l2 = ?a :: nil =>
-      let Hnil1 := fresh in
-      let Hnil2 := fresh in
+      let Hnil1 := fresh H in
+      let Hnil2 := fresh H in
       apply elt_eq_unit in H as [H [Hnil1 Hnil2]];
-      (try subst x); (try subst a); rewrite ? Hnil1, ? Hnil2 in *;
-      clear Hnil1 Hnil2; (try clear l1); (try clear l2)
+      (try subst x); (try subst a); decomp_nil_eq Hnil1; decomp_nil_eq Hnil2;
+      (try clear l1); (try clear l2)
   end.
 
 Lemma trichot_appT A (l1 l2 l3 l4 : list A) : l1 ++ l2 = l3 ++ l4 ->
@@ -376,7 +443,7 @@ intro Heq. change (b :: l4) with ((b :: nil) ++ l4) in Heq.
 decomp_elt_eq_app_app Heq as [[[l2' ? ?] | [[[|a' l2'] l2''] -> [[= -> H] ->]] ] | [l2' ? ?] ];
   [ now left; exists l2' | right; left .. | now right; right; exists l2' ].
 - subst. list_simpl. repeat split.
-- decomp_nil_eq_elt H.
+- decomp_nil_eq H.
 Qed.
 
 #[local] Ltac decomp_elt_eq_elt_Prop_core H p :=
@@ -439,15 +506,15 @@ Ltac substitute_map_family H :=
                    let H2' := fresh in
                    rename H1 into H1'; rename H2 into H2'; (* test if both H1 and H2 exist *)
                    clear H; assert (H := conj H1' H2'); clear H1' H2');
-              try (match type of H with | True => clear H; rename H1 into H end);
-              try (match type of H with | True => clear H; rename H2 into H end);
-              try (match type of H with | True => clear H end)
+              try (match type of H with True => clear H; rename H1 into H end);
+              try (match type of H with True => clear H; rename H2 into H end);
+              try (match type of H with True => clear H end)
   | _ ?b = ?a => subst a; rename b into a
   | _ => idtac
   end.
 
 (* decompose [H : map f l = _] using [decomp_map_eq]
-   decompoistion of [l] is returned in [H] and sub-equations generated by [decomp_map_eq] in [Heq] *)
+   decomposition of [l] is returned in [H] and sub-equations generated by [decomp_map_eq] in [Heq] *)
 Ltac decomp_map_core H Heq :=
   match type of H with
   | map _ ?l = _ => let l' := fresh "l" in
