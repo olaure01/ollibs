@@ -4,6 +4,9 @@
 
 Ongoing development.
 
+* generalize `decomp_nil_eq_elt` and `decomp_unit_eq_elt` to `decomp_nil_eq` and `decomp_unit_eq`
+* rename `list_to_Forall` into `list_to_ForallT`, `Forall_to_list` into `ForallT_to_list`, etc.
+
 ## Version 2.1.0
 
 * use names ending with `T` rather than `_Type` or `_inf` (for files and statements)

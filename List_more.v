@@ -753,34 +753,34 @@ Proof. now intros Hemp; apply (@Forall_remove _ eqdec _ a); [ rewrite Hemp | ]. 
 
 (** Translation from [ForallT] to a list of dependent pairs *)
 
-Fixpoint list_to_Forall T P (l : list (sigT P)) : ForallT P (map (@projT1 T P) l) :=
+Fixpoint list_to_ForallT T P (l : list (sigT P)) : ForallT P (map (@projT1 T P) l) :=
   match l with
   | nil => ForallT_nil _
-  | p :: l => ForallT_cons (projT1 p) (projT2 p) (list_to_Forall l)
+  | p :: l => ForallT_cons (projT1 p) (projT2 p) (list_to_ForallT l)
   end.
 
-Fixpoint Forall_to_list T P (l : list T) (Fl : ForallT P l) : list (sigT P) :=
+Fixpoint ForallT_to_list T P (l : list T) (Fl : ForallT P l) : list (sigT P) :=
   match Fl with
   | ForallT_nil _ => nil
-  | ForallT_cons x Px Fl => (existT P x Px) :: (Forall_to_list Fl)
+  | ForallT_cons x Px Fl => (existT P x Px) :: (ForallT_to_list Fl)
   end.
 
-Lemma Forall_to_list_support T P L FL :
-  map (@projT1 _ _) (@Forall_to_list T P L FL) = L.
+Lemma ForallT_to_list_support T P L FL :
+  map (@projT1 _ _) (@ForallT_to_list T P L FL) = L.
 Proof. induction FL as [|? ? ? ? IHFL]; [ | cbn; rewrite IHFL ]; reflexivity. Defined.
 
-Lemma Forall_to_list_length T P (l : list T) (Fl : ForallT P l) :
-  length (Forall_to_list Fl) = length l.
+Lemma ForallT_to_list_length T P (l : list T) (Fl : ForallT P l) :
+  length (ForallT_to_list Fl) = length l.
 Proof. induction Fl as [|? ? ? ? IHFl]; [ | cbn; rewrite IHFl ]; reflexivity. Defined.
 
-Lemma Forall_to_list_to_Forall T P : forall L FL,
- rew (Forall_to_list_support _) in list_to_Forall (@Forall_to_list T P L FL) = FL.
+Lemma ForallT_to_list_to_ForallT T P : forall L FL,
+ rew (ForallT_to_list_support _) in list_to_ForallT (@ForallT_to_list T P L FL) = FL.
 Proof.
 intros L FL. induction FL as [|x l p FL IHFL]; [ reflexivity | ].
 transitivity (ForallT_cons x p
-             (rew [ForallT P] Forall_to_list_support FL in
-                 list_to_Forall (Forall_to_list FL))).
-- clear. simpl. destruct (Forall_to_list_support FL). reflexivity.
+             (rew [ForallT P] ForallT_to_list_support FL in
+                 list_to_ForallT (ForallT_to_list FL))).
+- clear. simpl. destruct (ForallT_to_list_support FL). reflexivity.
 - rewrite IHFL. reflexivity.
 Qed.
 
