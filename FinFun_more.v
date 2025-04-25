@@ -136,7 +136,7 @@ induction lP as [ | b [ | c l ] IH ] in P, Hdec, Hnd, HP, a, Ha |- *; [ contradi
 Qed.
 
 Lemma finite_strictorder_max A (eq_dec : ListDec.decidable_eq A) (P : A -> Prop)
-  (R : relation A) (Rdec : forall x y, decidableP (R x y)) d (Hd : P d) :
+  (R : relation A) (Rdec : forall x y, decidable (R x y)) d (Hd : P d) :
   finite_subset P -> transitive _ R -> irreflexive _ R ->
   exists a, P a /\ forall b, P b -> ~ R a b.
 Proof.

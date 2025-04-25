@@ -6,6 +6,7 @@ Ongoing development.
 
 * generalize `decomp_nil_eq_elt` and `decomp_unit_eq_elt` to `decomp_nil_eq` and `decomp_unit_eq`
 * rename `list_to_Forall` into `list_to_ForallT`, `Forall_to_list` into `ForallT_to_list`, etc.
+* weaken uselessly strong hypothesis in `finite_strictorder_max`
 
 ## Version 2.1.0
 
