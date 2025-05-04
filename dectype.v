@@ -5,6 +5,7 @@ From Stdlib Require Import Bool PeanoNat Equalities.
 From Stdlib Require Eqdep_dec.
 From OLlibs Require Export inhabitedT.
 From OLlibs Require Import DecidableT funtheory.
+From OLlibs Require ComparisonOrder.
 
 (* Set Mangle Names. Set Mangle Names Light. *)
 Set Default Goal Selector "!".
@@ -117,6 +118,12 @@ Definition nat_dectype := {|
   car := nat;
   eqb := Nat.eqb;
   eqb_eq := Nat.eqb_eq |}.
+
+(** the [comparison] instance *)
+Definition comparison_dectype := {|
+  car := comparison;
+  eqb := ComparisonOrder.eqb;
+  eqb_eq := ComparisonOrder.eqb_eq |}.
 
 (** the [option] construction *)
 Scheme Equality for option.
