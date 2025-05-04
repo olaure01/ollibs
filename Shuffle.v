@@ -85,16 +85,16 @@ intro s1. induction s1 as [ | x l' l'' l''' s1 IHs1 | x l' l'' l''' s1 IHs1 ];
   intro s2; [ assumption | cbn; constructor; apply IHs1, s2 .. ].
 Qed.
 
-Lemma sublist_app_app_l_l A (l0 l1 l2 l3 : list A) : shuffle l1 l2 l3 -> shuffle (l0 ++ l1) l2 (l0 ++ l3).
+Lemma shuffle_app_app_l_l A (l0 l1 l2 l3 : list A) : shuffle l1 l2 l3 -> shuffle (l0 ++ l1) l2 (l0 ++ l3).
 Proof. rewrite <- (app_nil_l l2). apply shuffle_app_app, shuffle_id_nil. Qed.
 
-Lemma sublist_app_app_l_r A (l0 l1 l2 l3 : list A) : shuffle l1 l2 l3 -> shuffle (l1 ++ l0) l2 (l3 ++ l0).
+Lemma shuffle_app_app_l_r A (l0 l1 l2 l3 : list A) : shuffle l1 l2 l3 -> shuffle (l1 ++ l0) l2 (l3 ++ l0).
 Proof. rewrite <- (app_nil_r l2) at 2. intro s. apply (shuffle_app_app s), shuffle_id_nil. Qed.
 
-Lemma sublist_app_app_r_l A (l0 l1 l2 l3 : list A) : shuffle l1 l2 l3 -> shuffle l1 (l0 ++ l2) (l0 ++ l3).
+Lemma shuffle_app_app_r_l A (l0 l1 l2 l3 : list A) : shuffle l1 l2 l3 -> shuffle l1 (l0 ++ l2) (l0 ++ l3).
 Proof. rewrite <- (app_nil_l l1). apply shuffle_app_app, shuffle_nil_id. Qed.
 
-Lemma sublist_app_app_r_r A (l0 l1 l2 l3 : list A) : shuffle l1 l2 l3 -> shuffle l1 (l2 ++ l0) (l3 ++ l0).
+Lemma shuffle_app_app_r_r A (l0 l1 l2 l3 : list A) : shuffle l1 l2 l3 -> shuffle l1 (l2 ++ l0) (l3 ++ l0).
 Proof. rewrite <- (app_nil_r l1) at 2. intro s. apply (shuffle_app_app s), shuffle_nil_id. Qed.
 
 Lemma shuffle_elt_l A (a : A) l1' l1'' l2 l3 : shuffle (l1' ++ a :: l1'') l2 l3 ->
@@ -207,7 +207,7 @@ inversion s'' as [ | x l1 l2 l3 | x l1 l2 l3 ]; subst.
 - exists l1', l1'', l2', l2. now split; [ right | ].
 Qed.
 
-Lemma Permutation_shuffle A (l1 l2 l3 : list A) :
+Lemma shuffle_Permutation A (l1 l2 l3 : list A) :
   shuffle l1 l2 l3 -> Permutation (l1 ++ l2) l3.
 Proof.
 intro s. induction s.
@@ -216,7 +216,7 @@ intro s. induction s.
 - symmetry. apply Permutation_cons_app. symmetry. assumption.
 Qed.
 
-Lemma shuffle_Permutation A (l1 l2 l3 l3' : list A) : shuffle l1 l2 l3 -> Permutation l3 l3' ->
+Lemma Permutation_shuffle A (l1 l2 l3 l3' : list A) : shuffle l1 l2 l3 -> Permutation l3 l3' ->
   exists l1' l2', Permutation l1 l1' /\ Permutation l2 l2' /\ shuffle l1' l2' l3'.
 Proof.
 intro s. induction s as [ | x l' l'' l''' s IHs | x l' l'' l''' s IHs ] in l3' |-; intro p.
@@ -272,10 +272,10 @@ Qed.
 
 Lemma Permutation_app_shuffle A (l1 l2 l3 : list A) : Permutation (l1 ++ l2) l3 ->
   exists l1' l2', Permutation l1 l1' /\ Permutation l2 l2' /\ shuffle l1' l2' l3.
-Proof. intro p. refine (shuffle_Permutation _ p). apply shuffle_app. Qed.
+Proof. intro p. refine (Permutation_shuffle _ p). apply shuffle_app. Qed.
 
 Lemma shuffle_length A (l1 l2 l3 : list A) : shuffle l1 l2 l3 -> length l1 + length l2 = length l3.
-Proof. intros s%Permutation_shuffle%Permutation_length. rewrite <- length_app. assumption. Qed.
+Proof. intros s%shuffle_Permutation%Permutation_length. rewrite <- length_app. assumption. Qed.
 
 Lemma shuffle_map A B (f : A -> B) l1 l2 l3 :
   shuffle l1 l2 l3 -> shuffle (map f l1) (map f l2) (map f l3).
