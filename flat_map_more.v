@@ -17,7 +17,7 @@ Proof.
 intro Heq. rewrite flat_map_concat_map in Heq.
 apply concat_eq_elt in Heq as [(((L1, L2), l1''), l2'') [-> ->] Heq].
 remember (l1'' ++ a :: l2'') as L0.
-decomp_map Heq eqn:Hf. subst L.
+decomp_map_eq Heq eqn:Hf. subst L.
 now exists (L1, L2, L0, l1'', l2''); cbn; repeat split; rewrite ? flat_map_concat_map.
 Qed.
 
@@ -168,7 +168,7 @@ induction L as [|[b l0] L IHL] in lw, l |- *; cbn; intro Heq.
 - rewrite app_comm_cons, app_assoc in Heq.
   apply IHL in Heq as [Lw Heq].
   remember (g b) as c. remember (flat_map (fun '(_, p2) => map f lw' ++ p2) L) as L0.
-  decomp_map Heq eqn:Hf. subst Lw. destruct Hf as [_ <-].
+  decomp_map_eq Heq eqn:Hf. subst Lw. destruct Hf as [_ <-].
   exists (l ++ (lw' ++ l0) ++ L0). rewrite ! map_app. reflexivity.
 Qed.
 
@@ -565,7 +565,7 @@ induction L as [|l0 L IHL] in lw, l |- *; cbn; intro Heq.
 - rewrite app_comm_cons, app_assoc in Heq.
   apply IHL in Heq as [Lw Heq].
   remember (flat_map (app (map f lw')) L) as L0.
-  decomp_map Heq eqn:Hf. subst Lw. rewrite <- Hf.
+  decomp_map_eq Heq eqn:Hf. subst Lw. rewrite <- Hf.
   exists (l ++ (lw' ++ l0) ++ L0). rewrite ! map_app. reflexivity.
 Qed.
 

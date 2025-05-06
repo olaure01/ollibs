@@ -69,7 +69,7 @@ induction l1 as [|a l1 IHl1] in l2 |- *; intro HP.
 - apply Permutation_nil, map_eq_nil in HP as ->. constructor.
 - symmetry in HP.
   destruct (Permutation_vs_cons_inv HP) as [l3 [l4 Heq]].
-  decomp_map Heq eqn:Hf. subst l2.
+  decomp_map_eq Heq eqn:Hf. subst l2.
   rewrite map_app in HP. cbn in HP. rewrite Hf in HP.
   symmetry in HP. apply Permutation_cons_app_inv in HP.
   specialize IHl1 with (l3 ++ l4).
@@ -87,7 +87,7 @@ induction l1 as [|a l1 IHl1] in l2 |- *; intros Hi HP.
 - apply Permutation_nil, map_eq_nil in HP as ->. constructor.
 - assert (Heq := HP). symmetry in Heq.
   apply Permutation_vs_cons_inv in Heq as [l3 [l4 Heq]].
-  decomp_map Heq eqn:Hf. subst l2.
+  decomp_map_eq Heq eqn:Hf. subst l2.
   rewrite map_app in HP. cbn in HP. rewrite Hf in HP.
   apply Permutation_cons_app_inv in HP.
   specialize IHl1 with (l3 ++ l4).

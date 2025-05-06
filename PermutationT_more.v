@@ -243,7 +243,7 @@ induction l1 as [|a l1 IHl1] in l2 |- *; intro HP.
   now exists nil.
 - apply PermutationT_sym in HP.
   destruct (PermutationT_vs_cons_inv HP) as [(l1', l2') Heq].
-  decomp_map Heq. subst l2.
+  decomp_map_eq Heq. subst l2.
   apply PermutationT_sym in HP.
   rewrite map_app in HP.
   apply PermutationT_cons_app_inv in HP.
@@ -264,7 +264,7 @@ revert l2; induction l1 as [|a l1 IHl1]; intros l2 HP.
 - assert (Heq := HP).
   apply PermutationT_sym in Heq.
   apply PermutationT_vs_cons_inv in Heq as [(l3, l4) Heq].
-  decomp_map Heq eqn:Hf. subst l2.
+  decomp_map_eq Heq eqn:Hf. subst l2.
   rewrite map_app in HP. cbn in HP. rewrite Hf in HP.
   apply PermutationT_cons_app_inv in HP.
   specialize IHl1 with (l3 ++ l4).
@@ -292,7 +292,7 @@ apply PermutationT_sym, PermutationT_vs_elt_inv in HP as [(l', l'') Heq].
 decomp_elt_eq_app Heq as [[l''' <- ->]|[? -> Heq]].
 - exists (l', l'''). reflexivity.
 - exfalso.
-  decomp_map Heq.
+  decomp_map_eq Heq.
   exact (Hf a eq_refl).
 Qed.
 

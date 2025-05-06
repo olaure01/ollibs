@@ -5,6 +5,7 @@
 Ongoing development.
 
 * generalize `decomp_nil_eq_elt` and `decomp_unit_eq_elt` to `decomp_nil_eq` and `decomp_unit_eq`
+* rename `decomp_map` into `decomp_map_eq`
 * rename `list_to_Forall` into `list_to_ForallT`, `Forall_to_list` into `ForallT_to_list`, etc.
 * correct bad namings in `shuffle.v` and `shuffleT.v`
   * rename `sublist_*` into `shuffle[T]_*`

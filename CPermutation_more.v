@@ -82,7 +82,7 @@ Lemma CPermutation_map_inv_inj A B (f : A -> B) : injective f ->
   forall l1 l2, CPermutation (map f l1) (map f l2) -> CPermutation l1 l2.
 Proof.
 intros Hi l1 l2 HP. inversion HP as [l3 l4 Heq1 Heq2].
-decomp_map Heq1. decomp_map Heq2 eqn:Heq.
+decomp_map_eq Heq1. decomp_map_eq Heq2 eqn:Heq.
 destruct Heq as [->%(map_injective Hi) ->%(map_injective Hi)].
 subst. constructor.
 Qed.
@@ -92,7 +92,7 @@ Lemma CPermutation_map_inv_inj_local A B (f : A -> B) l1 l2 :
     CPermutation (map f l1) (map f l2) -> CPermutation l1 l2.
 Proof.
 intros Hi HP. inversion HP as [l3 l4 Heq1 Heq2].
-symmetry in Heq1. symmetry in Heq2. decomp_map Heq1. decomp_map Heq2 eqn:Heq. subst.
+symmetry in Heq1. symmetry in Heq2. decomp_map_eq Heq1. decomp_map_eq Heq2 eqn:Heq. subst.
 destruct Heq as [->%map_injective_in ->%map_injective_in]; [ constructor | | ].
 - intros x y Hin1 Hin2 Heq. symmetry. apply Hi; [ apply in_or_app .. | ]; auto.
 - intros x y Hin1 Hin2 Heq. symmetry. apply Hi; [ apply in_or_app .. | ]; auto.

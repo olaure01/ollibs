@@ -261,7 +261,7 @@ induction l1 as [|a l1 IHl1] in l2 |- *; intro HP.
   + apply CPermutationT_nil in HP as [=].
 - apply CPermutationT_sym in HP.
   destruct (CPermutationT_vs_cons_inv HP) as [(l3, l4) -> Heq2].
-  decomp_map Heq2. subst l2.
+  decomp_map_eq Heq2. subst l2.
   exists (a :: l4 ++ l3).
   + rewrite <- map_app. reflexivity.
   + constructor.
@@ -325,7 +325,7 @@ Lemma CPermutationT_map_inv_inj A B (f : A -> B) (Hi : injective f) l1 l2 :
   CPermutationT (map f l1) (map f l2) -> CPermutationT l1 l2.
 Proof.
 intro HP. inversion HP as [l3 l4 Heq1 Heq2].
-decomp_map Heq1. decomp_map Heq2 eqn:Heq. subst l1 l2.
+decomp_map_eq Heq1. decomp_map_eq Heq2 eqn:Heq. subst l1 l2.
 destruct Heq as [->%(map_injective Hi) ->%(map_injective Hi)]. constructor.
 Qed.
 
@@ -334,7 +334,7 @@ Lemma CPermutationT_map_inv_inj_local A B (f : A -> B) l1 l2 :
     CPermutationT (map f l1) (map f l2) -> CPermutationT l1 l2.
 Proof.
 intros Hi HP. inversion HP as [l3 l4 Heq1 Heq2].
-decomp_map Heq1. decomp_map Heq2 eqn:Heq. subst l1 l2.
+decomp_map_eq Heq1. decomp_map_eq Heq2 eqn:Heq. subst l1 l2.
 destruct Heq as [Heq1%eq_sym Heq2%eq_sym].
 apply map_injective_in in Heq1 as ->; [ apply map_injective_in in Heq2 as -> | ]; [ constructor | | ].
 - intros x y Hin1 Hin2 Heq. apply Hi; [ apply in_or_app .. | ]; [left | right | ]; assumption.

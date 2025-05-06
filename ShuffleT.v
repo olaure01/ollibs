@@ -294,10 +294,10 @@ intro s. remember (map f l3) as l3' eqn:Heql3.
 induction s as [ | x l' l'' l''' s IHs | x l' l'' l''' s IHs ] in l3, Heql3 |- *.
 - symmetry in Heql3. apply map_eq_nil in Heql3 as ->.
   exists ([], []); [ repeat split | constructor ].
-- decomp_map Heql3. subst.
+- decomp_map_eq Heql3. subst.
   destruct (IHs l''' eq_refl) as [(l1', l2') [-> ->] Hs].
   exists (x :: l1', l2'); [ repeat split | constructor; assumption ].
-- decomp_map Heql3. subst.
+- decomp_map_eq Heql3. subst.
   destruct (IHs l''' eq_refl) as [(l1', l2') [-> ->] Hs].
   exists (l1', x :: l2'); [ repeat split | constructor; assumption ].
 Qed.
