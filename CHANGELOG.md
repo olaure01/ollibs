@@ -4,12 +4,17 @@
 
 Ongoing development.
 
-* generalize `decomp_nil_eq_elt` and `decomp_unit_eq_elt` to `decomp_nil_eq` and `decomp_unit_eq`
-* rename `decomp_map` into `decomp_map_eq`
-* rename `list_to_Forall` into `list_to_ForallT`, `Forall_to_list` into `ForallT_to_list`, etc.
-* correct bad namings in `shuffle.v` and `shuffleT.v`
-  * rename `sublist_*` into `shuffle[T]_*`
-  * exchange names of `Permutation[T]_shuffle[T]` and `shuffle[T]_Permutation[T]`
+* add some documentation in `DOCUMENTATION.md`
+* list tactics
+  * new version of `list_simpl` (more stable in presence of existential variables), the old version is now `list_esimpl`
+  * add `list_[e]reflexivity` as shortcut for `list_[e]simpl; reflexivity`
+  * define `list_apply` for application up to list equality (through `list_reflexivity`)
+  * generalize `decomp_nil_eq_elt` and `decomp_unit_eq_elt` to `decomp_nil_eq` and `decomp_unit_eq`
+  * rename `decomp_map` into `decomp_map_eq`
+* correct bad namings
+  * rename `list_to_Forall` into `list_to_ForallT`, `Forall_to_list` into `ForallT_to_list`, etc.
+  * in `shuffle.v` and `shuffleT.v`, rename `sublist_*` into `shuffle[T]_*`
+  * in `shuffle.v` and `shuffleT.v`, exchange names of `Permutation[T]_shuffle[T]` and `shuffle[T]_Permutation[T]`
 * weaken uselessly strong hypothesis in `finite_strictorder_max`
 
 ## Version 2.1.0
