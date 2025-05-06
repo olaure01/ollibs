@@ -42,22 +42,81 @@ Tactic Notation "last_destruct" constr(l) "as" simple_intropattern(p) := destruc
 Ltac list_simpl :=
   repeat (
     repeat cbn;
-    rewrite <- ? app_assoc, <- ? app_comm_cons, ? app_nil_r;
-    rewrite <- ? map_rev, ? rev_involutive, ? rev_app_distr, ? rev_unit;
-    rewrite ? map_app, ? flat_map_app).
+    repeat match goal with
+    | |- context [(?l1 ++ ?l2) ++ ?l3] => rewrite <- (app_assoc l1 l2 l3)
+    | |- context [(?a :: ?l1) ++ ?l2] => rewrite <- (app_comm_cons l1 l2 a)
+    | |- context [?l ++ nil] => rewrite (app_nil_r l)
+    | |- context [rev (map ?f ?l)] => rewrite <- (map_rev f l)
+    | |- context [rev (rev ?l)] => rewrite (rev_involutive l)
+    | |- context [rev (?l1 ++ ?l2)] => rewrite (rev_app_distr l1 l2)
+    | |- context [map ?f (?l1 ++ ?l2)] => rewrite (map_app f l1 l2)
+    | |- context [flat_map ?f (?l1 ++ ?l2)] => rewrite (flat_map_app f l1 l2)
+    end).
 #[local] Ltac list_simpl_hyp H :=
   repeat (
     repeat cbn in H;
-    rewrite <- ? app_assoc, <- ? app_comm_cons, ? app_nil_r in H;
-    rewrite <- ? map_rev, ? rev_involutive, ? rev_app_distr, ? rev_unit in H;
-    rewrite ? map_app, ? flat_map_app in H).
+    repeat match type of H with
+    | context [(?l1 ++ ?l2) ++ ?l3] => rewrite <- (app_assoc l1 l2 l3) in H
+    | context [(?a :: ?l1) ++ ?l2] => rewrite <- (app_comm_cons l1 l2 a) in H
+    | context [?l ++ nil] => rewrite (app_nil_r l) in H
+    | context [rev (map ?f ?l)] => rewrite <- (map_rev f l) in H
+    | context [rev (rev ?l)] => rewrite (rev_involutive l) in H
+    | context [rev (?l1 ++ ?l2)] => rewrite (rev_app_distr l1 l2) in H
+    | context [map ?f (?l1 ++ ?l2)] => rewrite (map_app f l1 l2) in H
+    | context [flat_map ?f (?l1 ++ ?l2)] => rewrite (flat_map_app f l1 l2) in H
+    end).
 Ltac list_simpl_hyps :=
   match goal with
   | H : _ |- _ => list_simpl_hyp H; revert H; list_simpl_hyps; intro H
   | _ => idtac
   end.
+
 Tactic Notation "list_simpl" "in" "*" := list_simpl_hyps; list_simpl.
 Tactic Notation "list_simpl" "in" hyp(H) := list_simpl_hyp H.
+
+Ltac list_reflexivity := list_simpl; reflexivity.
+
+(* same as [list_simpl] but might do more job on specific case
+     could loop with existential variables *)
+Ltac list_esimpl :=
+  repeat (
+    repeat cbn;
+    rewrite <- ? app_assoc, <- ? app_comm_cons, ? app_nil_r,
+            <- ? map_rev, ? rev_involutive, ? rev_app_distr,
+            ? map_app, ? flat_map_app).
+#[local] Ltac list_esimpl_hyp H :=
+  repeat (
+    repeat cbn in H;
+    rewrite <- ? app_assoc, <- ? app_comm_cons, ? app_nil_r,
+            <- ? map_rev, ? rev_involutive, ? rev_app_distr,
+            ? map_app, ? flat_map_app in H).
+Ltac list_esimpl_hyps :=
+  match goal with
+  | H : _ |- _ => list_esimpl_hyp H; revert H; list_esimpl_hyps; intro H
+  | _ => idtac
+  end.
+Tactic Notation "list_esimpl" "in" "*" := list_esimpl_hyps; list_esimpl.
+Tactic Notation "list_esimpl" "in" hyp(H) := list_esimpl_hyp H.
+
+Ltac list_ereflexivity := list_esimpl; reflexivity.
+
+
+(** ** Application up to list equality (associativity, unit, etc.) **)
+
+(* similar to [apply] but tries to unify up to equality of lists thanks to [list_reflexivity] *)
+(*   use [Tactic Notation] to avoid typing of the argument at calling time *)
+Tactic Notation "list_apply" open_constr(t) :=
+  match goal with
+  | |- context G [?L] => match type of L with
+                         | list _ => pattern L; eapply eq_rect; [ eapply t | list_reflexivity ]
+                         end
+  end.
+Tactic Notation "list_apply" open_constr(t) "in" hyp(H) :=
+  match type of H with
+  | context G [?L] => match type of L with
+                      | list _ => pattern L in H; eapply eq_rect in H; [ eapply t in H | list_reflexivity ]
+                      end
+  end.
 
 
 (** ** Removal of [cons] constructions *)
