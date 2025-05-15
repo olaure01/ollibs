@@ -68,14 +68,14 @@ decomp_app_eq_app Hx as [[l <- ->]|[l -> <-]];
 Qed.
 
 Lemma CPermutation_vs_elt_subst A (a : A) l l1 l2 :
-  CPermutation l (l1 ++ a :: l2) -> exists l3 l4,
-    (forall l0, CPermutation (l1 ++ l0 ++ l2) (l3 ++ l0 ++ l4)) /\ l = l3 ++ a :: l4.
+  CPermutation l (l1 ++ a :: l2) -> exists l' l'',
+    (forall l0, CPermutation (l' ++ l0 ++ l'') (l1 ++ l0 ++ l2)) /\ l = l' ++ a :: l''.
 Proof.
-intro HP. destruct (CPermutation_vs_elt_inv _ _ _ HP) as [l' [l'' [Heq ->]]].
+intros [l' [l'' [Heq ->]]]%CPermutation_vs_elt_inv.
 exists l', l''. split; [ | reflexivity ].
-intro l0.
-etransitivity; [ apply CPermutation_app_comm | ].
-list_simpl. rewrite Heq, app_assoc. constructor.
+intro l0. transitivity (l'' ++ l' ++ l0); rewrite app_assoc.
+- apply CPermutation_app_comm.
+- rewrite <- Heq, <- app_assoc, (app_assoc l1). constructor.
 Qed.
 
 Lemma CPermutation_map_inv_inj A B (f : A -> B) : injective f ->

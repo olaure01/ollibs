@@ -121,8 +121,8 @@ Section GPermutationT.
 
   Lemma PCEPermutationT_vs_elt_subst a l l1 l2 :
     PCEPermutationT l (l1 ++ a :: l2) ->
-      {'(l3, l4) & forall l0, PCEPermutationT (l1 ++ l0 ++ l2) (l3 ++ l0 ++ l4)
-                 & l = l3 ++ a :: l4 }.
+      {'(l', l'') & forall l0, PCEPermutationT (l' ++ l0 ++ l'') (l1 ++ l0 ++ l2)
+                  & l = l' ++ a :: l'' }.
   Proof.
   case_perm_tri; intros HP.
   - apply CPermutationT_vs_elt_subst; assumption.
@@ -218,8 +218,8 @@ Section GPermutationT.
 
   Lemma PCPermutationT_vs_elt_subst a l l1 l2 :
     PCPermutationT l (l1 ++ a :: l2) ->
-      {'(l3, l4) & forall l0, PCPermutationT (l1 ++ l0 ++ l2) (l3 ++ l0 ++ l4)
-                 & l = l3 ++ a :: l4 }.
+      {'(l', l'') & forall l0, PCPermutationT (l' ++ l0 ++ l'') (l1 ++ l0 ++ l2)
+                  & l = l' ++ a :: l'' }.
   Proof.
   case_perm; intros HP;
     [ apply PermutationT_vs_elt_subst | apply CPermutationT_vs_elt_subst ]; assumption.
@@ -303,8 +303,8 @@ Section GPermutationT.
 
   Lemma PEPermutationT_vs_elt_subst a l l1 l2 :
     PEPermutationT l (l1 ++ a :: l2) ->
-      {'(l3, l4) & forall l0, PEPermutationT (l1 ++ l0 ++ l2) (l3 ++ l0 ++ l4)
-                 & l = l3 ++ a :: l4 }.
+      {'(l', l'') & forall l0, PEPermutationT (l' ++ l0 ++ l'') (l1 ++ l0 ++ l2)
+                  & l = l' ++ a :: l'' }.
   Proof.
   case_perm; intros HP.
   - apply PermutationT_vs_elt_subst; assumption.
@@ -313,15 +313,15 @@ Section GPermutationT.
 
   Lemma PEPermutationT_vs_elt_inv a l l1 l2 :
     PEPermutationT l (l1 ++ a :: l2) ->
-      {'(l3, l4) & PEPermutationT (l1 ++ l2) (l3 ++ l4) & l = l3 ++ a :: l4 }.
+      {'(l', l'') & PEPermutationT (l' ++ l'') (l1 ++ l2) & l = l' ++ a :: l'' }.
   Proof.
-  intros HP; apply PEPermutationT_vs_elt_subst in HP as [(l3, l4) HP ->].
-  exists (l3, l4); [ apply (HP nil) | reflexivity ].
+  intros HP; apply PEPermutationT_vs_elt_subst in HP as [(l', l'') HP ->].
+  exists (l', l''); [ apply (HP nil) | reflexivity ].
   Qed.
 
   Lemma PEPermutationT_vs_cons_inv a l l1 :
     PEPermutationT l (a :: l1) ->
-      {'(l2, l3) & PEPermutationT l1 (l2 ++ l3) & l = l2 ++ a :: l3 }.
+      {'(l2, l3) & PEPermutationT (l2 ++ l3) l1 & l = l2 ++ a :: l3 }.
   Proof.
   intros HP; rewrite <- (app_nil_l l1).
   now apply PEPermutationT_vs_elt_inv.

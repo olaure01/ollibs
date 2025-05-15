@@ -11,6 +11,8 @@ Ongoing development.
   * define `list_apply` for application up to list equality (through `list_reflexivity`)
   * generalize `decomp_nil_eq_elt` and `decomp_unit_eq_elt` to `decomp_nil_eq` and `decomp_unit_eq`
   * rename `decomp_map` into `decomp_map_eq`
+* correct ad hoc statements
+  * symmetry in `*Permutation*_vs_elt_subst` and add `Permutation*_vs_elt_inv_perm` (to strengthen `Permutation*_vs_elt_inv`)
 * correct bad namings
   * rename `list_to_Forall` into `list_to_ForallT`, `Forall_to_list` into `ForallT_to_list`, etc.
   * in `shuffle.v` and `shuffleT.v`, rename `sublist_*` into `shuffle[T]_*`

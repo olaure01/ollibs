@@ -50,16 +50,21 @@ revert l2 l3 l4; induction l1 as [|a l1 IHl1]; intros l2 l3 l4 HP.
   + now constructor.
 Qed.
 
-Lemma Permutation_vs_elt_subst A (a : A) l l1 l2 :
-  Permutation l (l1 ++ a :: l2) -> exists l3 l4,
-    (forall l0, Permutation (l1 ++ l0 ++ l2) (l3 ++ l0 ++ l4)) /\ l = l3 ++ a :: l4.
+Lemma Permutation_vs_elt_inv_perm A l l1 l2 (a : A) :
+  Permutation l (l1 ++ a :: l2) -> exists l' l'', Permutation (l' ++ l'') (l1 ++ l2) /\ l = l' ++ a :: l''.
 Proof.
-intros HP.
-destruct (Permutation_vs_elt_inv _ _ _ HP) as [l' [l'' ->]].
+intro HP. destruct (Permutation_vs_elt_inv _ _ _ HP) as [l' [l'' ->]].
 exists l', l''; split; [ | reflexivity ].
-intros l0.
-apply Permutation_app_inv, (Permutation_app_middle l0) in HP.
-symmetry; assumption.
+apply (Permutation_app_inv _ _ _ _ _ HP).
+Qed.
+
+Lemma Permutation_vs_elt_subst A (a : A) l l1 l2 :
+  Permutation l (l1 ++ a :: l2) -> exists l' l'',
+    (forall l0, Permutation (l' ++ l0 ++ l'') (l1 ++ l0 ++ l2)) /\ l = l' ++ a :: l''.
+Proof.
+intros [l' [l'' [HP ->]]]%Permutation_vs_elt_inv_perm.
+exists l', l''; split; [ | reflexivity ].
+intro l0. apply (Permutation_app_middle l0 _ _ _ _ HP).
 Qed.
 
 Lemma Permutation_map_inv_inj A B (f : A -> B) (Hinj : injective f) l1 l2 :

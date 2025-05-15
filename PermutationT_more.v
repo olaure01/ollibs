@@ -131,16 +131,21 @@ apply PermutationT_trans with (l3 ++ l ++ l4); [ assumption | ].
 apply PermutationT_app_swap_app.
 Qed.
 
+Lemma PermutationT_vs_elt_inv_perm A l l1 l2 (a : A) :
+  PermutationT l (l1 ++ a :: l2) -> {'(l', l'') & PermutationT (l' ++ l'') (l1 ++ l2) & l = l' ++ a :: l'' }.
+Proof.
+intro HP. destruct (PermutationT_vs_elt_inv _ _ _ HP) as [(l', l'') ->].
+exists (l', l''); [ | reflexivity ].
+apply (PermutationT_app_inv _ _ _ _ _ HP).
+Qed.
+
 Lemma PermutationT_vs_elt_subst A (a : A) l l1 l2 :
   PermutationT l (l1 ++ a :: l2) ->
-  {'(l3, l4) & forall l0, PermutationT (l1 ++ l0 ++ l2) (l3 ++ l0 ++ l4) & l = l3 ++ a :: l4 }.
+  {'(l', l'') & forall l0, PermutationT (l' ++ l0 ++ l'') (l1 ++ l0 ++ l2) & l = l' ++ a :: l'' }.
 Proof.
-intros HP.
-destruct (PermutationT_vs_elt_inv _ _ _ HP) as [(l', l'') ->].
+intros [(l', l'') HP ->]%PermutationT_vs_elt_inv_perm.
 exists (l', l''); [ | reflexivity ].
-intros l0.
-apply PermutationT_app_inv, (PermutationT_app_middle l0) in HP.
-symmetry; assumption.
+intro l0. apply (PermutationT_app_middle l0 _ _ _ _ HP).
 Qed.
 
 Lemma PermutationT_app_app_inv A (l1 l2 l3 l4 : list A) :

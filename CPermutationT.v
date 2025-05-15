@@ -169,13 +169,12 @@ Qed.
 
 Lemma CPermutationT_vs_elt_subst A (a : A) l l1 l2 :
   CPermutationT l (l1 ++ a :: l2) ->
-  {'(l3, l4) & forall l0, CPermutationT (l1 ++ l0 ++ l2) (l3 ++ l0 ++ l4) & l = l3 ++ a :: l4 }.
+  {'(l', l'') & forall l0, CPermutationT (l' ++ l0 ++ l'') (l1 ++ l0 ++ l2) & l = l' ++ a :: l'' }.
 Proof.
 intros [(l', l'') Heq ->]%CPermutationT_vs_elt_inv.
 exists (l', l''); [ | reflexivity ].
-intro l0.
-etransitivity; [ apply CPermutationT_app_comm | ].
-list_simpl. rewrite Heq, app_assoc. constructor.
+intro l0. etransitivity; [ apply CPermutationT_app_comm | ].
+list_simpl. rewrite <- Heq, app_assoc. constructor.
 Qed.
 
 Lemma CPermutationT_app_app_inv A (l1 l2 l3 l4 : list A) :

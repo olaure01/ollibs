@@ -96,8 +96,8 @@ Section GPermutation.
   Qed.
 
   Lemma PCEPermutation_vs_elt_subst a l l1 l2 :
-    PCEPermutation l (l1 ++ a :: l2) -> exists l3 l4,
-      (forall l0, PCEPermutation (l1 ++ l0 ++ l2) (l3 ++ l0 ++ l4)) /\ l = l3 ++ a :: l4.
+    PCEPermutation l (l1 ++ a :: l2) -> exists l' l'',
+      (forall l0, PCEPermutation (l' ++ l0 ++ l'') (l1 ++ l0 ++ l2)) /\ l = l' ++ a :: l''.
   Proof.
   case_perm_tri; intros HP.
   - apply CPermutation_vs_elt_subst, HP.
@@ -173,8 +173,8 @@ Section GPermutation.
   Qed.
 
   Lemma PCPermutation_vs_elt_subst a l l1 l2 :
-    PCPermutation l (l1 ++ a :: l2) -> exists l3 l4,
-      (forall l0, PCPermutation (l1 ++ l0 ++ l2) (l3 ++ l0 ++ l4)) /\ l = l3 ++ a :: l4.
+    PCPermutation l (l1 ++ a :: l2) -> exists l' l'',
+      (forall l0, PCPermutation (l' ++ l0 ++ l'') (l1 ++ l0 ++ l2)) /\ l = l' ++ a :: l''.
   Proof.
   case_perm; intros HP;
     [ apply Permutation_vs_elt_subst | apply CPermutation_vs_elt_subst ]; assumption.
@@ -243,8 +243,8 @@ Section GPermutation.
   Proof. now case_perm; [ apply Permutation_length_2_inv | left; symmetry ]. Qed.
 
   Lemma PEPermutation_vs_elt_subst a l l1 l2 :
-    PEPermutation l (l1 ++ a :: l2) -> exists l3 l4,
-      (forall l0, PEPermutation (l1 ++ l0 ++ l2) (l3 ++ l0 ++ l4)) /\ l = l3 ++ a :: l4.
+    PEPermutation l (l1 ++ a :: l2) -> exists l' l'',
+      (forall l0, PEPermutation (l' ++ l0 ++ l'') (l1 ++ l0 ++ l2)) /\ l = l' ++ a :: l''.
   Proof.
   case_perm; intros HP.
   - apply Permutation_vs_elt_subst; assumption.
@@ -252,15 +252,15 @@ Section GPermutation.
   Qed.
 
   Lemma PEPermutation_vs_elt_inv a l l1 l2 :
-    PEPermutation l (l1 ++ a :: l2) -> exists l3 l4,
-      PEPermutation (l1 ++ l2) (l3 ++ l4) /\ l = l3 ++ a :: l4.
+    PEPermutation l (l1 ++ a :: l2) -> exists l' l'',
+      PEPermutation (l' ++ l'') (l1 ++ l2) /\ l = l' ++ a :: l''.
   Proof.
-  intros HP; apply PEPermutation_vs_elt_subst in HP as [l3 [l4 [HP ->]]].
-  exists l3, l4; split; [ apply (HP nil) | reflexivity ].
+  intro HP; apply PEPermutation_vs_elt_subst in HP as [l' [l'' [HP ->]]].
+  exists l', l''; split; [ apply (HP nil) | reflexivity ].
   Qed.
 
   Lemma PEPermutation_vs_cons_inv a l l1 :
-    PEPermutation l (a :: l1) -> exists l2 l3, PEPermutation l1 (l2 ++ l3) /\ l = l2 ++ a :: l3.
+    PEPermutation l (a :: l1) -> exists l2 l3, PEPermutation (l2 ++ l3) l1 /\ l = l2 ++ a :: l3.
   Proof. now intro HP; rewrite <- (app_nil_l l1); apply PEPermutation_vs_elt_inv. Qed.
 
   #[export] Instance PEPermtutation_in a : Proper (PEPermutation ==> Basics.impl) (In a).
@@ -302,7 +302,7 @@ Section GPermutation.
 
   Lemma PCPermutation_vs_elt_inv a l l1 l2 :
     PCPermutation l (l1 ++ a :: l2) ->  exists l' l'',
-      PEPermutation (l2 ++ l1) (l'' ++ l') /\ l = l' ++ a :: l''.
+      PEPermutation (l'' ++ l') (l2 ++ l1) /\ l = l' ++ a :: l''.
   Proof.
   case_perm; intro HP.
   - destruct (Permutation_vs_elt_inv _ _ _ HP) as (l' & l'' & ->).
@@ -310,13 +310,13 @@ Section GPermutation.
     apply Permutation_app_inv in HP.
     symmetry in HP.
     etransitivity; [ eapply Permutation_app_comm | ].
-    etransitivity; [ eassumption | apply Permutation_app_comm ].
+    etransitivity; [ symmetry; eassumption | apply Permutation_app_comm ].
   - destruct (CPermutation_vs_elt_inv _ _ _ HP) as (l' & l'' & Heq & ->).
     exists l', l''; auto.
   Qed.
 
   Lemma PCPermutation_vs_cons_inv a l l1 :
-    PCPermutation l (a :: l1) -> exists l' l'', PEPermutation l1 (l'' ++ l') /\ l = l' ++ a :: l''.
+    PCPermutation l (a :: l1) -> exists l' l'', PEPermutation (l'' ++ l') l1 /\ l = l' ++ a :: l''.
   Proof.
   intro HP.
   rewrite <- app_nil_l in HP.
@@ -330,10 +330,8 @@ Section GPermutation.
        a1 = a2 /\ PEPermutation l1 l2
     \/ exists l3 l4, PEPermutation l1 (l4 ++ a2 :: l3) /\ l2 = l3 ++ a1 :: l4.
   Proof.
-  intros HP; symmetry in HP.
-  apply PCPermutation_vs_cons_inv in HP.
-  destruct HP as [l1' [l2' [HP' Heq]]].
-  destruct l1' as [|a' l1']; inversion Heq; subst.
+  intros HP. symmetry in HP.
+  apply PCPermutation_vs_cons_inv in HP as [[|a' l1'] [l2' [HP' [= -> ->]]]]; symmetry in HP'.
   - left; split; auto.
     now rewrite app_nil_r in HP'.
   - right; exists l1', l2'; auto.
