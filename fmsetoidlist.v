@@ -146,7 +146,7 @@ Section Fmmap.
   Definition fmmap (m : M) := list2fm (map f (elts m)).
 
   #[export] Instance fmmap_meq : Proper (meq ==> meq) fmmap.
-  Proof. intro; intros. apply perm_meq, Permutation_map, meq_perm. assumption. Qed.
+  Proof. intro. intros. apply perm_meq, Permutation_map, meq_perm. assumption. Qed.
 
   Lemma list2fm_map l : meq (list2fm (map f l)) (fmmap (list2fm l)).
   Proof. symmetry. apply perm_meq, Permutation_map, elts_perm. Qed.
@@ -155,7 +155,7 @@ Section Fmmap.
   Proof.
   rewrite <- (list2fm_retract m) at 1.
   remember (elts m) as l eqn:Heql. clear m Heql. induction l as [|a l IHl].
-  - cbn. unfold fmmap. rewrite elts_empty. cbn. rewrite elts_empty. reflexivity.
+  - cbn. unfold fmmap. rewrite 2 elts_empty. reflexivity.
   - transitivity (map f (elts (list2fm (a :: l)))).
     + apply elts_perm.
     + apply Permutation_map, elts_perm.
@@ -170,11 +170,12 @@ Arguments fmmap {_ _ _ _ _ _} _ _.
 
 Fact FMoidConstr_list : FMoidConstructor list id.
 Proof.
-intro A.
-split with (@Permutation A) (@nil A) (@cons A) id; auto.
+intro A. split with (@Permutation A) (@nil A) (@cons A) id.
 - apply Permutation_Equivalence.
 - intros a1 a2 <- l1 l2 HP.
   apply Permutation_cons, HP. reflexivity.
-- intros. rewrite 2 fold_id. assumption.
-- intro. rewrite fold_id. reflexivity.
+- reflexivity.
+- intros. rewrite 2 fold_right_id. assumption.
+- intros. assumption.
+- intro. rewrite fold_right_id. reflexivity.
 Defined.

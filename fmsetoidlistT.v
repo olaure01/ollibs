@@ -5,8 +5,8 @@ Equality is an equivalence relation.
 An implementation of the axioms is provided for every type
 by lists up to permutation (with output in [Type]. *)
 
-From Stdlib Require Import CMorphisms List.
-From OLlibs Require Import PermutationT.
+From Stdlib Require Import CMorphisms.
+From OLlibs Require Import List_more PermutationT.
 
 (* Set Mangle Names. Set Mangle Names Light. *)
 Set Default Goal Selector "!".
@@ -103,26 +103,26 @@ Section FMSet2List.
   Proof. apply elts_perm. Qed.
 
   Lemma sum_empty_left m : meq (sum empty m) m.
-  Proof. unfold sum; rewrite elts_empty; apply retract_meq. Qed.
+  Proof. unfold sum. rewrite elts_empty. apply retract_meq. Qed.
 
   Lemma sum_empty_right m : meq (sum m empty) m.
-  Proof. unfold sum; rewrite elts_empty, app_nil_r; apply retract_meq. Qed.
+  Proof. unfold sum. rewrite elts_empty, app_nil_r. apply retract_meq. Qed.
 
   Lemma sum_comm m1 m2 : meq (sum m1 m2) (sum m2 m1).
-  Proof. now unfold sum; rewrite PermutationT_app_comm. Qed.
+  Proof. unfold sum. rewrite PermutationT_app_comm. reflexivity. Qed.
 
   Lemma sum_ass m1 m2 m3 : meq (sum (sum m1 m2) m3) (sum m1 (sum m2 m3)).
   Proof.
-  unfold sum; apply perm_meq.
+  apply perm_meq.
   transitivity ((elts m1 ++ elts m2) ++ elts m3).
   - apply PermutationT_app_tail, elts_perm.
-  - rewrite <- app_assoc; symmetry.
+  - rewrite <- app_assoc. symmetry.
     apply PermutationT_app_head, elts_perm.
   Qed.
 
   Lemma list2fm_app l1 l2 : meq (list2fm (l1 ++ l2)) (sum (list2fm l1) (list2fm l2)).
   Proof.
-  unfold sum; apply perm_meq.
+  apply perm_meq.
   transitivity (elts (list2fm l1) ++ l2); symmetry.
   - apply PermutationT_app_tail, elts_perm.
   - apply PermutationT_app_head, elts_perm.
@@ -130,10 +130,8 @@ Section FMSet2List.
 
   #[export] Instance sum_meq : Proper (meq ==> meq ==> meq) sum.
   Proof.
-  intros m1 m2 Heq m1' m2' Heq'; unfold sum.
-  apply meq_perm in Heq.
-  apply meq_perm in Heq'.
-  now apply perm_meq, PermutationT_app.
+  intros m1 m2 Heq%meq_perm m1' m2' Heq'%meq_perm.
+  apply perm_meq, PermutationT_app; assumption.
   Qed.
 
 End FMSet2List.
@@ -153,21 +151,17 @@ Section Fmmap.
   Definition fmmap (m : M) := list2fm (map f (elts m)).
 
   #[export] Instance fmmap_meq : Proper (meq ==> meq) fmmap.
-  Proof.
-  intros l1 l2 Heq.
-  now apply perm_meq, PermutationT_map, meq_perm.
-  Qed.
+  Proof. intros l1 l2 Heq. apply perm_meq, PermutationT_map, meq_perm. assumption. Qed.
 
   Lemma list2fm_map l : meq (list2fm (map f l)) (fmmap (list2fm l)).
-  Proof. symmetry; apply perm_meq, PermutationT_map, elts_perm. Qed.
+  Proof. symmetry. apply perm_meq, PermutationT_map, elts_perm. Qed.
 
   Lemma elts_fmmap m : PermutationT (elts (fmmap m)) (map f (elts m)).
   Proof.
   etransitivity ; [ apply meq_perm ; apply fmmap_meq ;
                     symmetry ; apply (list2fm_retract m) | ].
   remember (elts m) as l eqn:Heql; clear m Heql; induction l as [|a l IHl].
-  - simpl; unfold fmmap; rewrite elts_empty; simpl.
-    now rewrite elts_empty.
+  - cbn. unfold fmmap. rewrite 2 elts_empty. constructor.
   - transitivity (map f (elts (list2fm (a :: l)))).
     + apply elts_perm.
     + apply PermutationT_map, elts_perm.
@@ -180,16 +174,14 @@ Arguments fmmap {_ _ _ _ _ _} _ _.
 
 (** * Lists up to permutation as finite multisets *)
 
-Lemma fold_id A l : fold_right (@cons A) nil l = l.
-Proof. now induction l; simpl; auto; f_equal. Qed.
-
 Fact FMoidConstr_list : FMoidConstructor list id.
 Proof.
-intros A.
-split with (@PermutationT A) (@nil A) (@cons A) id; auto.
+intro A. split with (@PermutationT A) (@nil A) (@cons A) id.
 - apply PermutationT_Equivalence.
-- intros a1 a2 Heq l1 l2 HP; subst.
-  now apply PermutationT_cons.
-- now intros l1 l2 HP; rewrite 2 fold_id.
-- now intros m; rewrite fold_id.
+- intros a1 a2 Heq l1 l2 HP.
+  apply PermutationT_cons; assumption.
+- reflexivity.
+- intros l1 l2 HP. rewrite 2 fold_right_id. assumption.
+- intros. assumption.
+- intro m. rewrite fold_right_id. reflexivity.
 Defined.

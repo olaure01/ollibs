@@ -14,6 +14,7 @@ Ongoing development.
 * correct ad hoc statements
   * symmetry in `*Permutation*_vs_elt_subst` and add `Permutation*_vs_elt_inv_perm` (to strengthen `Permutation*_vs_elt_inv`)
 * correct bad namings
+  * rename `fold_id` into `fold_right_id`
   * rename `list_to_Forall` into `list_to_ForallT`, `Forall_to_list` into `ForallT_to_list`, etc.
   * in `shuffle.v` and `shuffleT.v`, rename `sublist_*` into `shuffle[T]_*`
   * in `shuffle.v` and `shuffleT.v`, exchange names of `Permutation[T]_shuffle[T]` and `shuffle[T]_Permutation[T]`
