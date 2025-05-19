@@ -8,14 +8,17 @@ Ongoing development.
 * list tactics
   * new version of `list_simpl` (more stable in presence of existential variables), the old version is now `list_esimpl`
   * add `list_[e]reflexivity` as shortcut for `list_[e]simpl; reflexivity`
-  * define `list_apply` for application up to list equality (through `list_reflexivity`)
+  * add `list_apply` for application up to list equality (through `list_reflexivity`)
+  * add `decomp_app_eq_app_strict` based on `app_eq_app_trichotT` (relying on strict prefixes)
   * generalize `decomp_nil_eq_elt` and `decomp_unit_eq_elt` to `decomp_nil_eq` and `decomp_unit_eq`
-  * rename `decomp_map` into `decomp_map_eq`
+  * remove automatic substitutions in `decomp_elt_eq_elt`
 * correct ad hoc statements
   * symmetry in `*Permutation*_vs_elt_subst` and add `Permutation*_vs_elt_inv_perm` (to strengthen `Permutation*_vs_elt_inv`)
 * correct bad namings
+  * rename `decomp_map` into `decomp_map_eq`
   * rename `fold_id` into `fold_right_id`
   * rename `list_to_Forall` into `list_to_ForallT`, `Forall_to_list` into `ForallT_to_list`, etc.
+  * rename `dichot[T]_*` and `trichot[T]_*` into `*_dichot[T]` and `*_trichot[T]`
   * in `shuffle.v` and `shuffleT.v`, rename `sublist_*` into `shuffle[T]_*`
   * in `shuffle.v` and `shuffleT.v`, exchange names of `Permutation[T]_shuffle[T]` and `shuffle[T]_Permutation[T]`
 * weaken uselessly strong hypothesis in `finite_strictorder_max`
