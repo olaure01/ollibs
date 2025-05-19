@@ -72,7 +72,7 @@ Below _l_ is a list, _p_ is a pattern, _H_ is an hypothesis, _t_ is any term, et
 
 * `list_simpl` [`in` [_H_ | *]]
 
-   flatten lists and also simplifies uses of `rev`, `map` and `flat_map` (`list_esimpl` is very similar, might do a bit more job, but might loop in presence of existential variables)
+   flattens lists and also simplifies uses of `rev`, `map` and `flat_map` (`list_esimpl` is very similar, it might do a bit more job, but it might loop in presence of existential variables)
 
 * `list_[e]reflexivity`
 
@@ -80,7 +80,7 @@ Below _l_ is a list, _p_ is a pattern, _H_ is an hypothesis, _t_ is any term, et
 
 * `cons2app` [`in` [_H_ | *]]
 
-   constrain uses of `cons` (i.e. `::`): turn each `a :: l` into `[a] ++ l`
+   constrains uses of `cons` (i.e. `::`): turn each `a :: l` into `[a] ++ l`
 
 * `list_apply` _t_ [`in` _H_]
 
@@ -88,47 +88,50 @@ Below _l_ is a list, _p_ is a pattern, _H_ is an hypothesis, _t_ is any term, et
 
 * `decomp_nil_eq` _H_
 
-   when_H_ is an equalty of the shape `nil = l` or `l = nil`, `l` is recursively analysed and decomposed into empty lists or a contradiction
+   when _H_ is an equalty of the shape `nil = l` or `l = nil`, `l` is recursively analysed and decomposed into empty lists or a contradiction
 
 * `decomp_unit_eq` _H_
 
-   when_H_ is an equalty of the shape `[a] = l` or `l = [a]`, `l` is recursively analysed and decomposed into empty and singleton lists or a contradiction
+   when _H_ is an equalty of the shape `[a] = l` or `l = [a]`, `l` is recursively analysed and decomposed into empty and singleton lists or a contradiction
 
 * `decomp_app_eq_app` _H_
 
-  _TODO_
+   when _H_ is an equalty of the shape `l1 ++ l2 = l3 ++ l4`, it is decomposed into the two possible cases: `l1` is a prefix of `l3` or `l3` is a prefix of `l1`
+
+   (`decomp_app_eq_app_strict` is similar by giving three possible cases by distinguishing strict prefixes)
 
 * `decomp_elt_eq_app` _H_
 
-  _TODO_
+   when _H_ is an equalty of the shape `l1 ++ a ::  l2 = l3 ++ l4` (or `l3 ++ l4 = l1 ++ a ::  l2`), it is decomposed into the two possible cases: `a` is in `l3` or `a` is in `l4`
 
 * `decomp_elt_eq_elt` _H_
 
-  _TODO_
+   when _H_ is an equalty of the shape `l1 ++ a ::  l2 = l3 ++ b :: l4`, it is decomposed into the three possible cases: `a` is in `l3` (and `b` in `l2`) or `a` and `b` are the same occurrence or `a` is in `l4` (and `b` in `l1`)
 
 * `decomp_elt_eq_app_app` _H_
 
-  _TODO_
+   when _H_ is an equalty of the shape `l1 ++ a ::  l2 = l3 ++ l4 ++ l5` (or `l3 ++ l4 ++ l5 = l1 ++ a ::  l2`), it is decomposed into the three possible cases: `a` is in `l3` or `a` is in `l4` or `a` is in `l5`
 
 * `decomp_map_eq` _H_
 
-  _TODO_
+  when _H_ is an equalty of the shape `map f l1 = l2` (or `l2 = map f l1`), `l1` is decomposed to match the list structure (`cons`, `app`, etc.) of `l2`
+  (the tactic might work better when the leaves of the list structure of `l2` are variables, so it might be useful to precook by using `remember` before applying `decomp_map_eq`) 
 
 * `specialize_Forall` _H_ `with` _t_
 
-  _TODO_
+  instantiate _H_ of type `Forall P l` with element _t_ (assuming an assumption `In t l` is in the context)
 
 * `specialize_Forall_all` _t_
 
-  _TODO_
+  apply `specialize_Forall` to all hypotheses of type `Forall _ _`
 
 * `in_solve`
 
-  _TODO_
+  automatic tactic for (an attempt of) solving statements about `In`
 
 * `Forall[T]_solve`
 
-  _TODO_
+  automatic tactic for (an attempt of) solving statements about `Forall[T]`
 
 
 ### Namings
@@ -139,5 +142,6 @@ Below _l_ is a list, _p_ is a pattern, _H_ is an hypothesis, _t_ is any term, et
 * `elt` refers to lists of the shape `_ ++ _ :: _`;
 * `app_app` refers to lists of the shape `_ ++ _ ++ _`;
 * `map` refers to lists of the shape `map _ _`;
+* `last` refers to the last element of a list or to a list of the shape `_ ++ [_]` (i.e. `_ ++ _ :: nil`);
 * tactics `decomp_*_eq` and `decomp_*_eq_*` act on an equality hypothesis (with `*` describing the shapes on one or each side of the equality) and decompose it (most of such tactics work up to applying symmetry on the equality).
 
