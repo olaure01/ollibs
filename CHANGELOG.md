@@ -9,8 +9,10 @@ Ongoing development.
   * new version of `list_simpl` (more stable in presence of existential variables), the old version is now `list_esimpl`
   * add `list_[e]reflexivity` as shortcut for `list_[e]simpl; reflexivity`
   * add `list_apply` for application up to list equality (through `list_reflexivity`)
-  * add `decomp_app_eq_app_strict` based on `app_eq_app_trichotT` (relying on strict prefixes)
   * generalize `decomp_nil_eq_elt` and `decomp_unit_eq_elt` to `decomp_nil_eq` and `decomp_unit_eq`
+  * add `decomp_app_eq_app_strict` based on `app_eq_app_trichotT` (relying on strict prefixes)
+  * add `decomp_cons_eq_*`
+  * add `decomp_list_eq`
   * remove automatic substitutions in `decomp_elt_eq_elt`
 * correct ad hoc statements
   * symmetry in `*Permutation*_vs_elt_subst` and add `Permutation*_vs_elt_inv_perm` (to strengthen `Permutation*_vs_elt_inv`)

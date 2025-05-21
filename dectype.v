@@ -29,7 +29,7 @@ Section DecTypes.
   Implicit Type x y : X.
 
   Lemma eqb_refl x : eqb x x = true.
-  Proof. apply (proj2 (eqb_eq x x) eq_refl). Qed.
+  Proof. exact (proj2 (eqb_eq x x) eq_refl). Qed.
 
   Lemma eqb_neq x y : eqb x y = false <-> x <> y.
   Proof.
@@ -48,7 +48,7 @@ Section DecTypes.
   Definition eq_dec_dectype (eq_dec : forall x y, decidableP (x = y)) : DecType.
   Proof.
   exists X (fun x y => if eq_dec x y then true else false).
-  intros x y. split; destruct (eq_dec x y); now intros [=].
+  intros x y. split; destruct (eq_dec x y); intros [=]; [ assumption | reflexivity | contradiction ].
   Defined.
 
   Lemma eq_dt_dec x y : decidableP (x = y).

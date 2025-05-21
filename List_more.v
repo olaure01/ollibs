@@ -338,8 +338,26 @@ Tactic Notation "decomp_elt_eq_app" hyp(H) "as" simple_intropattern(p) := decomp
 Tactic Notation "decomp_elt_eq_app" hyp(H) :=
   let l := fresh "l" in
   let H1 := fresh H in
-  let H2 := fresh H in
-  decomp_elt_eq_app_core H ipattern:([[l H1 H2]|[l H1 H2]]).
+  decomp_elt_eq_app_core H ipattern:([[l H H1]|[l H1 H]]).
+
+#[local] Ltac decomp_cons_eq_app_core H p :=
+  match type of H with
+  | ?a :: ?l = _ ++ _ => rewrite <- (app_nil_l (a :: l)) in H;
+                         let l0 := fresh "l" in
+                         let H0 := fresh H in
+                         apply elt_eq_app_dichotT in H as [p|[l0 H0 H]];
+                           [ rewrite (app_nil_l (a :: _)) in * | decomp_nil_eq H0 ]
+  | _ ++ _ = ?a :: ?l => simple apply eq_sym in H; rewrite <- (app_nil_l (a :: l)) in H;
+                         let l0 := fresh "l" in
+                         let H0 := fresh H in
+                         apply elt_eq_app_dichotT in H as [p|[l0 H0 H]];
+                           [ rewrite (app_nil_l (a :: _)) in * | decomp_nil_eq H0 ]
+  end.
+Tactic Notation "decomp_cons_eq_app" hyp(H) "as" simple_intropattern(p) := decomp_cons_eq_app_core H p.
+Tactic Notation "decomp_cons_eq_app" hyp(H) :=
+  let l := fresh "l" in
+  let H1 := fresh H in
+  decomp_cons_eq_app_core H ipattern:([l H H1]).
 
 Lemma elt_eq_app_app_trichotT A l1 (a : A) l2 l3 l4 l5 : l1 ++ a :: l2 = l3 ++ l4 ++ l5 ->
      { l2' | l1 ++ a :: l2' = l3 & l2 = l2' ++ l4 ++ l5 }
@@ -376,7 +394,46 @@ Tactic Notation "decomp_elt_eq_app_app" hyp(H) :=
   let l2 := fresh "l" in
   let H1 := fresh H in
   let H2 := fresh H in
-  decomp_elt_eq_app_app_core H ipattern:([[[l1 H1 H2] | [[l1 l2] H1 [H2 H3]] ] | [l2 H1 H2] ]).
+  decomp_elt_eq_app_app_core H ipattern:([[[l1 H H2] | [[l1 l2] H1 [H H2]] ] | [l2 H1 H] ]).
+
+#[local] Ltac decomp_cons_eq_app_app_core H p :=
+  match type of H with
+  | ?a :: ?l = _ ++ _ ++ _ => rewrite <- (app_nil_l (a :: l)) in H;
+                         let l0 := fresh l in
+                         let H0 := fresh H in
+                         apply elt_eq_app_app_trichotT in H as [p|[l0 H0 H]];
+                           [ rewrite (app_nil_l (a :: _)) in *
+                           | decomp_nil_eq H0; rewrite (app_nil_l (a :: _)) in *
+                           | decomp_nil_eq H0 ]
+  | _ ++ _ ++ _ = ?a :: ?l => simple apply eq_sym in H; rewrite <- (app_nil_l (a :: l)) in H;
+                         let l0 := fresh l in
+                         let H0 := fresh H in
+                         apply elt_eq_app_app_trichotT in H as [p|[l0 H0 H]];
+                           [ rewrite (app_nil_l (a :: _)) in *
+                           | decomp_nil_eq H0; rewrite (app_nil_l (a :: _)) in *
+                           | decomp_nil_eq H0 ]
+  end.
+Tactic Notation "decomp_cons_eq_app_app" hyp(H) "as" simple_intropattern(p) := decomp_cons_eq_app_app_core H p.
+Tactic Notation "decomp_cons_eq_app_app" hyp(H) :=
+  let l1 := fresh "l" in
+  let l2 := fresh "l" in
+  let H1 := fresh H in
+  match type of H with
+  | ?a :: ?l = _ ++ _ ++ _ => rewrite <- (app_nil_l (a :: l)) in H;
+                         let l0 := fresh l in
+                         let H0 := fresh H in
+                         apply elt_eq_app_app_trichotT in H as [[[l1 H H1]|[[l1 l2] H0 [H1 H]]]|[l0 H0 H]];
+                           [ rewrite (app_nil_l (a :: _)) in *
+                           | decomp_nil_eq H0; rewrite (app_nil_l (a :: _)) in *
+                           | decomp_nil_eq H0 ]
+  | _ ++ _ ++ _ = ?a :: ?l => simple apply eq_sym in H; rewrite <- (app_nil_l (a :: l)) in H;
+                         let l0 := fresh l in
+                         let H0 := fresh H in
+                         apply elt_eq_app_app_trichotT in H as [[[l1 H H1]|[[l1 l2] H0 [H1 H]]]|[l0 H0 H]];
+                           [ rewrite (app_nil_l (a :: _)) in *
+                           | decomp_nil_eq H0; rewrite (app_nil_l (a :: _)) in *
+                           | decomp_nil_eq H0 ]
+  end.
 
 Lemma elt_eq_elt_trichotT A l1 (a : A) l2 l3 b l4 : l1 ++ a :: l2 = l3 ++ b :: l4 ->
      { l2' | l1 ++ a :: l2' = l3 & l2 = l2' ++ b :: l4 }
@@ -400,8 +457,38 @@ Tactic Notation "decomp_elt_eq_elt" hyp(H) :=
   let l := fresh "l" in
   let H1 := fresh H in
   let H2 := fresh H in
-  let H3 := fresh H in
-  decomp_elt_eq_elt_core H ipattern:([[[l H1 H2] | [H1 [H2 H3]]] | [l H1 H2]]).
+  decomp_elt_eq_elt_core H ipattern:([[[l H1 H2] | [H1 [H H2]]] | [l H1 H2]]).
+
+#[local] Ltac decomp_cons_eq_elt_core H p :=
+  match type of H with
+  | ?a :: ?l = _ ++ _ :: _ => rewrite <- (app_nil_l (a :: l)) in H;
+                         let l0 := fresh l in
+                         let H0 := fresh H in
+                         apply elt_eq_elt_trichotT in H as [p|[l0 H0 H]];
+                           [ rewrite (app_nil_l (a :: _)) in * | | decomp_nil_eq H0 ]
+  | _ ++ _ :: _ = ?a :: ?l => simple apply eq_sym in H; rewrite <- (app_nil_l (a :: l)) in H;
+                         let l0 := fresh l in
+                         let H0 := fresh H in
+                         apply elt_eq_elt_trichotT in H as [p|[l0 H0 H]];
+                           [ rewrite (app_nil_l (a :: _)) in * | | decomp_nil_eq H0 ]
+  end.
+Tactic Notation "decomp_cons_eq_elt" hyp(H) "as" simple_intropattern(p) := decomp_cons_eq_elt_core H p.
+Tactic Notation "decomp_cons_eq_elt" hyp(H) :=
+  let l1 := fresh "l" in
+  let l2 := fresh "l" in
+  let H1 := fresh H in
+  match type of H with
+  | ?a :: ?l = _ ++ _ :: _ => rewrite <- (app_nil_l (a :: l)) in H;
+                         let l0 := fresh l in
+                         let H0 := fresh H in
+                         apply elt_eq_elt_trichotT in H as [[[l1 H H1]|[H0 [H H1]]]|[l0 H0 H]];
+                           [ rewrite (app_nil_l (a :: _)) in * | decomp_nil_eq H0 .. ]
+  | _ ++ _ :: _ = ?a :: ?l => simple apply eq_sym in H; rewrite <- (app_nil_l (a :: l)) in H;
+                         let l0 := fresh l in
+                         let H0 := fresh H in
+                         apply elt_eq_elt_trichotT in H as [[[l1 H1 H2]|[H0 [H H1]]]|[l0 H0 H]];
+                           [ rewrite (app_nil_l (a :: _)) in * | decomp_nil_eq H0 .. ]
+  end.
 
 
 (** BEGIN results in [Prop] subsumed by those in [Type] above *)
@@ -588,6 +675,20 @@ Tactic Notation "decomp_map" ident(H) :=
   let Heq := fresh "Heq" in decomp_map_core H Heq; substitute_map_family Heq.
 #[deprecated(since="ollibs 2.1.1", note="Use decomp_map_eq instead.")] (* TODO add [use] rocq#20444 *)
 Tactic Notation "decomp_map" ident(H) "eqn" ":" ident(Heq) := decomp_map_core H Heq; substitute_map_family Heq.
+
+(** ** Generic decomposition of list equalities *)
+
+Tactic Notation "decomp_list_eq" hyp(H) "as" simple_intropattern(p) :=
+  decomp_cons_eq_app_app H as p + decomp_cons_eq_elt H as p + decomp_cons_eq_app H as p
++ decomp_elt_eq_app_app H as p + decomp_elt_eq_elt H as p + decomp_elt_eq_app H as p + decomp_app_eq_app H as p.
+Tactic Notation "decomp_list_eq" hyp(H) :=
+  decomp_map_eq H + decomp_nil_eq H + decomp_unit_eq H
++ match type of H with
+  | _ :: _ = _ :: _ => let H1 := fresh H in injection H as [= H H1]
+  end
++ decomp_cons_eq_app_app H + decomp_cons_eq_elt H + decomp_cons_eq_app H
++ decomp_elt_eq_app_app H + decomp_elt_eq_elt H + decomp_elt_eq_app H
++ decomp_app_eq_app H.
 
 
 (** ** [Forall] *)
