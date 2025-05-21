@@ -15,18 +15,27 @@ Set Default Proof Using "Type".
 Set Implicit Arguments.
 
 
-(** misc *)
+(** * Notations *)
+
+Module ListNotations.
+Include List.ListNotations.
+Notation "l · a" := (l ++ a :: nil) (at level 55) : list_scope.
+End ListNotations.
+Import ListNotations.
+
+
+(** * Misc *)
 
 (* TODO included in PR rocq#11966 submitted, remove once merged and released *)
 
-    Lemma rev_case A (l : list A) : l = nil \/ exists a tl, l = tl ++ a :: nil.
+    Lemma rev_case A (l : list A) : l = nil \/ exists a tl, l = tl · a.
     Proof. induction l as [|a l] using rev_ind; [ left | right; exists a, l ]; reflexivity. Qed.
 
 (* case analysis similar to [destruct l] but splitting at the end of the list in the spirit of [rev_ind] *)
 
 Inductive last_list_internal A : list A -> Type :=
 | last_list_nil_internal : last_list_internal nil
-| last_list_last_internal : forall a l, last_list_internal (l ++ a :: nil).
+| last_list_last_internal : forall a l, last_list_internal (l · a).
 
 Lemma last_case_internal A (l : list A) : last_list_internal l.
 Proof. induction l as [|a l] using rev_rect; constructor. Qed.

@@ -83,7 +83,7 @@ Lemma CPermutationT_app_rot A (l1 l2 l3 : list A) :
 Proof. rewrite (app_assoc l2). apply cpermT. Qed.
 
 Lemma CPermutationT_cons_append A (a : A) l :
-  CPermutationT (a :: l) (l ++ a :: nil).
+  CPermutationT (a :: l) (l · a).
 Proof. intros. rewrite <- (app_nil_l l), app_comm_cons. apply cpermT. Qed.
 
 Lemma CPermutationT_swap A (a b : A) : CPermutationT (a :: b :: nil) (b :: a :: nil).
@@ -95,11 +95,11 @@ apply cpermT.
 Qed.
 
 Lemma CPermutationT_cons A l1 (a : A) l2 :
-  CPermutationT (l1 ++ a :: nil) l2 -> CPermutationT (a :: l1) l2.
+  CPermutationT (l1 · a) l2 -> CPermutationT (a :: l1) l2.
 Proof. intro. now apply (CPermutationT_app l1 (a :: nil)). Qed.
 
 Lemma CPermutationT_morph_cons A (P : list A -> Prop) :
-  (forall a l, P (l ++ a :: nil) -> P (a :: l)) ->
+  (forall a l, P (l · a) -> P (a :: l)) ->
   Proper (@CPermutationT A ==> Basics.impl) P.
 Proof.
 intros HP l1 l2 [l3 l4] HPl.

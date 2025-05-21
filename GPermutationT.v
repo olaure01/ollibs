@@ -1,6 +1,6 @@
 (** Factorized statements for different notions of permutation *)
 
-From Stdlib Require Import List CMorphisms.
+From Stdlib Require Import CMorphisms.
 From OLlibs Require Import funtheory ComparisonOrder List_more
                            PermutationT_more PermutationT_solve
                            CPermutationT CPermutationT_solve.
