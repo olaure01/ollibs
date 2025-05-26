@@ -1,6 +1,6 @@
 (** Finite sets as finite subsets (witnessed by a list of elements) of a Type *)
 
-From Stdlib Require Import PeanoNat Relation_Definitions.
+From Stdlib Require Import PeanoNat RelationClasses.
 From Stdlib Require Export FinFun.
 From OLlibs Require Import List_more DecidableT dectype infinite.
 
@@ -8,12 +8,6 @@ From OLlibs Require Import List_more DecidableT dectype infinite.
 Set Default Goal Selector "!".
 Set Default Proof Using "Type".
 Set Implicit Arguments.
-
-
-(* TODO move to Relation_Definitions if useful elsewhere
-   and consider making argument A implicit (might break a lot of things in Rocq *)
-Definition irreflexive A R : Prop := forall x : A, ~ R x x.
-Arguments irreflexive : clear implicits.
 
 
 Section Finite.
@@ -84,14 +78,12 @@ intros [lP HP]. induction lP as [|a lP IHlP] in P, HP |- *.
     * apply Forall_app in HPl as [HPl _].
       apply Forall_forall. intros x Hin1. apply Forall_forall with (x := x) in HPl; [ | assumption ].
       split; [ assumption | intros -> ].
-      apply in_split in Hin1 as [l1' [l2' ->]]. list_simpl in Hnd. apply NoDup_app_remove_l in Hnd.
-      inversion_clear Hnd as [|? ? Hina _]. apply Hina, in_elt.
+      apply in_split in Hin1 as [l1' [l2' ->]]. list_simpl in Hnd. apply (not_NoDup_2_elts _ _ _ _ Hnd).
     * apply NoDup_app_remove_r in Hnd. assumption.
     * apply Forall_app in HPl as [_ HPl]. inversion_clear HPl as [|? ? _ Ht].
       apply Forall_forall. intros x Hin2. apply Forall_forall with (x := x) in Ht; [ | assumption ].
       split; [ assumption | intros -> ].
-      apply in_split in Hin2 as [l1' [l2' ->]]. list_simpl in Hnd. apply NoDup_app_remove_l in Hnd.
-      inversion_clear Hnd as [|? ? Hina _]. apply Hina, in_elt.
+      apply in_split in Hin2 as [l1' [l2' ->]]. apply (not_NoDup_2_elts _ _ _ _ Hnd).
     * apply NoDup_app_remove_l in Hnd. inversion Hnd. assumption.
   + apply HP'. split; [ | assumption ].
     apply Forall_forall. intros x Hin. apply Forall_forall with (x := x) in HPl; [ | assumption ].
@@ -136,23 +128,22 @@ induction lP as [ | b [ | c l ] IH ] in P, Hdec, Hnd, HP, a, Ha |- *; [ contradi
 Qed.
 
 Lemma finite_strictorder_max A (eq_dec : ListDec.decidable_eq A) (P : A -> Prop)
-  (R : relation A) (Rdec : forall x y, decidable (R x y)) d (Hd : P d) :
-  finite_subset P -> transitive _ R -> irreflexive _ R ->
-  exists a, P a /\ forall b, P b -> ~ R a b.
+  R (HSO : StrictOrder R) (Rdec : forall x y, decidable (R x y)) (HneP : exists d, P d) :
+  finite_subset P -> exists a, P a /\ forall b, P b -> ~ R a b.
 Proof.
-intros [l [Hnd HP]] Htrans Hirrefl. induction l as [|x l IH] in P, d, Hd, Hnd, HP |- *.
-{ specialize (HP d) as [HP _]. destruct (HP Hd). }
+intros [l [Hnd HP]]. induction l as [|x l IH] in P, HneP, Hnd, HP |- *.
+{ destruct HneP as [d Hd]. destruct (proj1 (HP d) Hd). }
 specialize (IH (fun z => P z /\ z <> x)).
 destruct l as [|y l].
-{ exists d. split; [ assumption | ].
+{ exists x. split; [ apply (HP x), in_eq | ].
   intros b Pb.
-  apply HP in Hd. inversion Hd as [-> | []].
   apply HP in Pb. inversion Pb as [-> | []].
-  apply Hirrefl. }
-destruct (IH y) as [m [[Pm Hnmx] Hm]].
-- split.
-  + apply HP. right. apply in_eq.
-  + intros ->. inversion_clear Hnd as [|? ? Hinx _]. apply Hinx, in_eq.
+  apply HSO. }
+destruct IH as [m [[Pm Hnmx] Hm]].
+- exists y. split.
+  + apply HP. apply in_cons, in_eq.
+  + intros ->. cons2app in Hnd. rewrite <- app_nil_l, <- ? app_comm_cons in Hnd.
+    apply (not_NoDup_2_elts _ _ _ _ Hnd).
 - inversion Hnd. assumption.
 - intro z. specialize (HP z) as [Hfin1 Hfin2]. split.
   + intros [Pz Hnzx]. apply Hfin1 in Pz. destruct Pz as [->|Hin]; [ | assumption ].
@@ -164,8 +155,8 @@ destruct (IH y) as [m [[Pm Hnmx] Hm]].
   + exists x. split.
     * apply HP, in_eq.
     * intros b Pb HR. apply (Hm b).
-      -- split; [ assumption | intros -> ]. apply (Hirrefl x HR).
-      -- apply (Htrans _ x); assumption.
+      -- split; [ assumption | intros -> ]. revert HR. apply HSO.
+      -- transitivity x; assumption.
   + exists m. split; [ assumption | ].
     intros b Pb. destruct (eq_dec x b) as [-> | Hneq]; [ assumption | ].
     apply Hm. split; [ assumption | intros -> ]. contradiction Hneq. reflexivity.

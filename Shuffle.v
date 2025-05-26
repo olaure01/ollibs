@@ -7,6 +7,7 @@ Set Default Goal Selector "!".
 Set Default Proof Using "Type".
 Set Implicit Arguments.
 
+
 Inductive shuffle (A : Type) : list A -> list A -> list A -> Prop :=
 | shuffle_nil : shuffle nil nil nil
 | shuffle_l a l1 l2 l3 : shuffle l1 l2 l3 -> shuffle (a :: l1) l2 (a :: l3)

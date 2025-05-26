@@ -747,6 +747,12 @@ Section SetIncl.
   Lemma inclT_filter f l : inclT (filter f l) l.
   Proof. intros x Hin; apply filter_InT_inv in Hin; intuition. Qed.
 
+  Lemma inclT_cons_cons a l1 l2 : inclT l1 l2 -> inclT (a :: l1) (a :: l2).
+  Proof.
+  intro Hincl. change (a :: l1) with ((a :: nil) ++ l1). change (a :: l2) with ((a :: nil) ++ l2).
+  apply inclT_app_app; [ intros ? ? | ]; assumption.
+  Qed.
+
 End SetIncl.
 
 Lemma inclT_map A B (f : A -> B) l1 l2 : inclT l1 l2 -> inclT (map f l1) (map f l2).

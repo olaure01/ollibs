@@ -1,4 +1,4 @@
-From Stdlib Require Import PeanoNat Morphisms.
+From Stdlib Require Import PeanoNat Relations Morphisms.
 From Stdlib Require Decidable ListDec.
 From OLlibs Require Import List_more.
 Import ListNotations.
@@ -8,7 +8,8 @@ Set Default Goal Selector "!".
 Set Default Proof Using "Type".
 Set Implicit Arguments.
 
-Inductive sublist A : list A -> list A -> Prop :=
+
+Inductive sublist A : relation (list A) :=
 | sublist_nil : sublist nil nil
 | sublist_cons a l1 l2 : sublist l1 l2 -> sublist (a :: l1) (a :: l2)
 | sublist_drop a l1 l2 : sublist l1 l2 -> sublist l1 (a :: l2).
@@ -106,7 +107,7 @@ Lemma uniquify_map_sublist A B (eq_dec : forall x y:B, Decidable.decidable (x=y)
  exists l', NoDup (map f l') /\ incl (map f l) (map f l') /\ sublist (map f l') (map f l).
 Proof.
 induction l as [ | a l IHl ].
-- exists nil. simpl. split; [ | split ]; [ | red; trivial | ]; constructor.
+- exists nil. cbn. split; [ | split ]; [ | red; trivial | ]; constructor.
 - destruct IHl as [l' [Hnd [Hinc Hsub]]].
   destruct (ListDec.In_decidable eq_dec (f a) (map f l')).
   + exists l'. cbn. split; [ | split ]; [ assumption | | ].

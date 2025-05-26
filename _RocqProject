@@ -39,6 +39,7 @@ PermutationT.v
 Shuffle.v
 ShuffleT.v
 SubList.v
+SubListT.v
 transp_perm.v
 Vector_more.v
 Wf_nat_more.v

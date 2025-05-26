@@ -1,11 +1,12 @@
 From Stdlib Require Import List.
-From OLlibs Require Import Logic_Datatypes_more List_more SubList PermutationT_more Shuffle.
+From OLlibs Require Import Logic_Datatypes_more List_more SubListT PermutationT_more Shuffle.
 Import ListNotations.
 
 (* Set Mangle Names. Set Mangle Names Light. *)
 Set Default Goal Selector "!".
 Set Default Proof Using "Type".
 Set Implicit Arguments.
+
 
 Inductive shuffleT (A : Type) : list A -> list A -> list A -> Type :=
 | shuffleT_nil : shuffleT nil nil nil
@@ -322,10 +323,10 @@ intro s. induction s as [ | x l' l'' l''' s IHs | x l' l'' l''' s IHs ]; intro a
 - intros [-> | [ | ]%IHs ]; [right; left; reflexivity | left | right; right ]; assumption.
 Qed.
 
-Lemma shuffleT_sublist_l A (l1 l2 l3 : list A) : shuffleT l1 l2 l3 -> sublist l1 l3.
+Lemma shuffleT_sublistT_l A (l1 l2 l3 : list A) : shuffleT l1 l2 l3 -> sublistT l1 l3.
 Proof. intro s. induction s; constructor; assumption. Qed.
 
-Lemma shuffleT_sublist_r A (l1 l2 l3 : list A) : shuffleT l1 l2 l3 -> sublist l2 l3.
+Lemma shuffleT_sublistT_r A (l1 l2 l3 : list A) : shuffleT l1 l2 l3 -> sublistT l2 l3.
 Proof. intro s. induction s; constructor; assumption. Qed.
 
 Lemma NoDupT_shuffleT_l A (l1 l2 l3 : list A) : shuffleT l1 l2 l3 -> NoDupT l3 -> NoDupT l1.

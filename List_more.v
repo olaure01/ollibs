@@ -55,11 +55,11 @@ Ltac list_simpl :=
     | |- context [(?l1 ++ ?l2) ++ ?l3] => rewrite <- (app_assoc l1 l2 l3)
     | |- context [(?a :: ?l1) ++ ?l2] => rewrite <- (app_comm_cons l1 l2 a)
     | |- context [?l ++ nil] => rewrite (app_nil_r l)
-    | |- context [rev (map ?f ?l)] => rewrite <- (map_rev f l)
+    | |- context [rev (@map ?A ?B ?f ?l)] => rewrite <- (@map_rev A B f l)
     | |- context [rev (rev ?l)] => rewrite (rev_involutive l)
     | |- context [rev (?l1 ++ ?l2)] => rewrite (rev_app_distr l1 l2)
-    | |- context [map ?f (?l1 ++ ?l2)] => rewrite (map_app f l1 l2)
-    | |- context [flat_map ?f (?l1 ++ ?l2)] => rewrite (flat_map_app f l1 l2)
+    | |- context [@map ?A ?B ?f (?l1 ++ ?l2)] => rewrite (@map_app A B f l1 l2)
+    | |- context [@flat_map ?A ?B ?f (?l1 ++ ?l2)] => rewrite (@flat_map_app A B f l1 l2)
     end).
 #[local] Ltac list_simpl_hyp H :=
   repeat (
@@ -68,11 +68,11 @@ Ltac list_simpl :=
     | context [(?l1 ++ ?l2) ++ ?l3] => rewrite <- (app_assoc l1 l2 l3) in H
     | context [(?a :: ?l1) ++ ?l2] => rewrite <- (app_comm_cons l1 l2 a) in H
     | context [?l ++ nil] => rewrite (app_nil_r l) in H
-    | context [rev (map ?f ?l)] => rewrite <- (map_rev f l) in H
+    | context [rev (@map ?A ?B ?f ?l)] => rewrite <- (@map_rev A B f l) in H
     | context [rev (rev ?l)] => rewrite (rev_involutive l) in H
     | context [rev (?l1 ++ ?l2)] => rewrite (rev_app_distr l1 l2) in H
-    | context [map ?f (?l1 ++ ?l2)] => rewrite (map_app f l1 l2) in H
-    | context [flat_map ?f (?l1 ++ ?l2)] => rewrite (flat_map_app f l1 l2) in H
+    | context [@map ?A ?B ?f (?l1 ++ ?l2)] => rewrite (@map_app A B f l1 l2) in H
+    | context [@flat_map ?A ?B ?f (?l1 ++ ?l2)] => rewrite (@flat_map_app A B f l1 l2) in H
     end).
 Ltac list_simpl_hyps :=
   match goal with
@@ -824,6 +824,12 @@ Proof. split; intro; [ apply incl_refl | apply incl_tran ]. Qed.
 (** ** [NoDup] *)
 Lemma NoDup_unit A (a : A) : NoDup (a :: nil).
 Proof. constructor; [ intros [] | constructor ]. Qed.
+
+Lemma NoDup_2_elts A (a b : A) l1 l2 l3 : NoDup (l1 ++ a :: l2 ++ b :: l3) -> a <> b.
+Proof. intros [_ Hnd]%NoDup_remove ->. apply Hnd. rewrite app_assoc. apply in_elt. Qed.
+
+Lemma not_NoDup_2_elts A (a : A) l1 l2 l3 : ~ NoDup (l1 ++ a :: l2 ++ a :: l3).
+Proof. intros Hnd%NoDup_2_elts. apply Hnd. reflexivity. Qed.
 
 Lemma NoDup_app_remove_m A (l1 l2 l3 : list A) : NoDup (l1 ++ l2 ++ l3) -> NoDup (l1 ++ l3).
 Proof. induction l2 as [|a l2 IH]; [ exact id | ]. intros [Hnd _]%NoDup_remove. apply IH, Hnd. Qed.
