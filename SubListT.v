@@ -92,6 +92,11 @@ Proof. split; intro; [ apply sublistT_refl | apply sublistT_trans ]. Qed.
 #[export] Instance sublistT_antisym' A : Antisymmetric eq (@sublistT A).
 Proof. intro. apply sublistT_antisym. Qed.
 
+Lemma sublistT_cons_inv A (a : A) l1 l2 : sublistT (a :: l1) (a :: l2) -> sublistT l1 l2.
+Proof.
+intro Hs. inversion Hs; subst; [ | transitivity (a :: l1); [ constructor; reflexivity | ] ]; assumption.
+Qed.
+
 Lemma sublistT_AddT A (a : A) l1 l2 : AddT a l1 l2 -> sublistT l1 l2.
 Proof. induction 1; constructor; [ apply sublistT_refl | assumption ]. Qed.
 

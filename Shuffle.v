@@ -323,6 +323,16 @@ Proof. intro s. induction s; constructor; assumption. Qed.
 Lemma shuffle_sublist_r A (l1 l2 l3 : list A) : shuffle l1 l2 l3 -> sublist l2 l3.
 Proof. intro s. induction s; constructor; assumption. Qed.
 
+Lemma sublist_shuffle A (l1 l2 : list A) : sublist l1 l2 -> exists l, shuffle l1 l l2.
+Proof.
+intro H. induction H as  [ | ? ? ? ? IH | a ? ? ? IH ].
+- exists nil. constructor.
+- destruct IH as [l Hs]. exists l.
+  constructor; assumption.
+- destruct IH as [l Hs]. exists (a :: l).
+  constructor; assumption.
+Qed.
+
 Lemma NoDup_shuffle_l A (l1 l2 l3 : list A) : shuffle l1 l2 l3 -> NoDup l3 -> NoDup l1.
 Proof. intros Hs%shuffle_sublist_l. exact (NoDup_sublist Hs). Qed.
 
