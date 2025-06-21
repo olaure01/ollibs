@@ -9,6 +9,7 @@ Import ListNotations. (* For notations [] and [a;b;c] *)
 Set Default Goal Selector "!".
 Set Default Proof Using "Type".
 Set Implicit Arguments.
+Unset Printing Use Implicit Types.
 (* Set Universe Polymorphism. *)
 
 
