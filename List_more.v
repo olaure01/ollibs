@@ -85,6 +85,16 @@ Tactic Notation "list_simpl" "in" hyp(H) := list_simpl_hyp H.
 
 Ltac list_reflexivity := list_simpl; reflexivity.
 
+Ltac list_assumption :=
+  match goal with
+  | |- context G [?l] => match type of l with
+                         | list _ => pattern l;
+     match goal with
+     | H : _ |- _ => eapply eq_rect; [ exact H | list_reflexivity ]
+     end
+                         end
+  end.
+
 (* same as [list_simpl] but might do more job on specific case
      could loop with existential variables *)
 Ltac list_esimpl :=
@@ -693,7 +703,7 @@ Tactic Notation "decomp_list_eq" hyp(H) "as" simple_intropattern(p) :=
 Tactic Notation "decomp_list_eq" hyp(H) :=
   decomp_map_eq H + decomp_nil_eq H + decomp_unit_eq H
 + match type of H with
-  | _ :: _ = _ :: _ => let H1 := fresh H in injection H as [= H H1]
+  | _ :: _ = _ :: _ => let H1 := fresh H in injection H as [= H1 H]; try discriminate H1
   end
 + decomp_cons_eq_app_app H + decomp_cons_eq_elt H + decomp_cons_eq_app H
 + decomp_elt_eq_app_app H + decomp_elt_eq_elt H + decomp_elt_eq_app H
