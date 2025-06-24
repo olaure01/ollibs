@@ -11,8 +11,8 @@ Set Implicit Arguments.
 
 
 (* copy of Basics.compose to avoid exporting full Basics *)
-Definition compose {A B C} (g : B -> C) (f : A -> B) := fun x : A => g (f x).
-
+Definition compose A B C (g : B -> C) (f : A -> B) := fun x : A => g (f x).
+Notation " g ∘ f " := (compose g f) (at level 40, left associativity, f at next level).
 
 (** * Functions on constructors *)
 Definition Empty_fun {A} : Empty_set -> A := fun o => match o with end.
@@ -88,8 +88,7 @@ Section Function.
                    | inl (exist _ x _) => x
                    | _ => a
                    end).
-  intros x.
-  destruct (Hd (f x)) as [[x' ->%Hi]|Hneq]; [ | contradiction (Hneq x) ]; reflexivity.
+  intro x. destruct (Hd (f x)) as [[x' ->%Hi]|Hneq]; [ | contradiction (Hneq x) ]; reflexivity.
   Qed.
 
   Definition surjective := forall y, { x | y = f x }.
@@ -101,7 +100,7 @@ Section Function.
   Proof. intros Hr y. exists (g y). rewrite Hr. reflexivity. Qed.
 
   Lemma surjective_retract (Hs : surjective) : retract f (fun y => proj1_sig (Hs y)).
-  Proof. intros y. symmetry. exact (proj2_sig (Hs y)). Qed.
+  Proof. intro y. symmetry. exact (proj2_sig (Hs y)). Qed.
 
   (** ** Bijective functions *)
 
@@ -109,34 +108,27 @@ Section Function.
 
   Lemma bijective_inverse : bijective -> { g | retract f g & retract g f }.
   Proof.
-  intros Hbij.
-  exists (fun x => proj1_sig (sig_of_sig2 (Hbij x))); intros x; cbn.
+  intros Hbij. exists (fun x => proj1_sig (sig_of_sig2 (Hbij x))); intro x; cbn.
   - destruct (Hbij x) as [y <- _]. reflexivity.
   - destruct (Hbij (f x)) as [y _ Heq]. apply Heq. reflexivity.
   Qed.
 
   Lemma bijective_injective : bijective -> injective.
-  Proof.
-  intros Hbij.
-  destruct (bijective_inverse Hbij) as [g _ Hsec].
-  apply section_injective with g, Hsec.
-  Qed.
+  Proof.  intro Hbij. destruct (bijective_inverse Hbij) as [g _ Hsec]. apply section_injective with g, Hsec. Qed.
 
   Lemma bijective_surjective : bijective -> surjective.
   Proof. intros Hbij y. destruct (Hbij y) as [x -> _]. exists x. reflexivity. Qed.
 
   Lemma injective_surjective_bijective : injective -> surjective -> bijective.
   Proof.
-  intros Hinj Hsurj y.
-  destruct (Hsurj y) as [x ->].
+  intros Hinj Hsurj y. destruct (Hsurj y) as [x ->].
   exists x; [ reflexivity | ].
   intros x' Heq2. apply Hinj. assumption.
   Qed.
 
   Lemma biretract_bijective g : retract f g -> retract g f -> bijective.
   Proof.
-  intros Hfg Hgf.
-  apply injective_surjective_bijective.
+  intros Hfg Hgf. apply injective_surjective_bijective.
   - apply section_injective with g, Hgf.
   - apply retract_surjective with g, Hfg.
   Qed.
@@ -155,12 +147,9 @@ Proof. unfold injective. auto. Qed.
 
 Lemma map_injective A B (f : A -> B) : injective f -> injective (map f).
 Proof.
-intros Hf l1.
-induction l1 as [|a l1 IHl1]; intros [|b l2] Hmap; inversion Hmap as [[Hhd Htl]].
+intros Hf l1. induction l1 as [|a l1 IHl1]; intros [|b l2] Hmap; inversion Hmap as [[Hhd Htl]].
 - reflexivity.
-- apply Hf in Hhd as ->.
-  apply IHl1 in Htl as ->.
-  reflexivity.
+- apply Hf in Hhd as ->. apply IHl1 in Htl as ->. reflexivity.
 Qed.
 
 Lemma map_injective_in A B (f : A -> B) l1 l2 :
@@ -188,14 +177,14 @@ Section Inverse_image.
   Lemma PreOrder_inverse_image : PreOrder R -> PreOrder f_R.
   Proof.
   intros [Hrefl Htrans]. unfold f_R. split.
-  - intros x. apply Hrefl.
+  - intro x. apply Hrefl.
   - intros x y z HR1 HR2. exact (Htrans _ _ _ HR1 HR2).
   Qed.
 
   Lemma Equivalence_inverse_image : Equivalence R -> Equivalence f_R.
   Proof.
   intros [Hrefl Hsym Htrans]. unfold f_R. split.
-  - intros x. apply Hrefl.
+  - intro x. apply Hrefl.
   - intros x y HR. exact (Hsym _ _ HR).
   - intros x y z HR1 HR2. exact (Htrans _ _ _ HR1 HR2).
   Qed.
@@ -216,7 +205,7 @@ End Inverse_image.
 (** * More Properties of Surjective Functions *)
 
 Lemma id_surjective A : surjective (@id A).
-Proof. intros x. exists x. reflexivity. Qed.
+Proof. intro x. exists x. reflexivity. Qed.
 
 Lemma compose_surjective A B C (f : A -> B) (g : B -> C) :
   surjective f -> surjective g -> surjective (compose g f).
@@ -234,14 +223,13 @@ Qed.
 (** * More Properties of Bijective Functions *)
 
 Lemma id_bijective A : bijective (@id A).
-Proof. intros x. exists x; trivial. Qed.
+Proof. intro x. exists x; trivial. Qed.
 Arguments id_bijective {_}.
 
 Lemma compose_bijective A B C (f : A -> B) (g : B -> C) : bijective f -> bijective g ->
   bijective (compose g f).
 Proof.
-intros Hf Hg z.
-destruct (Hg z) as [y -> Hinjf], (Hf y) as [x -> Hinjg].
+intros Hf Hg z. destruct (Hg z) as [y -> Hinjf], (Hf y) as [x -> Hinjg].
 exists x; [ reflexivity | ].
 intros x' Heq. apply Hinjg, Hinjf, Heq.
 Qed.
@@ -249,16 +237,14 @@ Qed.
 
 (** * Extensional equality of functions *)
 
-Definition ext_eq A B (f g : A -> B) := forall a, f a = g a.
+Definition ext_eq A B : relation (A -> B) := fun f g => forall a, f a = g a.
 Notation " f ~ g " := (ext_eq f g) (at level 60).
 
 Lemma compose_ext_eq A B C (f1 g1 : A -> B) (f2 g2 : B -> C) :
   f1 ~ g1 -> f2 ~ g2 -> compose f2 f1 ~ compose g2 g1.
-Proof.
-intros Hext1 Hext2 x.
-unfold compose. rewrite (Hext1 x), (Hext2 (g1 x)). reflexivity.
-Qed.
+Proof. intros Hext1 Hext2 x. unfold compose. rewrite (Hext1 x), (Hext2 (g1 x)). reflexivity. Qed.
 
+(* TODO remove if useless thanks to [ext_eq_equiv]
 #[export] Instance ext_eq_refl A B : Reflexive (@ext_eq A B).
 Proof. intros f x. reflexivity. Qed.
 
@@ -267,6 +253,15 @@ Proof. intros f g Heq x. rewrite (Heq x). reflexivity. Qed.
 
 #[export] Instance ext_eq_trans A B : Transitive (@ext_eq A B).
 Proof. intros f g h Heq1 Heq2 x. rewrite (Heq1 x), (Heq2 x). reflexivity. Qed.
+*)
+
+#[export] Instance ext_eq_equiv A B : Equivalence (@ext_eq A B).
+Proof.
+split.
+- intros f x. reflexivity.
+- intros f g Heq x. rewrite Heq. reflexivity.
+- intros f g h Heq1 Heq2 x. rewrite Heq1, Heq2. reflexivity.
+Qed.
 
 Lemma id_compose_ext A B (f : A -> B) : compose id f ~ f.
 Proof. intro x. reflexivity. Qed.
@@ -288,8 +283,7 @@ Lemma bijective_ext A B (f g : A -> B) : bijective f -> f ~ g -> bijective g.
 Proof.
 intros Hs Heq y. destruct (Hs y) as [x -> Hi]. exists x.
 - apply Heq.
-- intros y Hy. apply Hi.
-  rewrite (Heq y). assumption.
+- intros y Hy. apply Hi. rewrite (Heq y). assumption.
 Qed.
 
 Lemma map_ext A B (f g : A -> B) : f ~ g -> map f ~ map g.
