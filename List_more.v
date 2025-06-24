@@ -879,7 +879,7 @@ Qed.
 
 (** ** [Forall] and [Exists] *)
 
-Lemma Forall_map A B (f : A -> B) l :
+Lemma Forall_exists_map A B (f : A -> B) l :
   Forall (fun x => exists y, x = f y) l <-> exists l0, l = map f l0.
 Proof.
 induction l as [|b l IHl]; split; intro H.
