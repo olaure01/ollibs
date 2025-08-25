@@ -151,7 +151,7 @@ Proof.
 intro HP. induction HP; cbn.
 - reflexivity.
 - apply Permutation_app_head. assumption.
-- rewrite ! app_assoc. apply Permutation_app_tail, Permutation_app_swap.
+- rewrite ! app_assoc. apply Permutation_app_tail, Permutation_app_comm.
 - etransitivity; eassumption.
 Qed.
 (* simpler proof of [Permutation_flat_map] using [Permutation_concat]:

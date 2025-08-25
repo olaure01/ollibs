@@ -239,21 +239,21 @@ Ltac decomp_unit_eq H :=
   match type of H with
   | _ :: nil = nil => discriminate H
   | nil = _ :: nil => discriminate H
-  | ?a :: nil = ?x :: ?l => let Hnil := fresh H in injection H as [= H Hnil];
+  | ?a :: nil = ?x :: ?l => let Hnil := fresh H in injection H as [= H Hnil]; try discriminate H;
                               (try subst x); (try subst a); try decomp_nil_eq Hnil
-  | ?x :: ?l = ?a :: nil => let Hnil := fresh H in injection H as [= H Hnil];
+  | ?x :: ?l = ?a :: nil => let Hnil := fresh H in injection H as [= H Hnil]; try discriminate H;
                               (try subst x); (try subst a); try decomp_nil_eq Hnil
   | ?a :: nil = ?l1 ++ ?x :: ?l2 =>
       let Hnil1 := fresh H in
       let Hnil2 := fresh H in
-      simple apply eq_sym in H; apply elt_eq_unit in H as [H [Hnil1 Hnil2]];
+      simple apply eq_sym in H; apply elt_eq_unit in H as [H [Hnil1 Hnil2]]; try discriminate H;
 (* [simple apply eq_sym] faster than [symmetry]? *)
       (try subst x); (try subst a); try decomp_nil_eq Hnil1; try decomp_nil_eq Hnil2;
       (try clear l1); (try clear l2)
   | ?l1 ++ ?x :: ?l2 = ?a :: nil =>
       let Hnil1 := fresh H in
       let Hnil2 := fresh H in
-      apply elt_eq_unit in H as [H [Hnil1 Hnil2]];
+      apply elt_eq_unit in H as [H [Hnil1 Hnil2]]; try discriminate H;
       (try subst x); (try subst a); try decomp_nil_eq Hnil1; try decomp_nil_eq Hnil2;
       (try clear l1); (try clear l2)
   | ?a :: nil = ?l1 ++ ?l2 => simple apply eq_sym in H; let Hnil := fresh H in
@@ -476,7 +476,7 @@ Tactic Notation "decomp_elt_eq_elt" hyp(H) :=
   let l := fresh "l" in
   let H1 := fresh H in
   let H2 := fresh H in
-  decomp_elt_eq_elt_core H ipattern:([[[l H1 H2] | [H1 [H H2]]] | [l H1 H2]]).
+  decomp_elt_eq_elt_core H ipattern:([[[l H1 H2] | [H1 [H H2]]] | [l H1 H2]]); try discriminate H.
 
 #[local] Ltac decomp_cons_eq_elt_core H p :=
   match type of H with
@@ -501,12 +501,12 @@ Tactic Notation "decomp_cons_eq_elt" hyp(H) :=
                          let l0 := fresh l in
                          let H0 := fresh H in
                          apply elt_eq_elt_trichotT in H as [[[l1 H H1]|[H0 [H H1]]]|[l0 H0 H]];
-                           [ rewrite (app_nil_l (a :: _)) in * | decomp_nil_eq H0 .. ]
+                           [ rewrite (app_nil_l (a :: _)) in * | decomp_nil_eq H0 .. ]; try discriminate H
   | _ ++ _ :: _ = ?a :: ?l => simple apply eq_sym in H; rewrite <- (app_nil_l (a :: l)) in H;
                          let l0 := fresh l in
                          let H0 := fresh H in
                          apply elt_eq_elt_trichotT in H as [[[l1 H1 H2]|[H0 [H H1]]]|[l0 H0 H]];
-                           [ rewrite (app_nil_l (a :: _)) in * | decomp_nil_eq H0 .. ]
+                           [ rewrite (app_nil_l (a :: _)) in * | decomp_nil_eq H0 .. ]; try discriminate H
   end.
 
 
