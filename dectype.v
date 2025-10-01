@@ -11,6 +11,7 @@ From OLlibs Require ComparisonOrder.
 Set Default Goal Selector "!".
 Set Default Proof Using "Type".
 Set Implicit Arguments.
+Unset Printing Use Implicit Types.
 
 
 (** * Decidable Types *)
@@ -239,6 +240,21 @@ Section Minus.
 End Minus.
 
 Arguments minus {_} _.
+
+(** the "out of [Scheme Equality]" construction *)
+Section SchemeEquality.
+
+  Variable T : Type.
+  Variable se_beq : T -> T -> bool.
+  Variable se_dec_bl : forall x y, se_beq x y = true -> x = y.
+  Variable se_dec_lb : forall x y, x = y -> se_beq x y = true.
+
+  Definition se_dectype := {|
+    car := T;
+    eqb := se_beq;
+    eqb_eq := fun a b => conj (@se_dec_bl a b) (@se_dec_lb a b) |}.
+
+End SchemeEquality.
 
 
 (** * Tactics *)
