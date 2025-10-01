@@ -1,6 +1,7 @@
-From Stdlib Require Import List.
+From Stdlib Require Import List CMorphisms.
 From Stdlib Require Export Bool.
 From OLlibs Require Import Logic_Datatypes_more DecidableT ListT.
+Import LogicNotations.
 
 (* Set Mangle Names. Set Mangle Names Light. *)
 Set Default Goal Selector "!".
@@ -12,6 +13,7 @@ Lemma dichot_bool_negb b1 b2 : {b1 = b2} + {b1 = negb b2}.
 Proof. destruct b1, b2; (left + right); reflexivity. Qed.
 
 
+(* ssr.ssrbool.negPP *)
 Lemma reflect_neg P b : reflect P b -> reflect (not P) (negb b).
 Proof. intros H. now inversion H; constructor. Qed.
 
@@ -30,10 +32,20 @@ Proof. intros Hspec1 Hspec2. destruct b1, b2; cbn; constructor; inversion Hspec1
 
 (** * ReflectT *)
 
-Variant reflectT (P : Type) : bool -> Type :=
-  | ReflectTT : P -> reflectT P true
-  | ReflectTF : notT P -> reflectT P false.
+Variant reflectT P : bool -> Type :=
+| ReflectTT : P -> reflectT P true
+| ReflectTF : notT P -> reflectT P false.
 #[global] Hint Constructors reflectT : bool.
+
+Lemma reflectT_reflect (P : Prop) b : reflectT P b <=> reflect P b.
+Proof. split; intros []; constructor; assumption. Qed.
+
+(* TODO current choice for Hint cost is random... *)
+#[export] Instance reflectT_iffT_compat : Proper (iffT ==> eq ==> iffT) reflectT | 10.
+Proof. intros P Q [HPQ HQP] u v <-. split; (intros [ | HnP ]; constructor; [ | intro; apply HnP ]); auto. Qed.
+#[export] Instance reflectT_CiffT_compat :
+  Proper (CRelationClasses.iffT ==> eq ==> CRelationClasses.iffT) reflectT | 10.
+Proof. intros P Q [HPQ HQP] u v <-. split; (intros [ | HnP ]; constructor; [ | intro; apply HnP ]); auto. Qed.
 
 Lemma reflectT_iffT P b : reflectT P b -> iffT P (b = true).
 Proof. now destruct 1; split; [ | | | discriminate ]. Qed.

@@ -3,18 +3,24 @@ Set Default Goal Selector "!".
 Set Default Proof Using "Type".
 Set Implicit Arguments.
 
+
 (** * Logic *)
 
-#[global]
-Hint Unfold notT: core.
+#[global] Hint Unfold notT : core.
 
 (* TODO make it universe polymorphic: cf CRelationClasses.iffT *)
+(* and make it a [crelation Type]? *)
+(* and manage possible conflicts with CRelationClasses.iffT *)
 Definition iffT (A B : Type) := ((A -> B) * (B -> A))%type.
+Module LogicNotations.
+Infix "<=>" := iffT (at level 95, no associativity).
+End LogicNotations.
+Import LogicNotations.
 
 Lemma sum_comm A B : A + B -> B + A.
 Proof. intros [a | b]; [right | left]; assumption. Qed.
 
-Lemma sum_assoc A B C : iffT ((A + B) + C) (A + (B + C)).
+Lemma sum_assoc A B C : ((A + B) + C) <=> (A + (B + C)).
 Proof.
 split.
 - intros [[a | b] | c]; [ left | right; left | right; right ]; assumption.
@@ -24,7 +30,7 @@ Qed.
 Lemma prod_comm A B : A * B -> B * A.
 Proof. intros [a b]. exact (b, a). Qed.
 
-Lemma prod_assoc A B C : iffT ((A * B) * C) (A * (B * C)).
+Lemma prod_assoc A B C : ((A * B) * C) <=> (A * (B * C)).
 Proof.
 split.
 - intros [[a b] c]. exact (a, (b, c)).
@@ -44,7 +50,6 @@ Definition prod_map2 A B C (f : A -> B -> C) p1 p2 :=
 
 (** * Datatypes *)
 
-(* TODO compare with [ssrbool.isSome] *)
 Definition is_Some T (o : option T) :=
 match o with
 | Some _ => True
