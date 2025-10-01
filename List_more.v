@@ -879,6 +879,9 @@ Qed.
 
 (** ** [Forall] and [Exists] *)
 
+Lemma Exists_elt A P (a : A) l1 l2 : P a -> Exists P (l1 ++ a :: l2).
+Proof. intro. apply Exists_app. right. constructor. assumption. Qed.
+
 Lemma Forall_exists_map A B (f : A -> B) l :
   Forall (fun x => exists y, x = f y) l <-> exists l0, l = map f l0.
 Proof.
