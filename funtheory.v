@@ -234,6 +234,13 @@ exists x; [ reflexivity | ].
 intros x' Heq. apply Hinjg, Hinjf, Heq.
 Qed.
 
+Lemma map_bijective A B (f : A -> B) : bijective f -> bijective (map f).
+Proof.
+intro Hf. apply injective_surjective_bijective.
+- apply map_injective, bijective_injective, Hf.
+- apply map_surjective, bijective_surjective, Hf.
+Qed.
+
 
 (** * Extensional equality of functions *)
 
