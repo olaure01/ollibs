@@ -12,10 +12,10 @@ Set Implicit Arguments.
 
 (* copy of Basics.compose to avoid exporting full Basics *)
 Definition compose A B C (g : B -> C) (f : A -> B) := fun x : A => g (f x).
-Notation " g ∘ f " := (compose g f) (at level 40, left associativity, f at next level).
+Notation "g ∘ f" := (compose g f) (at level 40, left associativity, f at next level).
 
 (** * Functions on constructors *)
-Definition Empty_fun {A} : Empty_set -> A := fun o => match o with end.
+Definition Empty_fun {A} (o : Empty_set) : A := match o with end.
 
 Definition option_eval_default A B default (f : A -> B) o :=
   match o with
@@ -172,18 +172,18 @@ Section Inverse_image.
 
   Variable R : relation B.
 
-  Definition f_R := fun x y => R (f x) (f y).
+  Definition f_R x y := R (f x) (f y).
 
   Lemma PreOrder_inverse_image : PreOrder R -> PreOrder f_R.
   Proof.
-  intros [Hrefl Htrans]. unfold f_R. split.
+  intros [Hrefl Htrans]. split.
   - intro x. apply Hrefl.
   - intros x y z HR1 HR2. exact (Htrans _ _ _ HR1 HR2).
   Qed.
 
   Lemma Equivalence_inverse_image : Equivalence R -> Equivalence f_R.
   Proof.
-  intros [Hrefl Hsym Htrans]. unfold f_R. split.
+  intros [Hrefl Hsym Htrans]. split.
   - intro x. apply Hrefl.
   - intros x y HR. exact (Hsym _ _ HR).
   - intros x y z HR1 HR2. exact (Htrans _ _ _ HR1 HR2).
@@ -238,7 +238,7 @@ Qed.
 (** * Extensional equality of functions *)
 
 Definition ext_eq A B : relation (A -> B) := fun f g => forall a, f a = g a.
-Notation " f ~ g " := (ext_eq f g) (at level 60).
+Infix "~" := ext_eq (at level 60).
 
 Lemma compose_ext_eq A B C (f1 g1 : A -> B) (f2 g2 : B -> C) :
   f1 ~ g1 -> f2 ~ g2 -> compose f2 f1 ~ compose g2 g1.
@@ -264,14 +264,14 @@ split.
 Qed.
 
 Lemma id_compose_ext A B (f : A -> B) : compose id f ~ f.
-Proof. intro x. reflexivity. Qed.
+Proof. reflexivity. Qed.
 
 Lemma compose_id_ext A B (f : A -> B) : compose f id ~ f.
-Proof. intro x. reflexivity. Qed.
+Proof. reflexivity. Qed.
 
 Lemma compose_assoc_ext A B C D (f : A -> B) (g : B -> C) (h : C -> D) :
   compose h (compose g f) ~ compose (compose h g) f.
-Proof. intro x. reflexivity. Qed.
+Proof. reflexivity. Qed.
 
 Lemma injective_ext A B (f g : A -> B) : injective f -> f ~ g -> injective g.
 Proof. intros Hi Heq x y Hg. apply Hi. rewrite (Heq x), (Heq y). assumption. Qed.

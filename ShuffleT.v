@@ -330,29 +330,10 @@ Lemma shuffleT_sublistT_r A (l1 l2 l3 : list A) : shuffleT l1 l2 l3 -> sublistT 
 Proof. intro s. induction s; constructor; assumption. Qed.
 
 Lemma sublistT_shuffleT A (l1 l2 : list A) : sublistT l1 l2 -> { l & shuffleT l1 l l2 }.
-Proof.
-intro H. induction H as  [ | ? ? ? ? IH | a ? ? ? IH ].
-- exists nil. constructor.
-- destruct IH as [l Hs]. exists l.
-  constructor; assumption.
-- destruct IH as [l Hs]. exists (a :: l).
-  constructor; assumption.
-Qed.
+Proof. intro H. induction H as [ | ? ? ? ? [] | ? ? ? ? [] ]; eexists; constructor; eassumption. Qed.
 
 Lemma NoDupT_shuffleT_l A (l1 l2 l3 : list A) : shuffleT l1 l2 l3 -> NoDupT l3 -> NoDupT l1.
-Proof.
-intro s. induction s as [ | x l' l'' l''' s IHs | x l' l'' l''' s IHs ]; intro Hnd.
-- constructor.
-- inversion Hnd. subst.
-  constructor.
-  + intro Hin.
-    apply shuffleT_PermutationT, (PermutationT_inT x) in s.
-    * contradiction s.
-    * apply inT_sum_app. left. assumption.
-  + apply IHs. assumption.
-- inversion Hnd. subst.
-  apply IHs. assumption.
-Qed.
+Proof. intros Hs%shuffleT_sublistT_l. exact (NoDupT_sublistT Hs). Qed.
 
 Lemma NoDupT_shuffleT_r A (l1 l2 l3 : list A) : shuffleT l1 l2 l3 -> NoDupT l3 -> NoDupT l2.
-Proof. intros Hs%shuffleT_comm. exact (NoDupT_shuffleT_l Hs). Qed.
+Proof. intros Hs%shuffleT_sublistT_r. exact (NoDupT_sublistT Hs). Qed.

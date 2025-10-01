@@ -50,6 +50,7 @@ Qed.
 
 
 Section DecidableEquality.
+(* TODO compare with Stdlib.Classes.EquivDec *)
 
 Variable A B : Type.
 
