@@ -939,8 +939,33 @@ Lemma in_empty_remove_Forall A (eqdec : forall x y : A, {x = y} + {x <> y}) a l 
   remove eqdec a l = nil -> Forall (eq a) l.
 Proof. now intros Hemp; apply (@Forall_remove _ eqdec _ a); [ rewrite Hemp | ]. Qed.
 
+#[export] Instance Forall2_refl A R `{HR : Reflexive A R} : Reflexive (@Forall2 A A R).
+Proof. intro l. induction l as [ | a  l IHl ]; constructor; [ | assumption ]. apply HR. Qed.
+
+#[export] Instance Forall2_trans A R `{HR : Transitive A R} : Transitive (@Forall2 A A R).
+Proof.
+intros l1 l2 l3 HF1 HF2.
+induction HF1 as [ | a b la lb Hab HF1 IH ] in l3, HF2 |- *; [ assumption | ].
+inversion HF2. constructor.
+- transitivity b; assumption.
+- apply IH. assumption.
+Qed.
+
+#[export] Instance Forall2_preorder A R `{HR : PreOrder A R} : PreOrder (@Forall2 A A R).
+Proof.
+split.
+- intro. reflexivity.
+- intros l1 l2 l3 ? ?. transitivity l2; assumption.
+Qed.
+
 
 (** ** [ForallT] *)
+
+Lemma ForallT_app_iffT T P (l1 l2 : list T) : iffT (ForallT P (l1 ++ l2)) (ForallT P l1 * ForallT P l2).
+Proof.
+split; [ intro; split | intros [] ];
+  [ eapply ForallT_app_l | eapply ForallT_app_r | eapply ForallT_app ]; eassumption.
+Qed.
 
 (** Translation from [ForallT] to a list of dependent pairs *)
 
@@ -1003,6 +1028,28 @@ induction l1 as [|a l1 IH] in l2 |- *; intro HF; destruct l2 as [|b l2]; inversi
 - cbn. apply Forall2T_app.
   + apply IH. assumption.
   + now constructor.
+Qed.
+
+#[export] Instance Forall2T_refl A R `{HR : CRelationClasses.Reflexive A R} :
+  CRelationClasses.Reflexive (@Forall2T A A R).
+Proof. intro l. induction l as [ | a  l IHl ]; constructor; [ | assumption ]. apply HR. Qed.
+
+#[export] Instance Forall2T_trans A R `{HR : CRelationClasses.Transitive A R} :
+  CRelationClasses.Transitive (@Forall2T A A R).
+Proof.
+intros l1 l2 l3 HF1 HF2.
+induction HF1 as [ | a b la lb Hab HF1 IH ] in l3, HF2 |- *; [ assumption | ].
+inversion HF2. constructor.
+- transitivity b; assumption.
+- apply IH. assumption.
+Qed.
+
+#[export] Instance Forall2T_preorder A R `{HR : CRelationClasses.PreOrder A R} :
+  CRelationClasses.PreOrder (@Forall2T A A R).
+Proof.
+split.
+- intro. reflexivity.
+- intros l1 l2 l3 ? ?. transitivity l2; assumption.
 Qed.
 
 
@@ -1073,6 +1120,34 @@ Lemma fold_right_app_assoc A f (e : A) l1 l2 :
   (forall x y z, f x (f y z) = f (f x y) z) -> (forall x, f e x = x) ->
   fold_right f e (l1 ++ l2) = f (fold_right f e l1) (fold_right f e l2).
 Proof. intros Hassoc Hunit. apply fold_right_app_assoc2, Hunit. assumption. Qed.
+
+(** *** [fold_right_unit] *)
+
+Section FoldUnitTypes.
+
+Variable A : Type.
+Variable f : A -> A -> A.
+Variable u : A.
+
+Fixpoint fold_right_unit l :=
+match l with
+| nil => u
+| a :: nil => a
+| a :: l0 => f a (fold_right_unit l0)
+end.
+
+Lemma simpl_fold_right_unit a b l :
+  fold_right_unit (a :: b :: l) = f a (fold_right_unit (b :: l)).
+Proof. reflexivity. Qed.
+
+End FoldUnitTypes.
+
+Lemma fold_right_unit_unit A f (u v : A) l : l <> nil ->
+  fold_right_unit f u l = fold_right_unit f v l.
+Proof.
+induction l as [ | a l IHl ]; intro Hnil; [ now contradiction Hnil | clear Hnil ].
+destruct l as [ | b l ]; [ | rewrite simpl_fold_right_unit, IHl; [ | intros [=] ] ]; reflexivity.
+Qed.
 
 
 (** ** [list_sum] and [repeat] *)
