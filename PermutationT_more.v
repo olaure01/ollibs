@@ -48,24 +48,9 @@ Qed.
 Lemma PermutationT_vs_elt_inv A (a : A) l l1 l2 :
   PermutationT l (l1 ++ a :: l2) -> {'(l1', l2') | l = l1' ++ a :: l2' }.
 Proof.
-intros HP.
-remember (l1 ++ a :: l2) as l0 eqn:Heql0; revert l1 l2 Heql0;
-  induction HP as [ | ? l ? ? IHP | ? a' l | ? ? ? ? IHP1 ? IHP2 ];
-  intros l1 l2 Heql; destruct l1 as [| b l1];
-  (try now inversion Heql); inversion Heql as [[Heq1 Heq2]]; subst.
-- now exists (@nil A, l).
-- destruct (IHP l1 l2 eq_refl) as [(l1', l2') ->].
-  now exists (b :: l1', l2').
-- now exists (a' :: nil, l).
-- destruct l1 as [| c l1]; inversion Heq2; subst.
-  + now exists (@nil A, b :: l2).
-  + now exists (c :: b :: l1, l2).
-- destruct (IHP2 nil l2 eq_refl) as [(l1', l2') ->].
-  destruct (IHP1 l1' l2' eq_refl) as [(l1'', l2'') ->].
-  now exists (l1'', l2'').
-- destruct (IHP2 (b :: l1) l2 eq_refl) as [(l1', l2') ->].
-  destruct (IHP1 l1' l2' eq_refl) as [(l1'', l2'') ->].
-  now exists (l1'', l2'').
+intro HP. symmetry in HP. apply (PermutationT_inT a) in HP.
+- apply inT_split. assumption.
+- apply inT_elt.
 Qed.
 
 Lemma PermutationT_vs_cons_inv A (a : A) l l1 :

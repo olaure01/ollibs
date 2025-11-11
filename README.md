@@ -1,7 +1,7 @@
 # OLlibs
 **Add-ons for the Rocq Standard Library**
 
-Working with the `Rocq Prover 9.0`
+Working with the `Rocq Prover 9.1`
 
 ## [Opam](https://rocq-prover.org/docs/using-opam)-based installation procedure:
 
