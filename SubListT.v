@@ -1,7 +1,7 @@
 From Stdlib Require Import PeanoNat CMorphisms.
 From OLlibs Require Import List_more SubList.
 From OLlibs Require DecidableT.
-Import ListNotations.
+Import Logic_Datatypes_more.LogicNotations ListNotations.
 
 (* Set Mangle Names. Set Mangle Names Light. *)
 Set Default Goal Selector "!".
@@ -97,14 +97,59 @@ Proof.
 intro Hs. inversion Hs; subst; [ | transitivity (a :: l1); [ constructor; reflexivity | ] ]; assumption.
 Qed.
 
+Lemma sublistT_sgt A (a : A) l : sublistT [a] l <=> InT a l.
+Proof.
+split.
+- intros Hs%sublistT_inclT. apply Hs, inT_eq.
+- intros [[l1 l2] ->]%inT_split.
+  apply sublistT_app_l. constructor. apply sublistT_nil_l.
+Qed.
+
 Lemma sublistT_AddT A (a : A) l1 l2 : AddT a l1 l2 -> sublistT l1 l2.
 Proof. induction 1; constructor; [ apply sublistT_refl | assumption ]. Qed.
+
+Lemma sublistT_inT_extend A (a : A) l1 l2 :
+  sublistT l1 l2 -> InT a l2 -> { l1' & sublistT l1' l2 & ((inclT (a :: l1) l1') * (inclT l1' (a :: l1)))%type}.
+Proof.
+intro Hsub. induction Hsub as [ | b l1 l2 Hsub IH | b l1 l2 Hsub IH ]; intro Hin.
+- destruct Hin.
+- destruct Hin as [[= ->] | Hin].
+  + exists (a :: l1); [ | split ].
+    * now constructor.
+    * apply inclT_cons; [ apply inT_eq | apply inclT_refl ].
+    * apply inclT_cons_cons, inclT_tl, inclT_refl.
+  + destruct (IH Hin) as [l1' Hsub' [Hin' Hincl']].
+    exists (b :: l1'); [ | split ].
+    * now constructor.
+    * apply inclT_cons_inv in Hin'.
+      apply inclT_cons.
+      -- apply inT_cons, (fst Hin').
+      -- apply inclT_cons_cons, Hin'.
+    * intros c [[= ->] | Hinc%Hincl'].
+      -- apply inT_cons, inT_eq.
+      -- destruct Hinc as [[= ->] | Hinc].
+         ++ apply inT_eq.
+         ++ apply inT_cons, inT_cons. assumption.
+- destruct Hin as [[= ->] | Hin].
+  + exists (a :: l1); [ | split ].
+    * now constructor.
+    * apply inclT_refl.
+    * apply inclT_refl.
+  + destruct (IH Hin) as [l1' Hsub' [Hin' Hincl']].
+    exists l1'; [ | split ].
+    * now constructor.
+    * assumption.
+    * assumption.
+Qed.
+
+Lemma sublistT_filter A f (l : list A) : sublistT (filter f l) l.
+Proof. induction l as [ | a l IH ]; cbn; try destruct (f a); now constructor. Qed.
 
 
 (* with decidable equality *)
 
 Lemma uniquify_map_sublistT A B (eq_dec : forall x y:B, DecidableT.decidableP (x=y)) (f : A -> B) l :
- { l' & (NoDupT (map f l') * inclT (map f l) (map f l'))%type & sublistT (map f l') (map f l) }.
+  { l' & (NoDupT (map f l') * inclT (map f l) (map f l'))%type & sublistT (map f l') (map f l) }.
 Proof.
 induction l as [ | a l IHl ].
 - exists nil; cbn; [ split | ]; [ | red; trivial | ]; constructor.

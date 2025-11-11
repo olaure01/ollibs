@@ -102,14 +102,59 @@ Proof.
 intro Hs. inversion Hs; subst; [ | transitivity (a :: l1); [ constructor; reflexivity | ] ]; assumption.
 Qed.
 
+Lemma sublist_sgt A (a : A) l : sublist [a] l <-> In a l.
+Proof.
+split.
+- intros Hs%sublist_incl. apply Hs, in_eq.
+- intros [l1 [l2 ->]]%in_split.
+  apply sublist_app_l. constructor. apply sublist_nil_l.
+Qed.
+
 Lemma sublist_Add A (a : A) l1 l2 : Add a l1 l2 -> sublist l1 l2.
 Proof. induction 1; constructor; [ apply sublist_refl | assumption ]. Qed.
+
+Lemma sublist_in_extend A (a : A) l1 l2 : sublist l1 l2 -> In a l2 ->
+  exists l1', sublist l1' l2 /\ incl (a :: l1) l1' /\ incl l1' (a :: l1).
+Proof.
+intro Hsub. induction Hsub as [ | b l1 l2 Hsub IH | b l1 l2 Hsub IH ]; intro Hin.
+- destruct Hin.
+- destruct Hin as [[= ->] | Hin].
+  + exists (a :: l1); split; [ | split ].
+    * now constructor.
+    * apply incl_cons; [ apply in_eq | apply incl_refl ].
+    * apply incl_cons_cons, incl_tl, incl_refl.
+  + destruct (IH Hin) as [l1' [Hsub' [Hin' Hincl']]].
+    exists (b :: l1'); split; [ | split ].
+    * now constructor.
+    * apply incl_cons_inv in Hin'.
+      apply incl_cons.
+      -- apply in_cons, (proj1 Hin').
+      -- apply incl_cons_cons, Hin'.
+    * intros c [[= ->] | Hinc%Hincl'].
+      -- apply in_cons, in_eq.
+      -- destruct Hinc as [[= ->] | Hinc].
+         ++ apply in_eq.
+         ++ apply in_cons, in_cons. assumption.
+- destruct Hin as [[= ->] | Hin].
+  + exists (a :: l1); split; [ | split ].
+    * now constructor.
+    * apply incl_refl.
+    * apply incl_refl.
+  + destruct (IH Hin) as [l1' [Hsub' [Hin' Hincl']]].
+    exists l1'; split; [ | split ].
+    * now constructor.
+    * assumption.
+    * assumption.
+Qed.
+
+Lemma sublist_filter A f (l : list A) : sublist (filter f l) l.
+Proof. induction l as [ | a l IH ]; cbn; try destruct (f a); now constructor. Qed.
 
 
 (* with decidable equality *)
 
 Lemma uniquify_map_sublist A B (eq_dec : forall x y:B, Decidable.decidable (x=y)) (f : A -> B) l :
- exists l', NoDup (map f l') /\ incl (map f l) (map f l') /\ sublist (map f l') (map f l).
+  exists l', NoDup (map f l') /\ incl (map f l) (map f l') /\ sublist (map f l') (map f l).
 Proof.
 induction l as [ | a l IHl ].
 - exists nil. cbn. split; [ | split ]; [ | red; trivial | ]; constructor.
