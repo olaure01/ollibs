@@ -49,45 +49,39 @@ intros [HPQ HQP] [HP|HnP]; [left|right].
 Qed.
 
 
+(* TODO more use of [Stdlib.Classes.EquivDec], use class [EqDec _ eq]? *)
+From Stdlib Require Import EquivDec.
+
+Definition eq_decidableP A := forall x y : A, decidableP (x = y).
+
 Section DecidableEquality.
-(* TODO compare with Stdlib.Classes.EquivDec *)
 
 Variable A B : Type.
 
-Lemma eq_decT_eq_dec (eq_decT : forall x y : A, decidableT (x = y)) (x y : A) : decidableP (x = y).
-Proof. apply decT_decP, eq_decT. Qed.
+Lemma eq_decT_eq_dec (eq_decT : forall x y : A, decidableT (x = y)) : eq_decidableP A.
+Proof. intros x y. apply decT_decP, eq_decT. Qed.
 
-Variable eq_decA : forall x y : A, decidableP (x = y).
+Variable eq_decA : eq_decidableP A.
 
 Lemma eq_dec_eq_decT (x y : A) : decidableT (x = y).
 Proof using eq_decA. destruct (eq_decA x y) as [Heq | Hneq]; [ left | right ]; assumption. Qed.
 
-Lemma option_dec (oa ob : option A) : decidableP (oa = ob).
-Proof using eq_decA.
-destruct oa as [a|], ob as [b|].
-- destruct (eq_decA a b) as [-> | Hneq]; [ left; reflexivity| right ].
-  intros [= ->]. contradiction Hneq. reflexivity.
-- right. intros [=].
-- right. intros [=].
-- left. reflexivity.
-Qed.
+#[deprecated(since="ollibs 2.1.1", use=Stdlib.Classes.EquivDec.option_eqdec)]
+Lemma option_dec : eq_decidableP (option A).
+Proof using eq_decA. apply option_eqdec. exact eq_decA. Qed.
 
-Variable eq_decB : forall x y : B, decidableP (x = y).
+#[deprecated(since="ollibs 2.1.1", use=Stdlib.Classes.EquivDec.list_eqdec)]
+Lemma list_dec : eq_decidableP (list A).
+Proof using eq_decA. apply list_eqdec. exact eq_decA. Qed.
 
-Lemma prod_dec (p q : A * B) : decidableP (p = q).
-Proof using eq_decA eq_decB.
-destruct p as (a1, b1), q as (a2, b2), (eq_decA a1 a2) as [ -> | HnA ], (eq_decB b1 b2) as [ -> | HnB ].
-- left. reflexivity.
-- right. intros Heq%(f_equal snd). cbn in Heq. contradiction.
-- right. intros Heq%(f_equal fst). cbn in Heq. contradiction.
-- right. intros Heq%(f_equal fst). cbn in Heq. contradiction.
-Qed.
+Variable eq_decB : eq_decidableP B.
 
-Lemma sum_dec (p q : A + B) : decidableP (p = q).
-Proof using eq_decA eq_decB.
-destruct p as [ p | p ], q as [ q | q ]; try (right; intros [=]; fail).
-- destruct (eq_decA p q); [ left | right ]; [ subst p; reflexivity | intros [=]; contradiction ].
-- destruct (eq_decB p q); [ left | right ]; [ subst p; reflexivity | intros [=]; contradiction ].
-Qed.
+#[deprecated(since="ollibs 2.1.1", use=Stdlib.Classes.EquivDec.prod_eqdec)]
+Lemma prod_dec : eq_decidableP (A * B).
+Proof using eq_decA eq_decB. eapply prod_eqdec; assumption. Qed.
+
+#[deprecated(since="ollibs 2.1.1", use=Stdlib.Classes.EquivDec.sum_eqdec)]
+Lemma sum_dec : eq_decidableP (A + B).
+Proof using eq_decA eq_decB. eapply sum_eqdec; assumption. Qed.
 
 End DecidableEquality.
