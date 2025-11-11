@@ -251,17 +251,6 @@ Lemma compose_ext_eq A B C (f1 g1 : A -> B) (f2 g2 : B -> C) :
   f1 ~ g1 -> f2 ~ g2 -> compose f2 f1 ~ compose g2 g1.
 Proof. intros Hext1 Hext2 x. unfold compose. rewrite (Hext1 x), (Hext2 (g1 x)). reflexivity. Qed.
 
-(* TODO remove if useless thanks to [ext_eq_equiv]
-#[export] Instance ext_eq_refl A B : Reflexive (@ext_eq A B).
-Proof. intros f x. reflexivity. Qed.
-
-#[export] Instance ext_eq_sym A B : Symmetric (@ext_eq A B).
-Proof. intros f g Heq x. rewrite (Heq x). reflexivity. Qed.
-
-#[export] Instance ext_eq_trans A B : Transitive (@ext_eq A B).
-Proof. intros f g h Heq1 Heq2 x. rewrite (Heq1 x), (Heq2 x). reflexivity. Qed.
-*)
-
 #[export] Instance ext_eq_equiv A B : Equivalence (@ext_eq A B).
 Proof.
 split.

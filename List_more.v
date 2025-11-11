@@ -1,8 +1,6 @@
 (** Add-ons for List library
 Useful tactics and properties apparently missing in the [List] library. *)
 
-(* TODO once it is confirmed that deprecated tactics are subsumed by [Type] versions, remove them *)
-
 From Stdlib Require Import Decidable PeanoNat Morphisms.
 From Stdlib Require Export List.
 From OLlibs Require Import Logic_Datatypes_more Bool_more.
@@ -508,120 +506,6 @@ Tactic Notation "decomp_cons_eq_elt" hyp(H) :=
                          apply elt_eq_elt_trichotT in H as [[[l1 H1 H2]|[H0 [H H1]]]|[l0 H0 H]];
                            [ rewrite (app_nil_l (a :: _)) in * | decomp_nil_eq H0 .. ]; try discriminate H
   end.
-
-
-(** BEGIN results in [Prop] subsumed by those in [Type] above *)
-
-#[deprecated(since="ollibs 2.0.8", use=app_eq_app_trichotT)]
-Lemma app_eq_app_trichot A (l1 l2 l3 l4 : list A) : l1 ++ l2 = l3 ++ l4 ->
-     (exists l2', l2' <> nil /\ l1 ++ l2' = l3 /\ l2 = l2' ++ l4)
-  \/ (l1 = l3 /\ l2 = l4)
-  \/ (exists l4', l4' <> nil /\ l1 = l3 ++ l4' /\ l4' ++ l2 = l4).
-Proof.
-intro Heq. decomp_app_eq_app_strict Heq as [[[l2' Hnil [<- ->]]|[-> ->]]|[l4' Hnil [-> <-]]].
-- left. exists l2'. repeat split. assumption.
-- right. left. repeat split.
-- right. right. exists l4'. repeat split. assumption.
-Qed.
-
-#[deprecated(since="ollibs 2.0.8", use=app_eq_app_trichotT)]
-Lemma app_eq_app_dichot A (l1 l2 l3 l4 : list A) : l1 ++ l2 = l3 ++ l4 ->
-     (exists l2', l1 ++ l2' = l3 /\ l2 = l2' ++ l4)
-  \/ (exists l4', l1 = l3 ++ l4' /\ l4' ++ l2 = l4).
-Proof. intros [l [[-> ->]|[-> ->]]]%app_eq_app; [ right | left ]; exists l; repeat split. Qed.
-
-#[local] Ltac decomp_app_eq_app_Prop_core H p :=
-  match type of H with
-  | _ ++ _ = _ ++ _ => apply app_eq_app_dichotT in H as p
-  end.
-#[deprecated(since="ollibs 2.0.8", note="Use decomp_app_eq_app instead.")] (* TODO add [use] rocq#20444 *)
-Tactic Notation "decomp_app_eq_app_Prop" hyp(H) "as" simple_intropattern(p) := decomp_app_eq_app_Prop_core H p.
-#[deprecated(since="ollibs 2.0.8", note="Use decomp_app_eq_app instead.")] (* TODO add [use] rocq#20444 *)
-Tactic Notation "decomp_app_eq_app_Prop" hyp(H) :=
-  let l := fresh "l" in
-  let H1 := fresh H in
-  let H2 := fresh H in
-  decomp_app_eq_app_Prop_core H ipattern:([[l [H1 H2]]|[l [H1 H2]]]).
-
-#[deprecated(since="ollibs 2.0.8", use=app_eq_app_trichotT)]
-Lemma elt_eq_app_dichot A l1 (a : A) l2 l3 l4 : l1 ++ a :: l2 = l3 ++ l4 ->
-     (exists l2', l1 ++ a :: l2' = l3 /\ l2 = l2' ++ l4)
-  \/ (exists l4', l1 = l3 ++ l4' /\ l4' ++ a :: l2 = l4).
-Proof.
-intro Heq. decomp_elt_eq_app Heq as [[l <- ->] | [l -> <-]]; [left | right]; exists l; repeat split. Qed.
-
-#[local] Ltac decomp_elt_eq_app_Prop_core H p :=
-  match type of H with
-  | _ ++ _ :: _ = _ ++ _ => apply elt_eq_app_dichotT in H as p
-  | _ ++ _ = _ ++ _ :: _ => simple apply eq_sym in H;
-                            apply elt_eq_app_dichotT in H as p
-  end.
-#[deprecated(since="ollibs 2.0.8", note="Use decomp_elt_eq_app instead.")] (* TODO add [use] rocq#20444 *)
-Tactic Notation "decomp_elt_eq_app_Prop" hyp(H) "as" simple_intropattern(p) := decomp_elt_eq_app_Prop_core H p.
-#[deprecated(since="ollibs 2.0.8", note="Use decomp_elt_eq_app instead.")] (* TODO add [use] rocq#20444 *)
-Tactic Notation "decomp_elt_eq_app_Prop" hyp(H) :=
-  let l := fresh "l" in
-  let H1 := fresh H in
-  let H2 := fresh H in
-  decomp_elt_eq_app_Prop_core H ipattern:([[l [H1 H2]]|[l [H1 H2]]]).
-
-#[deprecated(since="ollibs 2.0.8", use=app_eq_app_trichotT)]
-Lemma elt_eq_app_app_trichot A l1 (a : A) l2 l3 l4 l5 : l1 ++ a :: l2 = l3 ++ l4 ++ l5 ->
-      (exists l2', l1 ++ a :: l2' = l3 /\ l2 = l2' ++ l4 ++ l5)
-   \/ (exists l2' l2'', l1 = l3 ++ l2' /\ l2' ++ a :: l2'' = l4 /\ l2 = l2'' ++ l5)
-   \/ (exists l5', l1 = l3 ++ l4 ++ l5' /\ l5' ++ a :: l2 = l5).
-Proof.
-intro Heq. decomp_elt_eq_app_app Heq as [[[l <- ->] | [(l, l') -> [<- ->]]] | [l -> <-]].
-- left. exists l. repeat split.
-- right. left. exists l, l'. repeat split.
-- right. right. exists l. repeat split.
-Qed.
-
-#[local] Ltac decomp_elt_eq_app_app_Prop_core H p :=
-  match type of H with
-  | _ ++ _ :: _ = _ ++ _ ++ _ => apply elt_eq_app_app_trichotT in H as p
-  | _ ++ _ ++ _ = _ ++ _ :: _ => simple apply eq_sym in H;
-                                 apply elt_eq_app_app_trichotT in H as p
-  end.
-#[deprecated(since="ollibs 2.0.8", note="Use decomp_elt_eq_app_app instead.")] (* TODO add [use] rocq#20444 *)
-Tactic Notation "decomp_elt_eq_app_app_Prop" hyp(H) "as" simple_intropattern(p) :=
-  decomp_elt_eq_app_app_Prop_core H p.
-#[deprecated(since="ollibs 2.0.8", note="Use decomp_elt_eq_app_app instead.")] (* TODO add [use] rocq#20444 *)
-Tactic Notation "decomp_elt_eq_app_app_Prop" hyp(H) :=
-  let l1 := fresh "l" in
-  let l2 := fresh "l" in
-  let H1 := fresh H in
-  let H2 := fresh H in
-  let H3 := fresh H in
-  decomp_elt_eq_app_app_Prop_core H ipattern:([[l1 [H1 H2]] | [[l1 [l2 [H1 [H2 H3]]]] | [l2 [H1 H2]]]]).
-
-#[deprecated(since="ollibs 2.0.8", use=app_eq_app_trichotT)]
-Lemma elt_eq_elt_trichot A l1 (a : A) l2 l3 b l4 : l1 ++ a :: l2 = l3 ++ b :: l4 ->
-      (exists l2', l1 ++ a :: l2' = l3 /\ l2 = l2' ++ b :: l4)
-   \/ (l1 = l3 /\ a = b /\ l2 = l4)
-   \/ (exists l4', l1 = l3 ++ b :: l4' /\ l4' ++ a :: l2 = l4).
-Proof.
-intro Heq. decomp_elt_eq_elt Heq as [[[l <- ->] | [-> [-> ->]]] | [l -> <-]].
-- left. exists l. repeat split.
-- right. left. repeat split.
-- right. right. exists l. repeat split.
-Qed.
-
-#[local] Ltac decomp_elt_eq_elt_Prop_core H p :=
-  match type of H with
-  | _ ++ _ :: _ = _ ++ _ :: _ => apply elt_eq_elt_trichotT in H as p
-  end.
-#[deprecated(since="ollibs 2.0.8", note="Use decomp_elt_eq_elt instead.")] (* TODO add [use] rocq#20444 *)
-Tactic Notation "decomp_elt_eq_elt_Prop" hyp(H) "as" simple_intropattern(p) := decomp_elt_eq_elt_Prop_core H p.
-Tactic Notation "decomp_elt_eq_elt_Prop" hyp(H) :=
-  let l := fresh "l" in
-  let H1 := fresh H in
-  let H2 := fresh H in
-  let H3 := fresh H in
-  decomp_elt_eq_elt_Prop_core H ipattern:([[l [H1 H2]] | [[H1 [H2 H3]] | [l [H1 H2]]]]).
-
-(** END *)
-
 
 
 (** ** Decomposition of [map] *)
