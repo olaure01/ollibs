@@ -22,6 +22,7 @@
 * `DecidableT`      : `Decidable` with output as a `sum` in `Type`
 * `ListT`           : `List` with output in `Type`
 * `inhabitedT`      : `inhabited` with output in `Type`
+* `SubListT`         : `SubList` with output in `Type`
 * `ShuffleT`        : `Shuffle` with output in `Type`
 
 ## Around Finite Multisets
@@ -76,7 +77,11 @@ Below _l_ is a list, _p_ is a pattern, _H_ is an hypothesis, _t_ is any term, et
 
 * `list_[e]reflexivity`
 
-   reflexivity up to `list_[e]simpl`
+   `reflexivity` up to `list_[e]simpl`
+
+* `list_assumption`
+
+   `assumption` up to `list_reflexivity`
 
 * `cons2app` [`in` [_H_ | *]]
 
@@ -85,6 +90,11 @@ Below _l_ is a list, _p_ is a pattern, _H_ is an hypothesis, _t_ is any term, et
 * `list_apply` _t_ [`in` _H_]
 
   similar to `apply` _t_ but the conclusion of _t_ is unified to the goal (resp. the hypothesis of _t_ is unified to _H_) up to `list_reflexivity` (which includes associativity, unit, etc. of list constructions)
+
+* `decomp_list_eq` _H_
+
+   when _H_ is an equalty between lists, it is recursively analysed and decomposed into smaller cases depending how list constructors matches across the two sides of the equality
+   this generic tactic automaticaly applies some of the decomposition tactics described below, you should first try it and move to more specific tactics only if you need more control
 
 * `decomp_nil_eq` _H_
 
