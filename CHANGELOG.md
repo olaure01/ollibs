@@ -1,5 +1,9 @@
 # Versions 2.1.x
 
+## Version 2.1.2
+
+Ongoing development.
+
 ## Version 2.1.1
 
 * add some documentation in `DOCUMENTATION.md`

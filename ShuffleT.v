@@ -174,7 +174,7 @@ Qed.
 Lemma shuffleT_app_inv A (l1 l2 l3' l3'' : list A) :
   shuffleT l1 l2 (l3' ++ l3'') -> {'(l1', l1'', l2', l2'')
                                    & l1 = l1' ++ l1'' /\ l2 = l2' ++ l2''
-                                   & ((shuffleT l1' l2' l3') * (shuffleT l1'' l2'' l3''))%type }.
+                                   & shuffleT l1' l2' l3' * shuffleT l1'' l2'' l3'' }.
 Proof.
 intro s. remember (l3' ++ l3'') as l3 eqn:Heq3.
 induction s as [ | x l' l'' l''' s IHs | x l' l'' l''' s IHs ] in l3', l3'', Heq3 |- *.
@@ -201,9 +201,9 @@ induction s as [ | x l' l'' l''' s IHs | x l' l'' l''' s IHs ] in l3', l3'', Heq
 Qed.
 
 Lemma shuffleT_elt_inv A (a : A) l1 l2 l3' l3'' : shuffleT l1 l2 (l3' ++ a :: l3'') ->
-  {'(l1', l1'', l2', l2'') &   ((l1 = l1' ++ a :: l1'' /\ l2 = l2' ++ l2'')
-                              + (l1 = l1' ++ l1'' /\ l2 = l2' ++ a :: l2''))%type
-                           & ((shuffleT l1' l2' l3') * (shuffleT l1'' l2'' l3''))%type }.
+  {'(l1', l1'', l2', l2'') &   (l1 = l1' ++ a :: l1'' /\ l2 = l2' ++ l2'')
+                             + (l1 = l1' ++ l1'' /\ l2 = l2' ++ a :: l2'')
+                           & shuffleT l1' l2' l3' * shuffleT l1'' l2'' l3'' }.
 Proof.
 intros [[[[l1' l1''] l2'] l2''] [-> ->] [s' s'']]%shuffleT_app_inv.
 inversion s'' as [ | x l1 l2 l3 | x l1 l2 l3 ]; subst.
@@ -221,7 +221,7 @@ intro s. induction s.
 Qed.
 
 Lemma PermutationT_shuffleT A (l1 l2 l3 l3' : list A) : shuffleT l1 l2 l3 -> PermutationT l3 l3' ->
-  {'(l1', l2') & (PermutationT l1 l1' * PermutationT l2 l2')%type & shuffleT l1' l2' l3' }.
+  {'(l1', l2') & PermutationT l1 l1' * PermutationT l2 l2' & shuffleT l1' l2' l3' }.
 Proof.
 intro s. induction s as [ | x l' l'' l''' s IHs | x l' l'' l''' s IHs ] in l3' |-; intro p.
 - exists (nil, nil).
@@ -278,7 +278,7 @@ intro s. induction s as [ | x l' l'' l''' s IHs | x l' l'' l''' s IHs ] in l3' |
 Qed.
 
 Lemma PermutationT_app_shuffleT A (l1 l2 l3 : list A) : PermutationT (l1 ++ l2) l3 ->
-  {'(l1', l2') & (PermutationT l1 l1' * PermutationT l2 l2')%type & shuffleT l1' l2' l3}.
+  {'(l1', l2') & PermutationT l1 l1' * PermutationT l2 l2' & shuffleT l1' l2' l3}.
 Proof. intro p. refine (PermutationT_shuffleT _ p). apply shuffleT_app. Qed.
 
 Lemma shuffleT_length A (l1 l2 l3 : list A) : shuffleT l1 l2 l3 -> length l1 + length l2 = length l3.

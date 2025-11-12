@@ -8,6 +8,7 @@ Set Default Goal Selector "!".
 Set Default Proof Using "Type".
 Set Implicit Arguments.
 
+
 Inductive sublistT A : crelation (list A) :=
 | sublistT_nil : sublistT nil nil
 | sublistT_cons a l1 l2 : sublistT l1 l2 -> sublistT (a :: l1) (a :: l2)
@@ -109,7 +110,7 @@ Lemma sublistT_AddT A (a : A) l1 l2 : AddT a l1 l2 -> sublistT l1 l2.
 Proof. induction 1; constructor; [ apply sublistT_refl | assumption ]. Qed.
 
 Lemma sublistT_inT_extend A (a : A) l1 l2 :
-  sublistT l1 l2 -> InT a l2 -> { l1' & sublistT l1' l2 & ((inclT (a :: l1) l1') * (inclT l1' (a :: l1)))%type}.
+  sublistT l1 l2 -> InT a l2 -> { l1' & sublistT l1' l2 & inclT (a :: l1) l1' * inclT l1' (a :: l1) }.
 Proof.
 intro Hsub. induction Hsub as [ | b l1 l2 Hsub IH | b l1 l2 Hsub IH ]; intro Hin.
 - destruct Hin.
@@ -149,7 +150,7 @@ Proof. induction l as [ | a l IH ]; cbn; try destruct (f a); now constructor. Qe
 (* with decidable equality *)
 
 Lemma uniquify_map_sublistT A B (eq_dec : forall x y:B, DecidableT.decidableP (x=y)) (f : A -> B) l :
-  { l' & (NoDupT (map f l') * inclT (map f l) (map f l'))%type & sublistT (map f l') (map f l) }.
+  { l' & NoDupT (map f l') * inclT (map f l) (map f l') & sublistT (map f l') (map f l) }.
 Proof.
 induction l as [ | a l IHl ].
 - exists nil; cbn; [ split | ]; [ | red; trivial | ]; constructor.
@@ -169,7 +170,7 @@ induction l as [ | a l IHl ].
 Qed.
 
 Lemma uniquify_sublistT A (eq_dec : forall x y:A, DecidableT.decidableP (x=y)) (l:list A) :
-  { l' & (NoDupT l' * inclT l l')%type & sublistT l' l }.
+  { l' & NoDupT l' * inclT l l' & sublistT l' l }.
 Proof.
 destruct (uniquify_map_sublistT eq_dec id l) as [l' H].
 now exists l'; rewrite !map_id in *.

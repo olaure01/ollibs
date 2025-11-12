@@ -6,6 +6,7 @@ Set Default Goal Selector "!".
 Set Default Proof Using "Type".
 Set Implicit Arguments.
 
+
 Definition decidableP (P : Prop) := { P } + { ~ P }.
 
 Lemma decP_dec P : decidableP P -> decidable P.

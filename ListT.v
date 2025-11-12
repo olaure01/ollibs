@@ -1,9 +1,9 @@
 (** Properties of lists with output in [Type] *)
 
 From Stdlib Require Import PeanoNat Compare_dec List.
-Import ListNotations.
-Open Scope list_scope.
 From OLlibs Require Import Logic_Datatypes_more DecidableT.
+Import ListNotations LogicNotations.
+Open Scope list_scope.
 
 (* Set Mangle Names. Set Mangle Names Light. *)
 Set Default Goal Selector "!".
@@ -119,7 +119,7 @@ Section Facts.
       destruct H1 ; intuition.
   Qed.
 
-  Lemma inT_app_iff : forall l l' (a : A), iffT (InT a (l++l')) (InT a l + InT a l').
+  Lemma inT_app_iff : forall l l' (a : A),  InT a (l++l') <=> InT a l + InT a l'.
   Proof.
     split; auto using inT_app_sum, inT_sum_app.
   Qed.
@@ -1359,8 +1359,7 @@ Section Forall2T.
 
   Theorem Forall2T_app_inv_l : forall l1 l2 l,
     Forall2T (l1 ++ l2) l ->
-    {'(l1', l2') & (Forall2T l1 l1' * Forall2T l2 l2')%type
-                 & l = l1' ++ l2' }.
+    {'(l1', l2') & Forall2T l1 l1' * Forall2T l2 l2' & l = l1' ++ l2' }.
   Proof.
     intro l1. induction l1 as [|a l1 IHl1]; intros l1' l2' HF.
     - exists (nil, l2'); auto.
@@ -1372,8 +1371,7 @@ Section Forall2T.
 
   Theorem Forall2T_app_inv_r : forall l1 l2 l,
     Forall2T l (l1 ++ l2) ->
-    {'(l1', l2') & (Forall2T l1' l1 * Forall2T l2' l2)%type
-                 & l = l1' ++ l2' }.
+    {'(l1', l2') & Forall2T l1' l1 * Forall2T l2' l2 & l = l1' ++ l2' }.
   Proof.
     intro l1. induction l1 as [|a l1 IHl1]; intros l1' l2' HF.
     - exists (nil, l2'); auto.
