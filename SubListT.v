@@ -1,5 +1,5 @@
 From Stdlib Require Import PeanoNat CMorphisms.
-From OLlibs Require Import List_more SubList.
+From OLlibs Require Import List_more SubList PermutationT.
 From OLlibs Require DecidableT.
 Import Logic_Datatypes_more.LogicNotations ListNotations.
 
@@ -53,16 +53,6 @@ intro Hsub. induction Hsub as [ | | ? ? ? ? IHHsub ].
 - intros x Hx. right. apply IHHsub, Hx.
 Qed.
 
-Lemma NoDupT_sublistT A (l1 l2 : list A) : sublistT l1 l2 -> NoDupT l2 -> NoDupT l1.
-Proof.
-intro Hsub. induction Hsub as [ | ? ? ? Hsub IHHsub | ? ? ? ? IHHsub ]; intro Hnd.
-- assumption.
-- inversion_clear Hnd as [|? ? Hnin ?]. subst. constructor.
-  + intro Hin. apply Hnin, (sublistT_inclT Hsub _ Hin).
-  + apply IHHsub. assumption.
-- apply IHHsub. inversion_clear Hnd. assumption.
-Qed.
-
 Lemma sublistT_map A B (f : A -> B) l1 l2 : sublistT l1 l2 -> sublistT (map f l1) (map f l2).
 Proof. intro Hsub. induction Hsub; constructor; assumption. Qed.
 
@@ -96,6 +86,34 @@ Proof. intro. apply sublistT_antisym. Qed.
 Lemma sublistT_cons_inv A (a : A) l1 l2 : sublistT (a :: l1) (a :: l2) -> sublistT l1 l2.
 Proof.
 intro Hs. inversion Hs; subst; [ | transitivity (a :: l1); [ constructor; reflexivity | ] ]; assumption.
+Qed.
+
+Lemma sublistT_elt_l_inv A (a : A) l1' l1'' l2 :
+  sublistT (l1' ++ a :: l1'') l2 ->
+  {'(l2', l2'') & l2 = l2' ++ a :: l2'' & sublistT l1' l2' * sublistT l1'' l2'' }.
+Proof.
+intro Hs.
+remember (l1' ++ a :: l1'') as l1 eqn:Hl1.
+induction Hs as [ | b l1 l2 Hs' IH | b l1 l2 Hs' IH ] in l1', l1'', Hl1 |- *.
+- decomp_list_eq Hl1.
+- decomp_list_eq Hl1; subst.
+  + specialize (IH _ _ eq_refl) as [[l2' l2''] -> [Hs2 Hs2']].
+    exists (b :: l2', l2''); [ reflexivity | split ].
+    * constructor. assumption.
+    * assumption.
+  + exists (nil, l2); [ reflexivity | now split ].
+- subst.
+  specialize (IH _ _ eq_refl) as [[l2' l2''] -> [Hs2 Hs2']].
+  exists (b :: l2', l2''); [ reflexivity | split ].
+  * constructor. assumption.
+  * assumption.
+Qed.
+
+Lemma sublistT_cons_l_inv A (a : A) l1 l2 :
+  sublistT (a :: l1) l2 -> {'(l2', l2'') & l2 = l2' ++ a :: l2'' & sublistT l1 l2'' }.
+Proof.
+intros [[l2' l2''] -> [Hs Hs']]%(sublistT_elt_l_inv _ nil).
+exists (l2', l2''); [ reflexivity | assumption ].
 Qed.
 
 Lemma sublistT_sgt A (a : A) l : sublistT [a] l <=> InT a l.
@@ -174,4 +192,75 @@ Lemma uniquify_sublistT A (eq_dec : forall x y:A, DecidableT.decidableP (x=y)) (
 Proof.
 destruct (uniquify_map_sublistT eq_dec id l) as [l' H].
 now exists l'; rewrite !map_id in *.
+Qed.
+
+
+Lemma sublistT_PermutationT A (l1 l2 l2' : list A) :
+  sublistT l1 l2 -> PermutationT l2 l2' -> { l1' & PermutationT l1 l1' & sublistT l1' l2' }.
+Proof.
+intros Hs HP. induction HP as [ | x l l' ? IH | x y | ? ? ? ? IH1 ? IH2 ] in l1, Hs |- *.
+- inversion Hs. subst.
+  exists nil; constructor.
+- inversion Hs as [ | ? ? ? Hs' HP' IHs | ? ? ? Hs' HP' IHs ]; subst.
+  + apply IH in Hs' as [l1' Hs1' HP1'].
+    exists (x :: l1'); constructor; assumption.
+  + apply IH in Hs' as [l1' Hs1' HP1'].
+    exists l1'.
+    * assumption.
+    * constructor; assumption.
+- inversion Hs as [ | ? l0 ? Hs' HP IHs | ? ? ? Hs' HP IHs ]; subst.
+  + inversion Hs' as [ | ? l1 ? Hs'' HP' IHs' | ? ? ? Hs'' HP' IHs' ]; subst.
+    * exists (x :: y :: l1).
+      -- constructor.
+      -- do 2 constructor; assumption.
+    * exists (y :: l0).
+      -- reflexivity.
+      -- do 2 constructor; assumption.
+  + inversion Hs' as [ | ? l0 ? Hs'' HP' IHs' | ? ? ? Hs'' HP' IHs' ]; subst.
+    * exists (x :: l0).
+      -- reflexivity.
+      -- do 2 constructor; assumption.
+    * exists l1.
+      -- reflexivity.
+      -- do 2 constructor; assumption.
+- apply IH1 in Hs. destruct Hs as [l1' HP1' Hs1'].
+  apply IH2 in Hs1'. destruct Hs1' as [l2' HP2' Hs2'].
+  exists l2'; [ transitivity l1' | ]; assumption.
+Qed.
+
+Lemma PermutationT_sublistT A (l1 l1' l2' : list A) :
+  PermutationT l1 l1' -> sublistT l1' l2' -> { l2 & sublistT l1 l2 & PermutationT l2 l2' }.
+Proof.
+intro HP. induction HP as [ | x ? ? ? IH | x y | ? ? ? ? IH1 ? IH2 ] in l2' |- *; intro Hs.
+- now exists l2'.
+- apply sublistT_cons_l_inv in Hs as [[l2'' l2'''] -> Hs].
+  apply IH in Hs as [l2' Hs HP'].
+  exists (x :: l2'' ++ l2').
+  + constructor. apply sublistT_app_l. assumption.
+  + rewrite HP'. apply PermutationT_middle.
+- apply sublistT_cons_l_inv in Hs as [[l2'' l2'''] -> Hs].
+  apply sublistT_cons_l_inv in Hs as [[l3'' l3'''] -> Hs].
+  exists (y :: x :: l2'' ++ l3'' ++ l3''').
+  + do 2 constructor. apply sublistT_app_l, sublistT_app_l. assumption.
+  + rewrite (app_comm_cons l3'' _ x), (app_assoc _ _ (y :: _)).
+    apply PermutationT_cons_app. list_simpl. apply PermutationT_middle.
+- apply IH2 in Hs as [l2 HP2' Hs2'].
+  apply IH1 in HP2' as [l1' HP1' Hs1'].
+  exists l1'; [ | transitivity l2 ]; assumption.
+Qed.
+
+Lemma sublistT_as_PermutationT A (l1 l2 : list A) :
+  sublistT l1 l2 -> { l & PermutationT (l1 ++ l) l2 }.
+Proof.
+intro Hs. induction Hs as [ | ? ? ? ? [l HP] | a ? ? ? [l HP] ].
+- exists nil. reflexivity.
+- exists l. constructor. assumption.
+- exists (a :: l). rewrite <- HP. symmetry. apply PermutationT_middle.
+Qed.
+
+Lemma NoDupT_sublistT A (l1 l2 : list A) : sublistT l1 l2 -> NoDupT l2 -> NoDupT l1.
+Proof.
+intros [m HP]%sublistT_as_PermutationT Hnd.
+symmetry in HP. apply PermutationT_NoDupT, NoDupT_NoDup in HP; [ | assumption ].
+apply NoDup_NoDupT, (NoDup_app_remove_r _ _ HP).
 Qed.
