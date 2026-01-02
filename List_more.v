@@ -1061,6 +1061,25 @@ Ltac in_solve :=
     end);
   intuition auto with *; fail.
 
+Ltac inT_solve :=
+  cbn; repeat split;
+  repeat (apply inT_sum_app; cbn);
+  repeat (
+    repeat match goal with
+    | H : ?P * ?Q |- _ => destruct H
+    | H : ?P + ?Q |- _ => destruct H
+    end;
+    repeat match goal with
+    | H : InT _ _ |- _ => progress cbn in H
+    end;
+    repeat match goal with
+    | H : InT _ (_ :: _) |- _ => inversion H
+    end;
+    repeat match goal with
+    | H : InT _ _ |- _ => cbn in H; apply inT_app_sum in H as []
+    end);
+  intuition auto with *; fail.
+
 Ltac Forall_simpl_hyp :=
   repeat (
     match goal with
