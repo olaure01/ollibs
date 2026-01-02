@@ -1354,9 +1354,6 @@ Section Forall2T.
 
   Hint Constructors Forall2T : core.
 
-  Theorem Forall2T_refl : Forall2T [] [].
-  Proof. intros; apply Forall2T_nil. Qed.
-
   Theorem Forall2T_app_inv_l : forall l1 l2 l,
     Forall2T (l1 ++ l2) l ->
     {'(l1', l2') & Forall2T l1 l1' * Forall2T l2 l2' & l = l1' ++ l2' }.
