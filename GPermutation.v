@@ -225,7 +225,7 @@ Section GPermutation.
     PEPermutation tl tl' -> PEPermutation (l ++ tl) (l ++ tl').
   Proof. now case_perm; simpl; intros HP; [ apply Permutation_app_head | subst ]. Qed.
 
-  Lemma PEPermtuation_add_inside a l l' tl tl' :
+  Lemma PEPermutation_add_inside a l l' tl tl' :
     PEPermutation l l' -> PEPermutation tl tl' -> PEPermutation (l ++ a :: tl) (l' ++ a :: tl').
   Proof. now case_perm; simpl; intros HP1 HP2; [ apply Permutation_add_inside | subst ]. Qed.
 
@@ -263,7 +263,7 @@ Section GPermutation.
     PEPermutation l (a :: l1) -> exists l2 l3, PEPermutation (l2 ++ l3) l1 /\ l = l2 ++ a :: l3.
   Proof. now intro HP; rewrite <- (app_nil_l l1); apply PEPermutation_vs_elt_inv. Qed.
 
-  #[export] Instance PEPermtutation_in a : Proper (PEPermutation ==> Basics.impl) (In a).
+  #[export] Instance PEPermutation_in a : Proper (PEPermutation ==> Basics.impl) (In a).
   Proof. now case_perm; simpl; intros l l' HP HIn; subst; [ apply Permutation_in with l | ]. Qed.
 
   #[export] Instance PEPermutation_Forall (P : A -> Prop) :

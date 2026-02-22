@@ -327,12 +327,12 @@ Section GPermutationT.
   now apply PEPermutationT_vs_elt_inv.
   Qed.
 
-  #[export] Instance PEPermtutationT_in a : Proper (PEPermutationT ==> Basics.impl) (In a).
+  #[export] Instance PEPermutationT_in a : Proper (PEPermutationT ==> Basics.impl) (In a).
   Proof.
   now case_perm; cbn; intros l l' HP HIn; subst; [ apply PermutationT_in with l | ].
   Qed.
 
-  #[export] Instance PEPermtutationT_inT a : Proper (PEPermutationT ==> arrow) (InT a).
+  #[export] Instance PEPermutationT_inT a : Proper (PEPermutationT ==> arrow) (InT a).
   Proof.
   now case_perm; cbn; intros l l' HP HIn; subst; [ apply PermutationT_inT with l | ].
   Qed.
