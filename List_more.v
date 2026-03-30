@@ -5,7 +5,7 @@ From Stdlib Require Import Decidable PeanoNat Morphisms.
 From Stdlib Require Export List.
 From OLlibs Require Import Logic_Datatypes_more Bool_more.
 From OLlibs Require Export ListT.
-Import EqNotations.
+Import LogicNotations EqNotations.
 
 (* Set Mangle Names. Set Mangle Names Light. *)
 Set Default Goal Selector "!".
@@ -845,7 +845,7 @@ Qed.
 
 (** ** [ForallT] *)
 
-Lemma ForallT_app_iffT T P (l1 l2 : list T) : iffT (ForallT P (l1 ++ l2)) (ForallT P l1 * ForallT P l2).
+Lemma ForallT_app_iffT T P (l1 l2 : list T) : ForallT P (l1 ++ l2) <=> ForallT P l1 * ForallT P l2.
 Proof.
 split; [ intro; split | intros [] ];
   [ eapply ForallT_app_l | eapply ForallT_app_r | eapply ForallT_app ]; eassumption.

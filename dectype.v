@@ -21,6 +21,7 @@ Record DecType := {
   car :> Type;
   eqb : car -> car -> bool;
   eqb_eq : forall x y, eqb x y = true <-> x = y }.
+(* TODO replace with [reflect (x = y) (eqb x y)] *)
 Arguments eqb [_].
 Arguments eqb_eq [_].
 
@@ -246,6 +247,7 @@ Section SchemeEquality.
 
   Variable T : Type.
   Variable se_beq : T -> T -> bool.
+(* TODO use [Context [se_beq : T -> T -> bool].] *)
   Variable se_dec_bl : forall x y, se_beq x y = true -> x = y.
   Variable se_dec_lb : forall x y, x = y -> se_beq x y = true.
 

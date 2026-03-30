@@ -292,7 +292,7 @@ Proof.
 intros l1 l2 HP. induction HP; cbn.
 - reflexivity.
 - apply PermutationT_app_head. assumption.
-- rewrite ! app_assoc. apply PermutationT_app_tail, PermutationT_app_swap.
+- rewrite ! app_assoc. apply PermutationT_app_tail, PermutationT_app_comm.
 - etransitivity; eassumption.
 Qed.
 

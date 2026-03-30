@@ -641,10 +641,6 @@ Qed.
 
 End PermutationT_alt.
 
-(* begin hide *)
-Notation PermutationT_app_swap := PermutationT_app_comm (only parsing).
-(* end hide *)
-
 
 Lemma PermutationT_Permutation A : forall l1 l2 : list A,
   PermutationT l1 l2 -> Permutation.Permutation l1 l2.
