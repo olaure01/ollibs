@@ -1,3 +1,5 @@
+From Corelib Require CRelationClasses.
+
 (* Set Mangle Names. Set Mangle Names Light. *)
 Set Default Goal Selector "!".
 Set Default Proof Using "Type".
@@ -8,10 +10,8 @@ Set Implicit Arguments.
 
 #[global] Hint Unfold notT : core.
 
-(* TODO make it universe polymorphic: cf CRelationClasses.iffT *)
-(* and make it a [crelation Type]? *)
-(* and manage possible conflicts with CRelationClasses.iffT *)
-Definition iffT (A B : Type) := ((A -> B) * (B -> A))%type.
+#[universes(polymorphic)] Definition iffT : CRelationClasses.crelation Type := CRelationClasses.iffT.
+Arguments iffT (A B)%_type_scope.
 Module LogicNotations.
 Infix "<=>" := iffT (at level 95, no associativity).
 End LogicNotations.

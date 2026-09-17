@@ -302,18 +302,14 @@ Proof.
 intros l1 l2 HP. rewrite ! flat_map_concat_map. apply PermutationT_concat, PermutationT_map, HP.
 Qed.
 
-#[export] Instance list_sum_permT : Proper (@PermutationT nat ==> eq) list_sum.
+#[export] Instance PermutationT_list_sum : Proper (@PermutationT nat ==> eq) list_sum.
 Proof.
-intros l1; induction l1 as [|a l1 IHl1]; intros l2 HP.
-- now apply PermutationT_nil in HP; subst.
-- assert (HP' := HP).
-  apply PermutationT_sym, PermutationT_vs_cons_inv in HP'.
-  destruct HP' as [(l3, l4) ->].
-  apply PermutationT_cons_app_inv in HP.
-  simpl; erewrite IHl1; [ | apply HP ].
-  rewrite 2 list_sum_app; simpl.
-  now rewrite 2 (Nat.add_comm a), Nat.add_assoc.
+intros l1 l2 HP. induction HP; simpl; [ reflexivity | f_equal; assumption | | ].
+- apply Nat.add_shuffle3.
+- etransitivity; eassumption.
 Qed.
+#[deprecated(since="ollibs 2.1.2", use=PermutationT_list_sum)]
+Abbreviation list_sum_permT := PermutationT_list_sum.
 
 
 (** * Permutation definition based on transpositions for induction with fixed length *)
@@ -387,14 +383,6 @@ induction HP as [ | | ? l' ] in Hr, Ht, Htr |- *; auto.
 apply (Htr _ l'); auto; now apply perm_tT_permT.
 Qed.
 
-
-Lemma PermutationT_list_sum l1 l2 :
-  PermutationT l1 l2 -> list_sum l1 = list_sum l2.
-Proof.
-unfold list_sum. intros HP. induction HP; simpl; [ auto | auto | | ].
-- apply Nat.add_shuffle3.
-- etransitivity; eassumption.
-Qed.
 
 Lemma PermutationT_list_max l1 l2 :
   PermutationT l1 l2 -> list_max l1 = list_max l2.

@@ -164,7 +164,8 @@ End UsualOrderedTypeFull_as_ModBOrder.
 
 
 (** * [BOrder] structure over [nat]. *)
-#[export] Instance border_nat : BOrder.
+#[export]
+Instance border_nat : BOrder.
 Proof.
 split with nat Nat.leb; intros a b.
 - intros Hleb.
@@ -235,7 +236,7 @@ Fixpoint is_sorted B (l : list (@car B)) :=
 Arguments is_sorted {_} _.
 
 Lemma is_sorted_tail B a l : @is_sorted B (a :: l) = true -> is_sorted l = true.
-Proof. intros Hs. destruct l as [|b l]; [ reflexivity | apply andb_true_iff in Hs; apply Hs ]. Qed.
+Proof. intro Hs. destruct l as [|b l]; [ reflexivity | apply andb_true_iff in Hs; apply Hs ]. Qed.
 
 Definition SortedList B := { m | @is_sorted B m = true }.
 
