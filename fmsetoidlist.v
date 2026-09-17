@@ -93,6 +93,13 @@ Section FMSet2List.
   Lemma add_swap m a b : meq (add a (add b m)) (add b (add a m)).
   Proof. rewrite <- list2fm_retract, ? elts_add, perm_swap, <- 2 elts_add, list2fm_retract. reflexivity. Qed.
 
+  Lemma add_inj m1 m2 a : meq (add a m1) (add a m2) -> meq m1 m2.
+  Proof.
+  intro Heq.
+  apply Permutation_elts_meq, (@Permutation_cons_inv _ _ _ a).
+  rewrite <- ! elts_add, Heq. reflexivity.
+  Qed.
+
   Definition sum m1 m2 := list2fm (elts m1 ++ elts m2).
 
   Lemma elts_sum m1 m2 : Permutation (elts (sum m1 m2)) (elts m1 ++ elts m2).
@@ -114,6 +121,9 @@ Section FMSet2List.
   - apply Permutation_app_tail, elts_perm.
   - rewrite <- app_assoc. symmetry. apply Permutation_app_head, elts_perm.
   Qed.
+
+  Lemma sum_add_comm m1 m2 a : meq (sum (add a m1) m2) (add a (sum m1 m2)).
+  Proof. unfold sum. rewrite elts_add. reflexivity. Qed.
 
   Lemma list2fm_app l1 l2 : meq (list2fm (l1 ++ l2)) (sum (list2fm l1) (list2fm l2)).
   Proof.
