@@ -606,6 +606,16 @@ Ltac specialize_Forall_all a := repeat
 
 (** * Additional statements *)
 
+(** ** [length] *)
+
+Lemma length_one_iffT_sgt A (l : list A) : (length l = 1%nat) <=> { a | l = [a] }.
+Proof.
+destruct l as [ | a [ | ? l ] ].
+- split; [ intros [=] | intros [? [=]] ].
+- split; intro; [ exists a | ]; reflexivity.
+- split; [ intros [=] | intros [? [=]] ].
+Qed.
+
 (** ** [concat] *)
 
 Lemma concat_eq_elt A (a : A) L l1 l2 :
