@@ -27,8 +27,7 @@ Class FinMultiset M A := {
   elts_retract m : fold_right add empty (elts m) = m;
   perm_eq l1 l2 : PermutationT l1 l2 -> fold_right add empty l1 = fold_right add empty l2 }.
 
-Definition FinMultiset_carrier M A : FinMultiset M A -> Type := fun _ => M.
-Coercion FinMultiset_carrier : FinMultiset >-> Sortclass.
+Coercion FinMultiset_carrier M A : FinMultiset M A -> Type := fun _ => M.
 
 (** [Mst] and [Elt] define a finite multiset construction over a type [K]
     if for any [A] in [K], [Mst A] is a finite multiset with elements [Elt A]. *)
@@ -73,6 +72,15 @@ Section FMSet2List.
   apply PermutationT_nil, (PermutationT_app_inv_l (elts empty)).
   rewrite app_nil_r, <- list2fm_retract at 1.
   apply elts_perm_empty.
+  Qed.
+
+  Lemma elts_sgt a : elts (add a empty) = a :: nil.
+  Proof.
+  assert (HP := elts_add a empty). rewrite elts_empty in HP.
+  destruct (elts (add a empty)) as [ | b [ | c l ] ].
+  - apply PermutationT_nil in HP as [=].
+  - apply PermutationT_length_1 in HP as ->. reflexivity.
+  - apply PermutationT_length in HP as [=].
   Qed.
 
   Lemma elts_perm l : PermutationT (elts (list2fm l)) l.
@@ -204,6 +212,38 @@ Section Induction.
 End Induction.
 
 
+Section Flatten.
+
+  Variable A M MM : Type.
+  Variable fm : FinMultiset M A.
+  Variable fmfm : FinMultiset MM M.
+
+  Definition flatten mm := (fold_right sum empty) (elts mm).
+
+  Lemma flatten_empty : flatten empty = empty.
+  Proof. unfold flatten. rewrite elts_empty. reflexivity. Qed.
+
+  Lemma flatten_add m mm : flatten (add m mm) = sum m (flatten mm).
+  Proof.
+  unfold flatten.
+  change (sum m (fold_right sum empty (elts mm)))
+    with (fold_right sum empty (m :: elts mm)).
+  apply PermutationT_fold_right, elts_add.
+  intros. rewrite <- !sum_ass. f_equal. apply sum_comm.
+  Qed.
+
+  Lemma flatten_sgt a : flatten (add a empty) = a.
+  Proof. rewrite flatten_add, flatten_empty, sum_empty_right. reflexivity. Qed.
+
+  Lemma flatten_map_sgt l : flatten (list2fm (map (fun x => add x empty) l)) = list2fm l.
+  Proof.
+  induction l as [ | m l IH ]; [ apply flatten_empty | cbn ].
+  rewrite flatten_add, IH, sum_add_comm, sum_empty_left. reflexivity.
+  Qed.
+
+End Flatten.
+
+
 (** * Notations *)
 
 Module FMSetNotations.
@@ -221,11 +261,7 @@ End FMSetNotations.
 Definition fmslist_empty B : SortedList B := exist _ (nil) eq_refl.
 
 Lemma fmslist_add B : @car B -> SortedList B -> SortedList B.
-Proof.
-intros a m.
-exists (insert a (proj1_sig m)).
-apply (insert_sorted a m).
-Defined.
+Proof. intros a m. exists (insert a (proj1_sig m)). apply (insert_sorted a m). Defined.
 
 Lemma insert_add B (a : @car B) l :
   proj1_sig (fmslist_add a l) = insert a (proj1_sig l).
@@ -233,26 +269,26 @@ Proof. reflexivity. Qed.
 
 Theorem FMConstr_slist : FMConstructor SortedList (@car).
 Proof.
-intros A.
-split with (@fmslist_empty A) (@fmslist_add A) (fun m => proj1_sig m).
-- intros a [l Hsort].
-  revert Hsort; induction l as [|a' l IHl]; simpl; intros Hsort; auto.
-  destruct (leb a a'); auto.
+intro A.
+split with (fmslist_empty A) (@fmslist_add A) (@proj1_sig _ _).
+- intros a [l Hsort]. induction l as [ |a' l IHl ] in Hsort |- * ; [ reflexivity | cbn ].
+  destruct (leb a a'); [ reflexivity | ].
   change (a :: a' :: l) with ((a :: nil) ++ a' :: l).
   apply PermutationT_cons_app.
   apply is_sorted_tail in Hsort.
   apply (IHl Hsort).
 - intros [l Hsort].
-  revert Hsort; induction l as [|a l IHl]; intros Hsort.
+  induction l as [ |a l IHl ] in Hsort |- *.
   + now apply sortedlist_equality.
-  + destruct l as [|a' l]; apply sortedlist_equality; simpl; auto.
+  + destruct l as [ | a' l ]; apply sortedlist_equality; cbn; [ reflexivity | ].
     apply andb_true_iff in Hsort as [Ha Hsort].
     assert (H' := IHl Hsort).
-    apply (f_equal (fun m => proj1_sig m)) in H'.
-    simpl in H'; rewrite H'; simpl.
+    apply (f_equal (@proj1_sig _ _)) in H'.
+    cbn in H'. rewrite H'. cbn.
     destruct (leb a a'); [ reflexivity | discriminate Ha ].
-- intros l1 l2 HP; induction HP as [| ? ? ? ? IHP | | ? ? ? ? IHP ]; simpl; auto.
-  + now rewrite IHP.
-  + apply sortedlist_equality, insert_insert.
-  + now rewrite IHP.
+- intros l1 l2 HP. induction HP as [| ? ? ? ? IHP | | ? ? ? ? IHP ];
+    [ | cbn; rewrite IHP | | cbn; rewrite IHP ]; [ reflexivity .. | | assumption ].
+  apply sortedlist_equality, insert_insert.
 Defined.
+
+Definition FMConstr_slist_slist B := FMConstr_slist (border_slist B).

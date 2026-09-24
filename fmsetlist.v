@@ -5,8 +5,8 @@ Equality is required to be Rocq equality.
 An implementation of the axioms is provided by sorted lists
 for every type equiped with a Boolean-valued total order relation. *)
 
-From Stdlib Require Import Bool List Permutation Morphisms.
-From OLlibs Require Import BOrders.
+From Stdlib Require Import Bool List Morphisms.
+From OLlibs Require Import BOrders Permutation_more.
 
 (* Set Mangle Names. Set Mangle Names Light. *)
 Set Default Goal Selector "!".
@@ -26,8 +26,7 @@ Class FinMultiset M A := {
   elts_retract m : fold_right add empty (elts m) = m;
   perm_eq l1 l2 : Permutation l1 l2 -> fold_right add empty l1 = fold_right add empty l2 }.
 
-Definition FinMultiset_carrier M A : FinMultiset M A -> Type := fun _ => M.
-Coercion FinMultiset_carrier : FinMultiset >-> Sortclass.
+Coercion FinMultiset_carrier M A : FinMultiset M A -> Type := fun _ => M.
 
 (** [Mst] and [Elt] define a finite multiset construction over a type [K]
     if for any [A] in [K], [Mst A] is a finite multiset with elements [Elt A]. *)
@@ -69,6 +68,15 @@ Section FMSet2List.
   apply Permutation_nil, (Permutation_app_inv_l (elts empty)).
   rewrite app_nil_r, <- list2fm_retract at 1.
   apply elts_perm_empty.
+  Qed.
+
+  Lemma elts_sgt a : elts (add a empty) = a :: nil.
+  Proof.
+  assert (HP := elts_add a empty). rewrite elts_empty in HP.
+  destruct (elts (add a empty)) as [ | b [ | c l ] ].
+  - apply Permutation_nil in HP as [=].
+  - apply Permutation_length_1 in HP as ->. reflexivity.
+  - apply Permutation_length in HP as [=].
   Qed.
 
   Lemma elts_perm l : Permutation (elts (list2fm l)) l.
@@ -189,6 +197,38 @@ Section Induction.
 End Induction.
 
 
+Section Flatten.
+
+  Variable A M MM : Type.
+  Variable fm : FinMultiset M A.
+  Variable fmfm : FinMultiset MM M.
+
+  Definition flatten mm := (fold_right sum empty) (elts mm).
+
+  Lemma flatten_empty : flatten empty = empty.
+  Proof. unfold flatten. rewrite elts_empty. reflexivity. Qed.
+
+  Lemma flatten_add m mm : flatten (add m mm) = sum m (flatten mm).
+  Proof.
+  unfold flatten.
+  change (sum m (fold_right sum empty (elts mm)))
+    with (fold_right sum empty (m :: elts mm)).
+  apply Permutation_fold_right, elts_add.
+  intros. rewrite <- !sum_ass. f_equal. apply sum_comm.
+  Qed.
+
+  Lemma flatten_sgt a : flatten (add a empty) = a.
+  Proof. rewrite flatten_add, flatten_empty, sum_empty_right. reflexivity. Qed.
+
+  Lemma flatten_map_sgt l : flatten (list2fm (map (fun x => add x empty) l)) = list2fm l.
+  Proof.
+  induction l as [ | m l IH ]; [ apply flatten_empty | cbn ].
+  rewrite flatten_add, IH, sum_add_comm, sum_empty_left. reflexivity.
+  Qed.
+
+End Flatten.
+
+
 (** * Notations *)
 
 Module FMSetNotations.
@@ -213,16 +253,15 @@ Proof. reflexivity. Qed.
 
 Theorem FMConstr_slist : FMConstructor SortedList (@car).
 Proof.
-intros A.
-split with (@fmslist_empty A) (@fmslist_add A) (fun m => proj1_sig m).
+intro A.
+split with (fmslist_empty A) (@fmslist_add A) (@proj1_sig _ _).
 - intros ? ?. apply Permutation_insert.
-- intros [l Hsort].
-  induction l as [| a l IHl] in Hsort |- *.
+- intros [l Hsort]. induction l as [| a l IHl] in Hsort |- *.
   + apply sortedlist_equality. reflexivity.
-  + destruct l as [|c l]; apply sortedlist_equality; [ reflexivity | ].
+  + destruct l as [ | c l ]; apply sortedlist_equality; [ reflexivity | ].
     cbn. cbn in Hsort. apply andb_true_iff in Hsort as [Ha Hsort].
     assert (H' := IHl Hsort).
-    apply (f_equal (fun m => proj1_sig m)) in H'.
+    apply (f_equal (@proj1_sig _ _)) in H'.
     cbn in H'. rewrite H'. cbn.
     destruct (leb a c); [ reflexivity | discriminate Ha ].
 - intros l1 l2 HP. induction HP as [| ? ? ? ? IHP | | ? ? ? ? IHP ]; [ reflexivity | | | ]; cbn.
@@ -230,3 +269,5 @@ split with (@fmslist_empty A) (@fmslist_add A) (fun m => proj1_sig m).
   + apply sortedlist_equality, insert_insert.
   + rewrite IHP. assumption.
 Defined.
+
+Definition FMConstr_slist_slist B := FMConstr_slist (border_slist B).

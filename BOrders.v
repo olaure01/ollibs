@@ -1,7 +1,7 @@
 (** Boolean-valued total orders as a [Class] *)
 
-From Stdlib Require Import Bool PeanoNat Wf_nat Lia List Permutation Orders.
-From OLlibs Require Import funtheory.
+From Stdlib Require Import Bool PeanoNat Wf_nat Lia Permutation Orders.
+From OLlibs Require Import funtheory List_more.
 
 (* Set Mangle Names. Set Mangle Names Light. *)
 Set Default Goal Selector "!".
@@ -281,3 +281,81 @@ clear a m. intros a [[|b l'] Hsort] Hlen l; repeat split; auto.
       destruct (IH s (le_n _) a (exist _ l' (is_sorted_tail _ _ _ Hsort)) Hlen) as [_ Hin'].
       apply Hin' in Hin as [|]; [ left; apply in_cons | right ]; assumption.
 Qed.
+
+(** *** multiset ordering on (sorted) lists *)
+
+Fixpoint leb_mset_rev A (leA : brelation A) l1 l2 :=
+  match l1, l2 with
+  | nil, _ => true
+  | _ :: _, nil => false
+  | a1 :: r1, a2 :: r2 => if leA a1 a2 then (if leA a2 a1 then leb_mset_rev leA r1 r2 else true)
+                                       else false
+  end.
+
+Definition leb_mset (B : BOrder) (l1 l2 : list B) :=
+  leb_mset_rev B.(leb) (rev l1) (rev l2).
+
+#[export]
+Instance border_list (B : BOrder) : BOrder.
+Proof.
+split with (list B) (leb_mset B); intros l1 l2; unfold leb_mset; cbn.
+- intro Hle. induction l1 as [ | a1 r1 IH ] in Hle, l2 |- * using rev_ind; cbn in *.
+  + discriminate Hle.
+  + rewrite rev_unit in Hle. cbn in Hle.
+    destruct (rev_case l2) as [ -> | [a2 [r2 ->]] ]; cbn in Hle; cbn.
+    * reflexivity.
+    * rewrite rev_unit in Hle. rewrite !rev_unit. cbn.
+      case_eq (leb a1 a2); intros H1.
+      -- case_eq (leb a2 a1); intros H2.
+         ++ rewrite H1, H2 in Hle. apply IH. assumption.
+         ++ rewrite H1, H2 in Hle. discriminate Hle.
+      -- rewrite (total _ _ H1). reflexivity.
+- intros Hle1 Hle2.
+  induction l1 as [ | a1 r1 IH ] in Hle1, Hle2, l2 |- * using rev_ind;
+    destruct (rev_case l2) as [ -> | [a2 [r2 ->]] ]; cbn in *.
+  + reflexivity.
+  + rewrite rev_unit in Hle2. discriminate Hle2.
+  + rewrite rev_unit in Hle1. cbn in Hle1. discriminate Hle1.
+  + rewrite !rev_unit in Hle1, Hle2. cbn in Hle1, Hle2.
+    case_eq (leb a1 a2); intros H1; rewrite H1 in Hle1, Hle2.
+    * case_eq (leb a2 a1); intros H2; rewrite H2 in Hle1, Hle2.
+      -- rewrite (asym _ _ H1 H2).
+         rewrite (IH r2) by assumption. reflexivity.
+      -- discriminate Hle2.
+    * discriminate Hle1.
+- intros l Hle1 Hle2; cbn in *.
+  induction l1 as [ | a1 r1 IH ] in Hle1, Hle2, l2, l |- * using rev_ind; [ reflexivity | cbn in * ].
+  rewrite rev_unit. rewrite rev_unit in Hle1.
+  destruct (rev_case l2) as [ -> | [a2 [r2 ->]] ].
+  + discriminate Hle1.
+  + rewrite rev_unit in Hle1, Hle2. cbn in Hle1.
+    case_eq (leb a1 a2); intros H1; rewrite H1 in Hle1.
+    * destruct (rev_case l) as [ -> | [a [r ->]] ]; [ discriminate Hle2 | ].
+      case_eq (leb a2 a1); intros H2; rewrite H2 in Hle1;
+         rewrite rev_unit in Hle2; cbn in Hle2; rewrite rev_unit; cbn.
+      -- case_eq (leb a2 a); intros H3; rewrite H3 in Hle2.
+         ++ case_eq (leb a a2); intros H4; rewrite H4 in Hle2.
+            ** rewrite (trans _ _ _ H1 H3), (trans _ _ _ H4 H2).
+               apply (IH _ _ Hle1 Hle2).
+            ** rewrite (trans _ _ _ H1 H3).
+               case_eq (leb a a1); intros H; [ | reflexivity ].
+               exfalso. rewrite (trans _ _ _ H H1) in H4. discriminate H4.
+         ++ discriminate Hle2.
+      -- case_eq (leb a2 a); intros H3; rewrite H3 in Hle2.
+         ++ case_eq (leb a a2); intros H4; rewrite H4 in Hle2.
+            ** rewrite (asym _ _ H3 H4) in *. rewrite H1, H2. reflexivity.
+            ** rewrite (trans _ _ _ H1 H3).
+               case_eq (leb a a1); intros H; [ | reflexivity ].
+               exfalso. rewrite (trans _ _ _ H3 H) in H2. discriminate H2.
+         ++ discriminate Hle2.
+   * discriminate Hle1.
+Defined.
+
+#[export]
+Instance border_slist (B : BOrder) : BOrder.
+Proof.
+split with (SortedList B) (fun m1 m2 => leb_mset _ (proj1_sig m1) (proj1_sig m2)).
+- intros m1 m2. apply (border_list B).(total).
+- intros m1 m2 H1 H2. apply sortedlist_equality, (border_list B).(asym); assumption.
+- intros m1 m2 m3. apply (border_list B).(trans).
+Defined.

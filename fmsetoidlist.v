@@ -30,8 +30,7 @@ Class FinMultisetoid M A := {
   meq_perm m1 m2 : meq m1 m2 -> Permutation (elts m1) (elts m2);
   retract_meq m : meq (fold_right add empty (elts m)) m }.
 
-Definition FinMultisetoid_carrier M A : FinMultisetoid M A -> Type := fun _ => M.
-Coercion FinMultisetoid_carrier : FinMultisetoid >-> Sortclass.
+Coercion FinMultisetoid_carrier M A : FinMultisetoid M A -> Type := fun _ => M.
 
 (** [Mst] and [Elt] define a finite multiset construction over a type [K]
     if for any [A] in [K], [Mst A] is a finite multiset with elements [Elt A]. *)
@@ -79,6 +78,15 @@ Section FMSet2List.
   apply Permutation_nil, (Permutation_app_inv_l (elts empty)).
   rewrite app_nil_r, <- list2fm_retract at 1.
   apply elts_perm_empty.
+  Qed.
+
+  Lemma elts_sgt a : elts (add a empty) = a :: nil.
+  Proof.
+  assert (HP := elts_add a empty). rewrite elts_empty in HP.
+  destruct (elts (add a empty)) as [ | b [ | c l ] ].
+  - apply Permutation_nil in HP as [=].
+  - apply Permutation_length_1 in HP as ->. reflexivity.
+  - apply Permutation_length in HP as [=].
   Qed.
 
   Lemma elts_perm l : Permutation (elts (list2fm l)) l.

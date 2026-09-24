@@ -438,3 +438,24 @@ Proof. intros HP Hincl x Hin. symmetry in HP. apply Hincl, (PermutationT_in x HP
 
 Lemma PermutationT_repeat A (x : A) n l : PermutationT l (repeat x n) -> l = repeat x n.
 Proof. intros Heq%PermutationT_Permutation%Permutation_repeat. exact Heq. Qed.
+
+Lemma PermutationT_fold_right A B (f : B -> A -> A) e l1 l2 :
+  (forall x y z, f x (f y z) = f y (f x z)) -> PermutationT l1 l2 ->
+  fold_right f e l1 = fold_right f e l2.
+Proof.
+intros Hc HP.
+induction HP as [ | ? ? ? ? IHHP | | ]; cbn;
+  [ | rewrite IHHP | rewrite Hc | etransitivity; eassumption]; reflexivity.
+Qed.
+
+Lemma PermutationT_fold_left A B (f : A -> B -> A) e l1 l2 :
+  (forall x y z, f (f x y) z = f (f x z) y) -> PermutationT l1 l2 ->
+  fold_left f l1 e = fold_left f l2 e.
+Proof.
+intros Hc HP.
+induction HP as [ | ? ? ? ? IH | | ? ? ? ? IH1 ? IH2 ] in e |- *; cbn.
+- reflexivity.
+- apply IH.
+- rewrite Hc. reflexivity.
+- etransitivity; [ apply IH1 | apply IH2 ].
+Qed.

@@ -160,3 +160,24 @@ Proof. intros l1 l2 HP. rewrite ! flat_map_concat_map. apply Permutation_concat,
 
 Lemma Permutation_incl A (l1 l2 l0 : list A) : Permutation l1 l2 -> incl l1 l0 -> incl l2 l0.
 Proof. intros HP Hincl x Hin. symmetry in HP. apply Hincl, (Permutation_in x HP Hin). Qed.
+
+Lemma Permutation_fold_right A B (f : B -> A -> A) e l1 l2 :
+  (forall x y z, f x (f y z) = f y (f x z)) -> Permutation l1 l2 ->
+  fold_right f e l1 = fold_right f e l2.
+Proof.
+intros Hc HP.
+induction HP as [ | ? ? ? ? IH | | ]; cbn;
+  [ | rewrite IH | rewrite Hc | etransitivity; eassumption]; reflexivity.
+Qed.
+
+Lemma Permutation_fold_left A B (f : A -> B -> A) e l1 l2 :
+  (forall x y z, f (f x y) z = f (f x z) y) -> Permutation l1 l2 ->
+  fold_left f l1 e = fold_left f l2 e.
+Proof.
+intros Hc HP.
+induction HP as [ | ? ? ? ? IH | | ? ? ? ? IH1 ? IH2 ] in e |- *; cbn.
+- reflexivity.
+- apply IH.
+- rewrite Hc. reflexivity.
+- etransitivity; [ apply IH1 | apply IH2 ].
+Qed.
