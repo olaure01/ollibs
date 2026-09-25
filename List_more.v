@@ -1044,7 +1044,16 @@ destruct l as [ | b l ]; [ | rewrite simpl_fold_right_unit, IHl; [ | intros [=] 
 Qed.
 
 
-(** ** [list_sum] and [repeat] *)
+(** ** [repeat] *)
+
+Lemma firstn_repeat T (a : T) n k : firstn n (repeat a k) = repeat a (Nat.min n k).
+Proof. induction n as [ | n IH ] in k |- *; [ | destruct k as [ | k ]; [ | cbn; rewrite IH ] ]; reflexivity. Qed.
+
+Lemma skipn_repeat T (a : T) n k : skipn n (repeat a k) = repeat a (k - n).
+Proof.
+induction n as [ | n IH ] in k |- *;
+  [ rewrite skipn_0, Nat.sub_0_r | destruct k as [ | k ]; [ | cbn; rewrite IH ] ]; reflexivity.
+Qed.
 
 Lemma list_sum_repeat k n : list_sum (repeat k n) = n * k.
 Proof. induction n as [|n IHn]; [ | simpl repeat; simpl list_sum; rewrite IHn ]; reflexivity. Qed.
