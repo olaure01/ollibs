@@ -1018,33 +1018,55 @@ Lemma fold_right_app_assoc A f (e : A) l1 l2 :
   fold_right f e (l1 ++ l2) = f (fold_right f e l1) (fold_right f e l2).
 Proof. intros Hassoc Hunit. apply fold_right_app_assoc2, Hunit. assumption. Qed.
 
-(** *** [fold_right_unit] *)
+(** *** [fold_right_unit] and [fold_left_unit] *)
 
 Section FoldUnitTypes.
 
 Variable A : Type.
 Variable f : A -> A -> A.
-Variable u : A.
 
-Fixpoint fold_right_unit l :=
+Fixpoint fold_right_unit u l :=
 match l with
 | nil => u
 | a :: nil => a
-| a :: l0 => f a (fold_right_unit l0)
+| a :: l0 => f a (fold_right_unit u l0)
 end.
 
-Lemma simpl_fold_right_unit a b l :
-  fold_right_unit (a :: b :: l) = f a (fold_right_unit (b :: l)).
+Lemma fold_right_unit_cons_cons u a b l :
+  fold_right_unit u (a :: b :: l) = f a (fold_right_unit u (b :: l)).
 Proof. reflexivity. Qed.
 
-End FoldUnitTypes.
-
-Lemma fold_right_unit_unit A f (u v : A) l : l <> nil ->
-  fold_right_unit f u l = fold_right_unit f v l.
+Lemma fold_right_unit_last_last u a b l : fold_right_unit u (l · a · b) = fold_right_unit u (l · f a b).
 Proof.
-induction l as [ | a l IHl ]; intro Hnil; [ now contradiction Hnil | clear Hnil ].
-destruct l as [ | b l ]; [ | rewrite simpl_fold_right_unit, IHl; [ | intros [=] ] ]; reflexivity.
+induction l as [ | c [ | d l ] IH ]; [ reflexivity .. | ].
+rewrite <-!app_comm_cons in *.
+rewrite fold_right_unit_cons_cons, IH. reflexivity.
 Qed.
+
+Lemma fold_right_unit_unit (u v : A) l : l <> nil ->
+  fold_right_unit u l = fold_right_unit v l.
+Proof.
+induction l as [ | a l IHl ]; intro Hnil; [ contradiction Hnil; reflexivity | clear Hnil ].
+destruct l as [ | b l ]; [ | rewrite fold_right_unit_cons_cons, IHl; [ | intros [=] ] ]; reflexivity.
+Qed.
+
+Definition fold_left_unit u l :=
+match l with
+| nil => u
+| a :: l0 => fold_left f l0 a
+end.
+
+Lemma fold_left_unit_last u a l : l <> nil -> fold_left_unit u (l · a) = f (fold_left_unit u l) a.
+Proof.
+induction l as [ | b l IHl ]; intro Hnil; [ contradiction Hnil; reflexivity | clear Hnil ].
+cbn. rewrite fold_left_app. reflexivity.
+Qed.
+
+Lemma fold_left_unit_unit (u v : A) l : l <> nil ->
+  fold_left_unit u l = fold_left_unit v l.
+Proof. destruct l as [ | a l ]; intro Hnil; [ contradiction Hnil | ]; reflexivity. Qed.
+
+End FoldUnitTypes.
 
 
 (** ** [repeat] *)
