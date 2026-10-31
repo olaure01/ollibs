@@ -88,7 +88,7 @@ Section FMSet2List.
 
   #[export]
   Instance elts_perm' : Proper (eq ==> @PermutationT A) elts.
-  Proof. now intros m1 m2 Heq ; subst. Qed.
+  Proof. intros m1 m2 ->. reflexivity. Qed.
 
   Lemma elts_eq_nil m : elts m = nil -> m = empty.
   Proof. intro Heq. now assert (Hr := elts_retract m); rewrite Heq in Hr; simpl in Hr; subst. Qed.
@@ -125,7 +125,7 @@ Section FMSet2List.
 
   Lemma sum_ass m1 m2 m3 : sum (sum m1 m2) m3 = sum m1 (sum m2 m3).
   Proof.
-  unfold sum; apply perm_eq.
+  unfold sum. apply perm_eq.
   transitivity ((elts m1 ++ elts m2) ++ elts m3).
   - apply PermutationT_app_tail, elts_perm.
   - rewrite <- app_assoc; symmetry.
@@ -141,7 +141,7 @@ Section FMSet2List.
 
   Lemma list2fm_app l1 l2 : list2fm (l1 ++ l2) = sum (list2fm l1) (list2fm l2).
   Proof.
-  unfold sum; apply perm_eq.
+  unfold sum. apply perm_eq.
   transitivity (elts (list2fm l1) ++ l2); symmetry.
   - apply PermutationT_app_tail, elts_perm.
   - apply PermutationT_app_head, elts_perm.
@@ -163,7 +163,7 @@ Section Fmmap.
   Definition fmmap (m : M) := list2fm (map f (elts m)).
 
   Lemma list2fm_map l : list2fm (map f l) = fmmap (list2fm l).
-  Proof. symmetry; apply perm_eq, PermutationT_map, elts_perm. Qed.
+  Proof. symmetry. apply perm_eq, PermutationT_map, elts_perm. Qed.
 
   Lemma elts_fmmap m : PermutationT (elts (fmmap m)) (map f (elts m)).
   Proof.
@@ -258,7 +258,7 @@ End FMSetNotations.
 (** ** Sorted lists as finite multisets
   Sorted lists provide a finite multisets construction for [BOrder]. *)
 
-Definition fmslist_empty B : SortedList B := exist _ (nil) eq_refl.
+Definition fmslist_empty B : SortedList B := exist _ nil eq_refl.
 
 Lemma fmslist_add B : @car B -> SortedList B -> SortedList B.
 Proof. intros a m. exists (insert a (proj1_sig m)). apply (insert_sorted a m). Defined.
@@ -278,14 +278,13 @@ split with (fmslist_empty A) (@fmslist_add A) (@proj1_sig _ _).
   apply is_sorted_tail in Hsort.
   apply (IHl Hsort).
 - intros [l Hsort].
-  induction l as [ |a l IHl ] in Hsort |- *.
+  induction l as [ | a l IHl ] in Hsort |- *.
   + now apply sortedlist_equality.
   + destruct l as [ | a' l ]; apply sortedlist_equality; cbn; [ reflexivity | ].
     apply andb_true_iff in Hsort as [Ha Hsort].
     assert (H' := IHl Hsort).
     apply (f_equal (@proj1_sig _ _)) in H'.
-    cbn in H'. rewrite H'. cbn.
-    destruct (leb a a'); [ reflexivity | discriminate Ha ].
+    cbn in H'. rewrite H'. cbn. rewrite Ha. reflexivity.
 - intros l1 l2 HP. induction HP as [| ? ? ? ? IHP | | ? ? ? ? IHP ];
     [ | cbn; rewrite IHP | | cbn; rewrite IHP ]; [ reflexivity .. | | assumption ].
   apply sortedlist_equality, insert_insert.

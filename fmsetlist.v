@@ -243,7 +243,7 @@ End FMSetNotations.
 (** ** Sorted lists as finite multisets
   Sorted lists provide a finite multisets construction for [BOrder]. *)
 
-Definition fmslist_empty B : SortedList B := exist _ (nil) eq_refl.
+Definition fmslist_empty B : SortedList B := exist _ nil eq_refl.
 
 Lemma fmslist_add B : @car B -> SortedList B -> SortedList B.
 Proof. intros a m. exists (insert a (proj1_sig m)). apply (insert_sorted a m). Defined.
@@ -262,8 +262,7 @@ split with (fmslist_empty A) (@fmslist_add A) (@proj1_sig _ _).
     cbn. cbn in Hsort. apply andb_true_iff in Hsort as [Ha Hsort].
     assert (H' := IHl Hsort).
     apply (f_equal (@proj1_sig _ _)) in H'.
-    cbn in H'. rewrite H'. cbn.
-    destruct (leb a c); [ reflexivity | discriminate Ha ].
+    cbn in H'. rewrite H'. cbn. rewrite Ha. reflexivity.
 - intros l1 l2 HP. induction HP as [| ? ? ? ? IHP | | ? ? ? ? IHP ]; [ reflexivity | | | ]; cbn.
   + rewrite IHP. reflexivity.
   + apply sortedlist_equality, insert_insert.
