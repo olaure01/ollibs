@@ -1,6 +1,6 @@
 (** Properties of functions *)
 
-From Stdlib Require Import Program.Basics Relation_Definitions RelationClasses List.
+From Stdlib Require Import Relation_Definitions Morphisms List.
   (* do not export Program.Basics to avoid impact on [flip] and [arrow] for setoid_rewriting *)
 From OLlibs Require Import inhabitedT.
 
@@ -13,6 +13,10 @@ Set Implicit Arguments.
 (* copy of Basics.compose to avoid exporting full Basics *)
 Definition compose A B C (g : B -> C) (f : A -> B) := fun x : A => g (f x).
 Notation "g ∘ f" := (compose g f) (at level 40, left associativity, f at next level).
+
+Lemma compose_ap A B C (g : B -> C) (f : A -> B) x : (compose g f) x = g (f x).
+Proof. reflexivity. Qed.
+
 
 (** * Functions on constructors *)
 Definition Empty_fun {A} (o : Empty_set) : A := match o with end.
@@ -247,17 +251,18 @@ Qed.
 Definition ext_eq A B : relation (A -> B) := fun f g => forall a, f a = g a.
 Infix "~" := ext_eq (at level 60).
 
-Lemma compose_ext_eq A B C (f1 g1 : A -> B) (f2 g2 : B -> C) :
-  f1 ~ g1 -> f2 ~ g2 -> compose f2 f1 ~ compose g2 g1.
-Proof. intros Hext1 Hext2 x. unfold compose. rewrite (Hext1 x), (Hext2 (g1 x)). reflexivity. Qed.
-
-#[export] Instance ext_eq_equiv A B : Equivalence (@ext_eq A B).
+#[export]
+Instance ext_eq_equiv A B : Equivalence (@ext_eq A B).
 Proof.
 split.
 - intros f x. reflexivity.
 - intros f g Heq x. rewrite Heq. reflexivity.
 - intros f g h Heq1 Heq2 x. rewrite Heq1, Heq2. reflexivity.
 Qed.
+
+#[export]
+Instance compose_ext_eq A B C : Proper (@ext_eq B C ==> @ext_eq A B ==> @ext_eq A C) (@compose A B C).
+Proof. intros f1 f2 Hext2 g1 g2 Hext1 x. unfold compose. rewrite (Hext1 x), (Hext2 (g2 x)). reflexivity. Qed.
 
 Lemma id_compose_ext A B (f : A -> B) : compose id f ~ f.
 Proof. reflexivity. Qed.
@@ -269,21 +274,25 @@ Lemma compose_assoc_ext A B C D (f : A -> B) (g : B -> C) (h : C -> D) :
   compose h (compose g f) ~ compose (compose h g) f.
 Proof. reflexivity. Qed.
 
-Lemma injective_ext A B (f g : A -> B) : injective f -> f ~ g -> injective g.
-Proof. intros Hi Heq x y Hg. apply Hi. rewrite (Heq x), (Heq y). assumption. Qed.
+#[export]
+Instance injective_ext A B : Proper (@ext_eq A B ==> iff) (@injective A B).
+Proof. intros f g Hfg. split; intros Hi x y Heq; apply Hi; [ rewrite !Hfg | rewrite <-!Hfg ]; assumption. Qed.
 
-Lemma surjective_ext A B (f g : A -> B) : surjective f -> f ~ g -> surjective g.
-Proof. intros Hs Heq y. destruct (Hs y) as [x ->]. exists x. apply Heq. Qed.
+(* TODO maybe turn into Proper, but requires CMorphisms (together with already used Morphisms *)
+Lemma surjective_ext A B (f g : A -> B) : f ~ g -> surjective f -> surjective g.
+Proof. intros Heq Hs y. destruct (Hs y) as [x ->]. exists x. apply Heq. Qed.
 
-Lemma bijective_ext A B (f g : A -> B) : bijective f -> f ~ g -> bijective g.
+(* TODO maybe turn into Proper, but requires CMorphisms (together with already used Morphisms *)
+Lemma bijective_ext A B (f g : A -> B) : f ~ g -> bijective f -> bijective g.
 Proof.
-intros Hs Heq y. destruct (Hs y) as [x -> Hi]. exists x.
+intros Heq Hb y. destruct (Hb y) as [x -> Hi]. exists x.
 - apply Heq.
 - intros y Hy. apply Hi. rewrite (Heq y). assumption.
 Qed.
 
-Lemma map_ext A B (f g : A -> B) : f ~ g -> map f ~ map g.
-Proof. intros Heq l. induction l as [|a l IHl]; [ | cbn; rewrite IHl, (Heq a) ]; reflexivity. Qed.
+#[export]
+Instance map_ext A B : Proper (@ext_eq A B ==> @ext_eq (list A) (list B)) (@map A B).
+Proof. intros f g Heq l. induction l as [|a l IHl]; [ | cbn; rewrite IHl, (Heq a) ]; reflexivity. Qed.
 
 
 (** * Additional definitions *)
