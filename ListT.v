@@ -272,6 +272,20 @@ Section Elts.
       exists (x::l1, l2); simpl; now f_equal.
   Qed.
 
+  Hypothesis eq_dec : forall x y : A, {x = y}+{x <> y}.
+
+  Theorem remove_InT : forall (l : list A) (x : A), notT (InT x (remove eq_dec x l)).
+  Proof. intros l x Hin%inT_in. revert Hin. apply remove_In. Qed.
+
+  Lemma notinT_remove: forall l x, notT (InT x l) -> remove eq_dec x l = l.
+  Proof. intros l x Hnin. apply notin_remove. apply notT_inT_not_in. assumption. Qed.
+
+  Lemma inT_remove: forall l x y, InT x (remove eq_dec y l) -> (InT x l * (x <> y))%type.
+  Proof. intros l x y [Hin%in_inT H]%inT_in%in_remove; [ split | ]; assumption. Qed.
+
+  Lemma inT_inT_remove : forall l x y, x <> y -> InT x l -> InT x (remove eq_dec y l).
+  Proof. intros l x y Hneq Hin%inT_in. apply (in_inT eq_dec), in_in_remove; assumption. Qed.
+
 End Elts.
 
 
@@ -746,6 +760,13 @@ Section SetIncl.
 
   Lemma inclT_filter f l : inclT (filter f l) l.
   Proof. intros x Hin; apply filter_InT_inv in Hin; intuition. Qed.
+
+  Lemma remove_inclT eq_dec : forall l1 l2 x, inclT l1 l2 -> inclT (remove eq_dec x l1) (remove eq_dec x l2).
+  Proof.
+  intros l1 l2 x Hincl y Hin.
+  apply inT_remove in Hin as [Hin Hneq].
+  apply inT_inT_remove; [ | apply Hincl ]; assumption.
+  Qed.
 
   Lemma inclT_cons_cons a l1 l2 : inclT l1 l2 -> inclT (a :: l1) (a :: l2).
   Proof.

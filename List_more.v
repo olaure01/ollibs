@@ -17,7 +17,7 @@ Set Implicit Arguments.
 
 Module ListNotations.
 Include List.ListNotations.
-Notation "l · a" := (l ++ a :: nil) (at level 55) : list_scope.
+Notation "l · a" := (l ++ a :: nil) (at level 56, left associativity) : list_scope.
 End ListNotations.
 Import ListNotations.
 
@@ -714,7 +714,7 @@ Lemma partition_incl2T A f (l : list A) : inclT (snd (partition f l)) l.
 Proof. rewrite partition_as_filter. apply inclT_filter. Qed.
 
 
-(** ** [incl] *)
+(** ** [incl] and [inclT] *)
 Lemma incl_cons_cons A (a : A) l1 l2 : incl l1 l2 -> incl (a :: l1) (a :: l2).
 Proof.
 intro Hincl. change (a :: l1) with ((a :: nil) ++ l1). change (a :: l2) with ((a :: nil) ++ l2).
@@ -723,6 +723,9 @@ Qed.
 
 #[export] Instance incl_preorder A : PreOrder (@incl A).
 Proof. split; intro; [ apply incl_refl | apply incl_tran ]. Qed.
+
+#[export] Instance inclT_preorder A : CRelationClasses.PreOrder (@inclT A).
+Proof. split; intro; [ apply inclT_refl | apply inclT_tran ]. Qed.
 
 
 (** ** [NoDup] *)
