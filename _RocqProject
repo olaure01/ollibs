@@ -21,6 +21,8 @@ fmsetlistT.v
 fmsetlist.v
 fmsetoidlistT.v
 fmsetoidlist.v
+fsetlistT.v
+fsetlist.v
 funtheory.v
 GPermutationT.v
 GPermutation.v

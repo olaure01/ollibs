@@ -25,10 +25,12 @@
 * `SubListT`         : `SubList` with output in `Type`
 * `ShuffleT`        : `Shuffle` with output in `Type`
 
-## Around Finite Multisets
+## Around Finite Sets and Finite Multisets
 
+* `fsetlist`               : finite sets with Rocq equality
 * `fmsetlist`               : finite multisets with Rocq equality
 * `fmsetoidlist`            : finite multisets as setoid
+* `fsetlistT`              : `fsetlist` with output in `Type`
 * `fmsetlistT`              : `fmsetlist` with output in `Type`
 * `fmsetoidlistT`           : `fmsetoidlist` with output in `Type`
 

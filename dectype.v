@@ -22,6 +22,7 @@ Record DecType := {
   eqb : car -> car -> bool;
   eqb_eq : forall x y, eqb x y = true <-> x = y }.
 (* TODO replace with [reflect (x = y) (eqb x y)] *)
+(* TODO turn into [Class]? define [Instance]s, relation with [BOrder] *)
 Arguments eqb [_].
 Arguments eqb_eq [_].
 

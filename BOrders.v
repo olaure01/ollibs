@@ -1,12 +1,14 @@
 (** Boolean-valued total orders as a [Class] *)
 
 From Stdlib Require Import Bool PeanoNat Wf_nat Lia Permutation Orders.
-From OLlibs Require Import funtheory List_more.
+From OLlibs Require Import funtheory dectype List_more.
 
 (* Set Mangle Names. Set Mangle Names Light. *)
 Set Default Goal Selector "!".
 Set Default Proof Using "Type".
 Set Implicit Arguments.
+
+(* TODO make closer to [DecType] *)
 
 
 (** * Class of Boolean-valued total orders *)
@@ -19,6 +21,34 @@ Class BOrder := {
   total a b : leb a b = false -> leb b a = true;
   asym a b : leb a b = true -> leb b a = true -> a = b;
   trans a b c : leb a b = true -> leb b c = true -> leb a c = true }.
+Arguments total [_ _ _] _.
+Arguments asym [_ _ _] _ _.
+Arguments trans [_ _ _ _] _ _, [_ _ _] _ _ _, [_] _ _ _ _ _.
+
+Section Properties.
+
+Variable B : BOrder.
+
+Lemma refl (x : @car B) : leb x x = true.
+Proof.
+destruct (leb x x) eqn:Hx; [ reflexivity | ].
+assert (Hnx := total Hx). rewrite <- Hx, <- Hnx. reflexivity.
+Qed.
+
+Definition BOrder_dec : DecType.
+Proof using B.
+split with car
+           (fun a b => leb a b && leb b a).
+intros x y. split.
+- intros [Heq1 Heq2]%andb_true_iff.
+  apply (asym Heq1 Heq2).
+- intros <-. rewrite refl. reflexivity.
+Defined.
+
+End Properties.
+
+Coercion BOrder_dec : BOrder >-> DecType.
+
 
 (** ** Equivalence with [UsualOrderedTypeFull] *)
 Module Type ModBOrder.
@@ -60,7 +90,7 @@ Module ModBOrder_as_UsualOrderedTypeFull (B : ModBOrder) : UsualOrderedTypeFull.
   - split; [ assumption | ].
     intros ->.
     rewrite Hlebx in Hleby. discriminate Hleby.
-  - assert (Ht := total _ _ Hlebx).
+  - assert (Ht := total Hlebx).
     split; [ assumption | ].
     intros ->.
     rewrite Ht in Hlebx. discriminate Hlebx.
@@ -69,7 +99,7 @@ Module ModBOrder_as_UsualOrderedTypeFull (B : ModBOrder) : UsualOrderedTypeFull.
   Lemma eq_dec x y : {eq x y} + {~ eq x y}.
   Proof.
   destruct (leb x y) eqn:Heq1, (leb y x) eqn:Heq2.
-  - destruct (asym _ _ Heq1 Heq2). left. reflexivity.
+  - destruct (asym Heq1 Heq2). left. reflexivity.
   - right. intros Heq. unfold eq in Heq. subst.
     rewrite Heq1 in Heq2. discriminate Heq2.
   - right. intros Heq. unfold eq in Heq. subst.
@@ -90,7 +120,7 @@ Module ModBOrder_as_UsualOrderedTypeFull (B : ModBOrder) : UsualOrderedTypeFull.
     destruct (leb y y) eqn:Heq2.
     + assumption.
     + exfalso.
-      assert (Heq3 := total _ _ Heq2).
+      assert (Heq3 := total Heq2).
       rewrite Heq2 in Heq3. discriminate Heq3.
   Qed.
 
@@ -188,13 +218,13 @@ Defined.
 
 (** * Sorted lists over [BOrder] *)
 
-(** ** Insertion sort *)
+(** ** Insertion functions respecting order (with and without duplicates) *)
 
 Fixpoint insert B (a : @car B) l :=
   match l with
   | nil => a :: nil
-  | b :: t => if (leb a b) then a :: b :: t
-                           else b :: (insert B a t)
+  | b :: t => if leb a b then a :: b :: t
+                         else b :: insert B a t
   end.
 Arguments insert {_} _ _.
 
@@ -203,16 +233,16 @@ Lemma insert_insert B (x y : @car B) l :
 Proof.
 induction l as [|a l IHl]; cbn.
 - destruct (leb x y) eqn:Heqbb1, (leb y x) eqn:Heqbb2; try reflexivity.
-  + apply (asym _ _ Heqbb1) in Heqbb2 as ->. reflexivity.
+  + apply (asym Heqbb1) in Heqbb2 as ->. reflexivity.
   + apply total in Heqbb1. rewrite Heqbb1 in Heqbb2. discriminate Heqbb2.
 - destruct (leb x a) eqn:Heqbb1, (leb y a) eqn:Heqbb2; cbn.
   + destruct (leb x y) eqn:Heqbb, (leb y x) eqn:Heqbb'; rewrite ? Heqbb1, ? Heqbb2; try reflexivity.
-    * apply (asym _ _ Heqbb') in Heqbb as ->. reflexivity.
+    * apply (asym Heqbb') in Heqbb as ->. reflexivity.
     * apply total in Heqbb'. rewrite Heqbb' in Heqbb. discriminate Heqbb.
   + destruct (leb y x) eqn:Heqbb'; rewrite ? Heqbb1, ? Heqbb2; try reflexivity.
-    apply (trans _ _ _ Heqbb') in Heqbb1. rewrite Heqbb1 in Heqbb2. discriminate Heqbb2.
+    apply (trans Heqbb') in Heqbb1. rewrite Heqbb1 in Heqbb2. discriminate Heqbb2.
   + destruct (leb x y) eqn:Heqbb; rewrite ? Heqbb1, ? Heqbb2; try reflexivity.
-    apply (trans _ _ _ Heqbb) in Heqbb2. rewrite Heqbb1 in Heqbb2. discriminate Heqbb2.
+    apply (trans Heqbb) in Heqbb2. rewrite Heqbb1 in Heqbb2. discriminate Heqbb2.
   + rewrite Heqbb1, Heqbb2, IHl. reflexivity.
 Qed.
 
@@ -222,6 +252,141 @@ induction l as [| y l IHl]; [ reflexivity | ].
 cbn. destruct (leb x y); [ reflexivity | ].
 change (x :: y :: l) with ((x :: nil) ++ y :: l).
 apply Permutation_cons_app, IHl.
+Qed.
+
+Fixpoint insert_neq B (a : @car B) l :=
+  match l with
+  | nil => a :: nil
+  | b :: t => if leb a b then if leb b a then b :: t
+                                         else a :: b :: t
+                         else b :: insert_neq B a t
+  end.
+Arguments insert_neq {_} _ _.
+
+Lemma insert_neq_insert_neq B (x y : @car B) l :
+  insert_neq y (insert_neq x l) = insert_neq x (insert_neq y l).
+Proof.
+induction l as [|a l IHl]; cbn.
+- destruct (leb x y) eqn:Heqbb1, (leb y x) eqn:Heqbb2; try reflexivity.
+  + apply (asym Heqbb1) in Heqbb2 as ->. reflexivity.
+  + apply total in Heqbb1. rewrite Heqbb1 in Heqbb2. discriminate Heqbb2.
+- destruct (leb x a) eqn:Heqbb1, (leb y a) eqn:Heqbb2; cbn.
+  + destruct (leb x y) eqn:Heqbb, (leb y x) eqn:Heqbb'; rewrite ? Heqbb1, ? Heqbb2.
+    * apply (asym Heqbb') in Heqbb as ->. reflexivity.
+    * destruct (leb a x) eqn:Heqbb''; cbn; rewrite ?Heqbb2, ?Heqbb'.
+      -- apply (trans Heqbb'') in Heqbb. rewrite !Heqbb. cbn. rewrite Heqbb1, Heqbb''. reflexivity.
+      -- destruct (leb a y) eqn:Heqbb'''.
+         ++ cbn. rewrite Heqbb1, Heqbb''. reflexivity.
+         ++ cbn. rewrite Heqbb, Heqbb'. reflexivity.
+    * destruct (leb a x) eqn:Heqbb''; cbn.
+      -- rewrite Heqbb2.
+         destruct (leb a y) eqn:Heqbb'''; cbn.
+         ++ exfalso.
+            apply (trans Heqbb1) in Heqbb'''. rewrite Heqbb''' in Heqbb. discriminate Heqbb.
+         ++ rewrite Heqbb, Heqbb1, Heqbb''. reflexivity.
+      -- rewrite Heqbb', Heqbb.
+         destruct (leb a y) eqn:Heqbb'''; cbn.
+         ++ exfalso.
+            apply (trans Heqbb''') in Heqbb'. rewrite Heqbb' in Heqbb''. discriminate Heqbb''.
+         ++ rewrite Heqbb, Heqbb1, Heqbb''. reflexivity.
+    * apply total in Heqbb'. rewrite Heqbb' in Heqbb. discriminate Heqbb.
+  + destruct (leb y x) eqn:Heqbb'; rewrite ?Heqbb1, ?Heqbb2.
+    * apply (trans Heqbb') in Heqbb1. rewrite Heqbb1 in Heqbb2. discriminate Heqbb2.
+    * destruct (leb a x) eqn:Heqbb''; cbn; rewrite ?Heqbb2, ?Heqbb'; reflexivity.
+  + destruct (leb x y) eqn:Heqbb; rewrite ? Heqbb1, ? Heqbb2.
+    * apply (trans Heqbb) in Heqbb2. rewrite Heqbb1 in Heqbb2. discriminate Heqbb2.
+    * destruct (leb a y) eqn:Heqbb''; cbn; rewrite ?Heqbb1, ?Heqbb; reflexivity.
+  + rewrite Heqbb1, Heqbb2, IHl. reflexivity.
+Qed.
+
+Lemma insert_neq_in B (x : @car B) l : In x (insert_neq x l).
+Proof.
+induction l as [| y l IHl]; [ apply in_eq | ].
+cbn. destruct (leb x y) eqn:Hxy.
+- destruct (leb y x) eqn:Hyx; [ rewrite (asym Hxy Hyx) | ]; apply in_eq.
+- apply in_cons, IHl.
+Qed.
+
+Lemma insert_neq_incl B (x : @car B) l : incl l (insert_neq x l).
+Proof.
+induction l as [| y l IHl]; [ apply incl_nil_l | ].
+cbn. destruct (leb x y) eqn:Hxy.
+- intros z [ -> | Hz ].
+  + destruct (leb z x) eqn:Hzx.
+    * apply in_eq.
+    * apply in_cons, in_eq.
+  + destruct (leb y x); apply in_cons; [ | apply in_cons ]; assumption.
+- apply incl_cons_cons, IHl.
+Qed.
+
+Lemma insert_neq_incl_l B (x : @car B) l : incl (insert_neq x l) (x :: l).
+Proof.
+induction l as [| y l IHl]; [ reflexivity | ].
+cbn. destruct (leb x y) eqn:Hxy.
+- destruct (leb y x) eqn:Hyx; [ apply incl_tl | ]; reflexivity.
+- intros z [ -> | [-> | Hz]%IHl ].
+  + apply in_cons, in_eq.
+  + apply in_eq.
+  + apply in_cons, in_cons, Hz.
+Qed.
+
+Lemma insert_neq_incl_r B (x : @car B) l : incl (x :: l) (insert_neq x l).
+Proof.
+induction l as [| y l IHl]; [ reflexivity | ].
+cbn. destruct (leb x y) eqn:Hxy.
+- destruct (leb y x) eqn:Hyx.
+  + rewrite (asym Hxy Hyx).
+    apply incl_cons; [ apply in_eq | reflexivity ].
+  + reflexivity.
+- intros z [ -> | [ -> | Hz ] ].
+  + apply in_cons, insert_neq_in.
+  + apply in_eq.
+  + apply in_cons, insert_neq_incl, Hz.
+Qed.
+
+Lemma insert_neq_inT B (x : @car B) l : InT x (insert_neq x l).
+Proof.
+induction l as [| y l IHl]; [ apply inT_eq | ].
+cbn. destruct (leb x y) eqn:Hxy.
+- destruct (leb y x) eqn:Hyx; [ rewrite (asym Hxy Hyx) | ]; apply inT_eq.
+- apply inT_cons, IHl.
+Qed.
+
+Lemma insert_neq_inclT B (x : @car B) l : inclT l (insert_neq x l).
+Proof.
+induction l as [| y l IHl]; [ apply inclT_nil_l | ].
+cbn. destruct (leb x y) eqn:Hxy.
+- intros z [ -> | Hz ].
+  + destruct (leb z x) eqn:Hzx.
+    * apply inT_eq.
+    * apply inT_cons, inT_eq.
+  + destruct (leb y x); apply inT_cons; [ | apply inT_cons ]; assumption.
+- apply inclT_cons_cons, IHl.
+Qed.
+
+Lemma insert_neq_inclT_l B (x : @car B) l : inclT (insert_neq x l) (x :: l).
+Proof.
+induction l as [| y l IHl]; [ reflexivity | ].
+cbn. destruct (leb x y) eqn:Hxy.
+- destruct (leb y x) eqn:Hyx; [ apply inclT_tl | ]; reflexivity.
+- intros z [ -> | [-> | Hz]%IHl ].
+  + apply inT_cons, inT_eq.
+  + apply inT_eq.
+  + apply inT_cons, inT_cons, Hz.
+Qed.
+
+Lemma insert_neq_inclT_r B (x : @car B) l : inclT (x :: l) (insert_neq x l).
+Proof.
+induction l as [| y l IHl]; [ reflexivity | ].
+cbn. destruct (leb x y) eqn:Hxy.
+- destruct (leb y x) eqn:Hyx.
+  + rewrite (asym Hxy Hyx).
+    apply inclT_cons; [ apply inT_eq | reflexivity ].
+  + reflexivity.
+- intros z [ -> | [ -> | Hz ] ].
+  + apply inT_cons, insert_neq_inT.
+  + apply inT_eq.
+  + apply inT_cons, insert_neq_inclT, Hz.
 Qed.
 
 
@@ -237,6 +402,19 @@ Arguments is_sorted {_} _.
 
 Lemma is_sorted_tail B a l : @is_sorted B (a :: l) = true -> is_sorted l = true.
 Proof. intro Hs. destruct l as [|b l]; [ reflexivity | apply andb_true_iff in Hs; apply Hs ]. Qed.
+
+Lemma is_sorted_in B a b l : @is_sorted B (a :: l) = true -> In b l -> leb a b = true.
+Proof.
+induction l as [ | c l IH ]; [ intros _ [] | ]. intros Hs [ -> | Hin ].
+- cbn in Hs. now destruct (leb a b).
+- apply IH; [ | assumption ]. cbn in Hs.
+  apply andb_true_iff in Hs as [Hac Hs].
+  cbn. destruct l as [ | d l ]; [ reflexivity | ].
+  apply andb_true_iff in Hs as [Hcd Hs].
+  apply andb_true_iff. split.
+  + apply (trans Hac Hcd).
+  + assumption.
+Qed.
 
 Definition SortedList B := { m | @is_sorted B m = true }.
 
@@ -282,6 +460,118 @@ clear a m. intros a [[|b l'] Hsort] Hlen l; repeat split; auto.
       apply Hin' in Hin as [|]; [ left; apply in_cons | right ]; assumption.
 Qed.
 
+Lemma insert_neq_sorted B a (m : SortedList B) : let l := insert_neq a (proj1_sig m) in
+    is_sorted l = true /\ l <> nil
+ /\ forall c, In c l -> In c (proj1_sig m) \/ c = a.
+Proof.
+enough (forall s a (m : SortedList B),
+  length (proj1_sig m) = s ->
+  let l := insert_neq a (proj1_sig m) in
+    is_sorted l = true /\ l <> nil
+ /\ forall c, In c l -> In c (proj1_sig m) \/ c = a) as Hlen
+  by now intros; apply Hlen with (length (proj1_sig m)).
+intro s. induction s as [s IH] using (well_founded_induction lt_wf).
+clear a m. intros a [[|b l'] Hsort] Hlen l; repeat split; auto.
+- intros [=].
+- intros c [ -> | [] ]. right. reflexivity.
+- unfold l. clear l. cbn.
+  destruct (leb a b) eqn:Heqbb.
+  + destruct (leb b a) eqn:Heqbb'; [ assumption | ].
+    now apply andb_true_iff; split.
+  + destruct s as [|s]; destr_eq Hlen.
+    destruct (IH s (le_n _) a (exist _ l' (is_sorted_tail _ _ _ Hsort)) Hlen)
+      as [Hsort' _].
+    apply total in Heqbb.
+    destruct l' as [|c l']; [ (apply andb_true_iff; split); auto | ].
+    cbn in Hsort', Hsort. cbn. destruct (leb a c); [ | apply andb_true_iff; split; auto ].
+    * destruct (leb c a); apply andb_true_iff; split; auto.
+      apply andb_true_iff in Hsort. apply Hsort.
+    * apply andb_true_iff in Hsort. apply Hsort.
+- intro Heq. unfold l in Heq. cbn in Heq.
+  destruct (leb a b), (leb b a); discriminate Heq.
+- intros d Hd. unfold l in Hd. cbn in Hd.
+  destruct (leb a b) eqn:Hab.
+  + destruct (leb b a) eqn:Hba.
+    * destruct Hd as [ -> | ]; [ right | left; right; assumption ].
+      apply (asym Hba Hab).
+    * destruct Hd as [ -> | ]; [ right | left ]; trivial.
+  + destruct Hd as [ -> | Hin ].
+    * left. apply in_eq.
+    * destruct s as [|s]; destr_eq Hlen.
+      destruct (IH s (le_n _) a (exist _ l' (is_sorted_tail _ _ _ Hsort)) Hlen) as [_ Hin'].
+      apply Hin' in Hin as [|]; [ left; apply in_cons | right ]; assumption.
+Qed.
+
+Lemma is_sorted_sorted_neq B (l : list (@car B)) : is_sorted (fold_right insert_neq nil l) = true.
+Proof. induction l as [ | x l IH ]; [ reflexivity | apply (insert_neq_sorted _ (exist _ _ IH)) ]. Qed.
+
+Lemma NoDup_insert_neq B (x : @car B) l : is_sorted l = true -> NoDup l -> NoDup (insert_neq x l).
+Proof.
+induction l as [ | y l IHl ]; intros Hs Hnd; [ repeat constructor; intros [] | cbn ].
+destruct (leb x y) eqn:Hxy.
+- destruct (leb y x) eqn:Hyx.
+  + assumption.
+  + constructor; [ | assumption ].
+    intros [-> | Hin].
+    * rewrite Hxy in Hyx. discriminate Hyx.
+    * apply (is_sorted_in _ _ _ _ Hs) in Hin.
+      rewrite Hin in Hyx. discriminate Hyx.
+- inversion_clear Hnd as [ | ? ? Hnin Hndl].
+  constructor.
+  + intro Hin. apply Hnin. apply insert_neq_incl_l in Hin as [ <- | Hin ]; [ exfalso | assumption ].
+    rewrite (refl _ x) in Hxy. discriminate Hxy.
+  + apply IHl.
+    * apply (is_sorted_tail _ _ _ Hs).
+    * assumption.
+Qed.
+
+Fixpoint nodup_sortedb B (l : list (@car B)) :=
+match l with
+| nil => true
+| a :: nil => true
+| a :: (b :: _) as r => negb (leb b a) && nodup_sortedb _ r
+end.
+
+Lemma nodup_sortedb_cons_cons B (a b : @car B) l :
+  nodup_sortedb _ (a :: b :: l) = negb (leb b a) && nodup_sortedb _ (b :: l).
+Proof. reflexivity. Qed.
+
+Lemma nodup_sortedb_spec B (l : list (@car B)) : is_sorted l = true -> reflect (NoDup l) (nodup_sortedb _ l).
+Proof.
+induction l as [ | a [ | b l ] IH ]; intro Hs.
+- apply ReflectT. constructor.
+- apply ReflectT. repeat constructor. intros [].
+- assert (Hs' := is_sorted_tail _ _ _ Hs).
+  cbn in Hs. apply andb_true_iff in Hs as [Hab _].
+  rewrite nodup_sortedb_cons_cons. destruct (IH Hs').
+  + destruct (leb b a) eqn:Hba.
+    * apply ReflectF. intro Hnd.
+      rewrite (asym Hab Hba) in Hnd.
+      inversion_clear Hnd as [ | ? ? Hin ]. apply Hin, in_eq.
+    * apply ReflectT.
+      constructor; [ | assumption ].
+      intros [ -> | Hin ].
+      -- rewrite Hba in Hab. discriminate Hab.
+      -- apply (is_sorted_in _ _ _ _ Hs') in Hin.
+         rewrite Hin in Hba. discriminate Hba.
+  + rewrite andb_false_r. apply ReflectF. intro Hnd.
+    inversion_clear Hnd. contradiction.
+Qed.
+
+Lemma nodup_sorted_neq B (l : list (@car B)) : nodup_sortedb _ (fold_right insert_neq nil l) = true.
+Proof. induction l as [ | x l IH ]; [ reflexivity | ].
+cbn.
+assert (Hs := is_sorted_sorted_neq _ l).
+remember (fold_right insert_neq nil l) as m eqn:Hm. clear Hm.
+change m with (proj1_sig (exist (fun z => is_sorted z = true) _ Hs)).
+destruct (nodup_sortedb_spec _ _ (proj1 (insert_neq_sorted x (exist _ _ Hs)))) as [ | Hd ]; [ reflexivity | ].
+exfalso. apply Hd.
+cbn in *.
+apply NoDup_insert_neq; [ assumption | ].
+destruct (nodup_sortedb_spec _ _ Hs); [ assumption | discriminate IH ].
+Qed.
+
+
 (** *** multiset ordering on (sorted) lists *)
 
 Fixpoint leb_mset_rev A (leA : brelation A) l1 l2 :=
@@ -309,7 +599,7 @@ split with (list B) (leb_mset B); intros l1 l2; unfold leb_mset; cbn.
       -- case_eq (leb a2 a1); intros H2.
          ++ rewrite H1, H2 in Hle. apply IH. assumption.
          ++ rewrite H1, H2 in Hle. discriminate Hle.
-      -- rewrite (total _ _ H1). reflexivity.
+      -- rewrite (total H1). reflexivity.
 - intros Hle1 Hle2.
   induction l1 as [ | a1 r1 IH ] in Hle1, Hle2, l2 |- * using rev_ind;
     destruct (rev_case l2) as [ -> | [a2 [r2 ->]] ]; cbn in *.
@@ -319,7 +609,7 @@ split with (list B) (leb_mset B); intros l1 l2; unfold leb_mset; cbn.
   + rewrite !rev_unit in Hle1, Hle2. cbn in Hle1, Hle2.
     case_eq (leb a1 a2); intros H1; rewrite H1 in Hle1, Hle2.
     * case_eq (leb a2 a1); intros H2; rewrite H2 in Hle1, Hle2.
-      -- rewrite (asym _ _ H1 H2).
+      -- rewrite (asym H1 H2).
          rewrite (IH r2) by assumption. reflexivity.
       -- discriminate Hle2.
     * discriminate Hle1.
@@ -335,18 +625,18 @@ split with (list B) (leb_mset B); intros l1 l2; unfold leb_mset; cbn.
          rewrite rev_unit in Hle2; cbn in Hle2; rewrite rev_unit; cbn.
       -- case_eq (leb a2 a); intros H3; rewrite H3 in Hle2.
          ++ case_eq (leb a a2); intros H4; rewrite H4 in Hle2.
-            ** rewrite (trans _ _ _ H1 H3), (trans _ _ _ H4 H2).
+            ** rewrite (trans H1 H3), (trans H4 H2).
                apply (IH _ _ Hle1 Hle2).
-            ** rewrite (trans _ _ _ H1 H3).
+            ** rewrite (trans H1 H3).
                case_eq (leb a a1); intros H; [ | reflexivity ].
-               exfalso. rewrite (trans _ _ _ H H1) in H4. discriminate H4.
+               exfalso. rewrite (trans H H1) in H4. discriminate H4.
          ++ discriminate Hle2.
       -- case_eq (leb a2 a); intros H3; rewrite H3 in Hle2.
          ++ case_eq (leb a a2); intros H4; rewrite H4 in Hle2.
-            ** rewrite (asym _ _ H3 H4) in *. rewrite H1, H2. reflexivity.
-            ** rewrite (trans _ _ _ H1 H3).
+            ** rewrite (asym H3 H4) in *. rewrite H1, H2. reflexivity.
+            ** rewrite (trans H1 H3).
                case_eq (leb a a1); intros H; [ | reflexivity ].
-               exfalso. rewrite (trans _ _ _ H3 H) in H2. discriminate H2.
+               exfalso. rewrite (trans H3 H) in H2. discriminate H2.
          ++ discriminate Hle2.
    * discriminate Hle1.
 Defined.
