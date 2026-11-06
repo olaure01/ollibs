@@ -246,14 +246,12 @@ Ltac decomp_unit_eq H :=
       let Hnil2 := fresh H in
       simple apply eq_sym in H; apply elt_eq_unit in H as [H [Hnil1 Hnil2]]; try discriminate H;
 (* [simple apply eq_sym] faster than [symmetry]? *)
-      (try subst x); (try subst a); try decomp_nil_eq Hnil1; try decomp_nil_eq Hnil2;
-      (try clear l1); (try clear l2)
+      (try subst x); (try subst a); try decomp_nil_eq Hnil1; try decomp_nil_eq Hnil2
   | ?l1 ++ ?x :: ?l2 = ?a :: nil =>
       let Hnil1 := fresh H in
       let Hnil2 := fresh H in
       apply elt_eq_unit in H as [H [Hnil1 Hnil2]]; try discriminate H;
-      (try subst x); (try subst a); try decomp_nil_eq Hnil1; try decomp_nil_eq Hnil2;
-      (try clear l1); (try clear l2)
+      (try subst x); (try subst a); try decomp_nil_eq Hnil1; try decomp_nil_eq Hnil2
   | ?a :: nil = ?l1 ++ ?l2 => simple apply eq_sym in H; let Hnil := fresh H in
                                 apply app_eq_unitT in H as [[Hnil H] | [H Hnil]];
                                 try decomp_nil_eq Hnil; try decomp_unit_eq H
@@ -270,14 +268,12 @@ Ltac decomp_unit_eq_elt H :=
       let Hnil2 := fresh H in
       simple apply eq_sym in H; apply elt_eq_unit in H as [H [Hnil1 Hnil2]];
 (* [simple apply eq_sym] faster than [symmetry]? *)
-      (try subst x); (try subst a); decomp_nil_eq Hnil1; decomp_nil_eq Hnil2;
-      (try clear l1); (try clear l2)
+      (try subst x); (try subst a); decomp_nil_eq Hnil1; decomp_nil_eq Hnil2
   | ?l1 ++ ?x :: ?l2 = ?a :: nil =>
       let Hnil1 := fresh H in
       let Hnil2 := fresh H in
       apply elt_eq_unit in H as [H [Hnil1 Hnil2]];
-      (try subst x); (try subst a); decomp_nil_eq Hnil1; decomp_nil_eq Hnil2;
-      (try clear l1); (try clear l2)
+      (try subst x); (try subst a); decomp_nil_eq Hnil1; decomp_nil_eq Hnil2
   end.
 
 Lemma app_eq_app_trichotT A (l1 l2 l3 l4 : list A) : l1 ++ l2 = l3 ++ l4 ->

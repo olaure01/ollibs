@@ -1,3 +1,6 @@
+--rocq-package rocq-ollibs
+--package-version 2.1.2_dev
+-package rocq-stdlib
 -R . OLlibs
 # -arg "-mangle-names '__'"
 

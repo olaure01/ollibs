@@ -26,7 +26,7 @@ Proof. intros [lP [_ HP]]. exists lP. apply HP. Qed.
 Lemma wfinite_finite : wfinite_subset -> finite_subset.
 Proof using eq_dec PdecT.
 intros [l Hf].
-exists (nodup eq_dec (filter (fun x => if (PdecT x) then true else false) l)). split.
+exists (nodup eq_dec (filter (fun x => if PdecT x is inl _ then true else false) l)). split.
 - apply NoDup_nodup.
 - intro x. split.
   + intro HP. apply nodup_In, filter_In. split.
@@ -49,7 +49,7 @@ Lemma finite_subset_subset A (P Q : A -> Prop) (QdecT : forall x, decidableT (Q 
   (forall x, Q x -> P x) -> finite_subset P -> finite_subset Q.
 Proof.
 intros Hsub [eltsP [HndP HP]].
-exists (filter (fun x => if QdecT x then true else false) eltsP). split.
+exists (filter (fun x => if QdecT x is inl _ then true else false) eltsP). split.
 - apply NoDup_filter, HndP.
 - intro x. split.
   + intro HQx. apply filter_In. split.

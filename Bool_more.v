@@ -60,7 +60,7 @@ Defined.
 Lemma reflectT_decT P b : reflectT P b -> decidableT P.
 Proof. intros [|]; [ left | right ]; assumption. Defined.
 
-Lemma decT_reflectT P (HdecT : decidableT P) : reflectT P (if HdecT then true else false).
+Lemma decT_reflectT P (HdecT : decidableT P) : reflectT P (if HdecT is inl _ then true else false).
 Proof. destruct HdecT; constructor; assumption. Qed.
 
 Lemma eqb_specT b b' : reflectT (b = b') (eqb b b').
