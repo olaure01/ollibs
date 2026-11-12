@@ -3,6 +3,7 @@ From Stdlib Require Export Decidable.
 (* Set Mangle Names. Set Mangle Names Light. *)
 Set Default Goal Selector "!".
 Set Default Proof Using "Type".
+Set Proof Using Clear Unused.
 Set Implicit Arguments.
 
 Lemma iff_dec P Q : (P <-> Q) -> decidable P -> decidable Q.

@@ -137,9 +137,9 @@ Below _l_ is a list, _p_ is a pattern, _H_ is an hypothesis, _t_ is any term, et
 
   apply `specialize_Forall` to all hypotheses of type `Forall _ _`
 
-* `in_solve`
+* `in[T]_solve`
 
-  automatic tactic for (an attempt of) solving statements about `In`
+  automatic tactic for (an attempt of) solving statements about `In[T]`
 
 * `Forall[T]_solve`
 

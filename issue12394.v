@@ -3,11 +3,7 @@
 From Stdlib Require Import Eqdep_dec.
 From OLlibs Require Import List_more.
 
-(* Set Mangle Names. Set Mangle Names Light. *)
-Set Default Goal Selector "!".
-Set Default Proof Using "Type".
 Set Implicit Arguments.
-
 
 Lemma injection_list_ForallT_cons A P :
   (forall x y : A, { x = y } + { x <> y }) ->

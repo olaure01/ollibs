@@ -7,6 +7,7 @@ From OLlibs Require Import inhabitedT.
 (* Set Mangle Names. Set Mangle Names Light. *)
 Set Default Goal Selector "!".
 Set Default Proof Using "Type".
+Set Proof Using Clear Unused.
 Set Implicit Arguments.
 
 
@@ -278,11 +279,11 @@ Proof. reflexivity. Qed.
 Instance injective_ext A B : Proper (@ext_eq A B ==> iff) (@injective A B).
 Proof. intros f g Hfg. split; intros Hi x y Heq; apply Hi; [ rewrite !Hfg | rewrite <-!Hfg ]; assumption. Qed.
 
-(* TODO maybe turn into Proper, but requires CMorphisms (together with already used Morphisms *)
+(* TODO maybe turn into Proper, but requires CMorphisms (together with already used Morphisms) *)
 Lemma surjective_ext A B (f g : A -> B) : f ~ g -> surjective f -> surjective g.
 Proof. intros Heq Hs y. destruct (Hs y) as [x ->]. exists x. apply Heq. Qed.
 
-(* TODO maybe turn into Proper, but requires CMorphisms (together with already used Morphisms *)
+(* TODO maybe turn into Proper, but requires CMorphisms (together with already used Morphisms) *)
 Lemma bijective_ext A B (f g : A -> B) : f ~ g -> bijective f -> bijective g.
 Proof.
 intros Heq Hb y. destruct (Hb y) as [x -> Hi]. exists x.

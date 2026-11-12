@@ -8,6 +8,7 @@ Import ListNotations. (* For notations [] and [a;b;c] *)
 (* Set Mangle Names. Set Mangle Names Light. *)
 Set Default Goal Selector "!".
 Set Default Proof Using "Type".
+Set Proof Using Clear Unused.
 Set Implicit Arguments.
 Unset Printing Use Implicit Types.
 (* Set Universe Polymorphism. *)

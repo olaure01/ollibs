@@ -2,7 +2,27 @@
 
 ## Version 2.1.2
 
-Ongoing development.
+* more about finite sets and multisets
+  * axiomatics for finite sets (files `fsetlist` and `fsetlistT`) with implementation as sorted lists with no duplicated elements (`BOrders`)
+  * `BOrders`: `BOrders` as `DecType` coercion
+  * multiset ordering on (sorted) lists: `leb_mset`, `border_list` and `border_slist` in `BOrders`
+  * flattening of finite multisets: `flatten*` and `FMConstr_slist_slist` in `fmsetlist[T]`
+* compatibility properties turned into instances and some type changes in `funtheory`: `compose_ext_eq`, `injective_ext`, `surjective_ext`, `bijective_ext`, `map_ext`
+* update on `fold_right_unit` (and add `fold_left_unit`): versions of `fold_right` and `fold_left` with dedicated behavior for the singleton case
+  * rename `simpl_fold_right_unit` into `fold_right_unit_cons_cons`
+  * add `fold_right_unit_last_last`
+  * add `fold_left_unit`, `fold_left_unit_last`, `fold_left_unit_unit`
+* add new lemmas and tactics
+  * `ListT`: `remove_InT`, `notinT_remove`, `inT_remove`, `inT_inT_remove`, `remove_inclT`
+  * `List_more`: `inT_solve` (automatic tactic for `InT`, same as `in_solve` for `In`), `length_one_iffT_sgt`, `firstn_repeat`, `skipn_repeat`, `inclT_preorder`
+  * `SubList[T]`: `sublist[T]_elt_l_inv`, `sublist[T]_cons_l_inv`, `sublist[T]_Permutation[T]`, `Permutation[T]_sublist[T]`, `sublist[T]_as_Permutation[T]`
+  * `fmset[oid]list[T]`: `add_inj`, `sum_add_comm`, `elts_sgt`
+  * `Permutation[T]_more`: `Permutation[T]_fold_right`, `Permutation[T]_fold_left`
+  * `funtheory`: `compose_ap`
+* remove redundant lemmas
+  * `ListT`: `Forall2T_refl` (same as `Forall2T_nil`)
+  * `PermutationT`: `PermutationT_app_swap` (same as `PermutationT_app_comm`)
+  * `PermutationT_more`: `list_sum_permT` (same as `PermutationT_list_sum`)
 
 ## Version 2.1.1
 

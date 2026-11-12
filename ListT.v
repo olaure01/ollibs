@@ -8,6 +8,7 @@ Open Scope list_scope.
 (* Set Mangle Names. Set Mangle Names Light. *)
 Set Default Goal Selector "!".
 Set Default Proof Using "Type".
+Set Proof Using Clear Unused.
 Set Implicit Arguments.
 
 
@@ -119,7 +120,7 @@ Section Facts.
       destruct H1 ; intuition.
   Qed.
 
-  Lemma inT_app_iff : forall l l' (a : A),  InT a (l++l') <=> InT a l + InT a l'.
+  Lemma inT_app_iff : forall l l' (a : A), InT a (l++l') <=> InT a l + InT a l'.
   Proof.
     split; auto using inT_app_sum, inT_sum_app.
   Qed.
@@ -272,7 +273,7 @@ Section Elts.
       exists (x::l1, l2); simpl; now f_equal.
   Qed.
 
-  Hypothesis eq_dec : forall x y : A, {x = y}+{x <> y}.
+  Hypothesis eq_dec : forall x y : A, decidableP (x = y).
 
   Theorem remove_InT : forall (l : list A) (x : A), notT (InT x (remove eq_dec x l)).
   Proof. intros l x Hin%inT_in. revert Hin. apply remove_In. Qed.

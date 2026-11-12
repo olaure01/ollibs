@@ -3,6 +3,7 @@ From Corelib Require CRelationClasses.
 (* Set Mangle Names. Set Mangle Names Light. *)
 Set Default Goal Selector "!".
 Set Default Proof Using "Type".
+Set Proof Using Clear Unused.
 Set Implicit Arguments.
 
 
